@@ -34,7 +34,7 @@ pub fn io_write_archive_skeleton(path: &str, archive: &Archive) {
             return;
         }
     };
-    let bytestart_end = (bytestart_pos + 8) as u64;
+    let bytestart_end = bytestart_pos + 8;
 
     // Call the helper function to write the bytestart block
     if let Err(e) = write_block_bytestart(&mut file, bytestart_end, bytestart_end) {

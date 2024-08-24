@@ -11,17 +11,18 @@ pub fn write_block_header(file: &mut File, archive: &Archive) -> std::io::Result
     Ok(())
 }
 
-pub fn write_block_bytestart(file: &mut File, bytestart_index: u64, bytestart_data: u64) -> std::io::Result<()> {
+pub fn write_block_bytestart(file: &mut File, bytestart_index: u32, bytestart_data: u32) -> std::io::Result<()> {
     // Convert the bytestart values to bytes
-    let bytestart_index_bytes = bytestart_index.to_be_bytes();
-    let bytestart_data_bytes = bytestart_data.to_be_bytes();
+    let bytestart_index_bytes = bytestart_index.to_be_bytes();  // This is [u8; 4]
+    let bytestart_data_bytes = bytestart_data.to_be_bytes();    // This is [u8; 4]
 
-    // Write the 4-byte bytestart_index value twice (using the last 4 bytes)
-    file.write_all(&bytestart_index_bytes[4..])?;
-    file.write_all(&bytestart_data_bytes[4..])?;
+    // Write the 4-byte bytestart_index and bytestart_data values
+    file.write_all(&bytestart_index_bytes)?;  // Write all 4 bytes
+    file.write_all(&bytestart_data_bytes)?;   // Write all 4 bytes
     
     Ok(())
 }
+
 
 // Function to write the index block
 pub fn write_block_index(file: &mut File, index_block: &IOStructIndex) -> io::Result<()> {

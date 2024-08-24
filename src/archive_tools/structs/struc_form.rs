@@ -50,7 +50,6 @@ impl FormBase {
         let mut form_id_buffer = [0u8; FormID::BYTE_COUNT];
         file.read_exact(&mut form_id_buffer)?;  // This reads the bytes into form_id_buffer
         let _form_id = FormID::from(form_id_buffer);
-        
 
         // Read the FormType
         let mut form_type_buffer = [0u8; FormType::BYTE_COUNT];
