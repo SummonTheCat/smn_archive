@@ -8,6 +8,8 @@ pub mod io_read_block;
 pub mod io_write_form;
 pub mod io_read_form;
 
+pub mod io_delete_form;
+
 #[allow(unused)]
 pub use io_struct::*;
 #[allow(unused)]
@@ -22,3 +24,5 @@ pub use io_read_block::*;
 pub use io_write_form::*;
 #[allow(unused)]
 pub use io_read_form::*;
+#[allow(unused)]
+pub use io_delete_form::*;

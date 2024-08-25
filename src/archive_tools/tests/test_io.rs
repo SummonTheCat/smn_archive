@@ -234,3 +234,79 @@ pub fn test_perf_write_x_forms(file_path: &str, form_count: u16) {
     println!("Read Duration: {:?}", read_duration);
     println!("Total Duration: {:?}", write_duration + read_duration);
 }
+
+#[allow(unused)]
+pub fn test_form_delete(file_path: &str) {
+    println!("---------------------------");
+    println!("--- Testing Form Delete ---");
+    println!("Writing to file: {}", file_path);
+
+    // create the archive
+    let archive = Archive::new(
+        ArchiveID::from("001"),
+        Version::from(1.0),
+        StrLrg::from("Test Archive"),
+    );
+
+    io_write_archive_skeleton(file_path, &archive);
+    
+    println!("---------------------------");
+    // Create a form
+    let form = FormWorld::new(
+        FormID::from("00002"),
+        StrSml::from("Wrld2"),
+        StrSml::from("Desert"),
+        vec![GlobalID::from("00100050")]
+    );
+
+    let write_result = write_form(file_path, &form);
+    println!("Write Result: {:?}", write_result);
+
+    println!("---------------------------");
+
+    let form2 = FormWorld::new(
+        FormID::from("00001"),
+        StrSml::from("Wrld1"),
+        StrSml::from("Jungle"),
+        vec![GlobalID::from("00100051")]
+    );
+
+    let write_result2 = write_form(file_path, &form2);
+    println!("Write Result: {:?}", write_result2);
+
+    println!("---------------------------");
+
+    // Delete a form
+    let delete_result = delete_form(file_path, FormID::from("00002"));
+    println!("Delete Result: {:?}", delete_result);
+
+    println!("---------------------------");
+
+    let read_form1 = read_form(file_path, FormID::from("00001"));
+    if read_form1.is_err() {
+        println!("Error reading form: {:?}", read_form1.err());
+    } else {
+        println!("Read Form: {:?}", read_form1.unwrap());
+    }
+
+    println!("---------------------------");
+
+    let delete_result2 = delete_form(file_path, FormID::from("00001"));
+    println!("Delete Result: {:?}", delete_result2);
+}
+
+#[allow(unused)]
+pub fn test_form_write2(file_path: &str) {
+    println!("Writing to file: {}", file_path);
+
+    // create the archive
+    let archive = Archive::new(
+        ArchiveID::from("001"),
+        Version::from(1.0),
+        StrLrg::from("Test Archive"),
+    );
+
+    io_write_archive_skeleton(file_path, &archive);
+    
+    println!("---------------------------");
+}
