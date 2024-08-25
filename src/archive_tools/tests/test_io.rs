@@ -13,8 +13,8 @@ pub fn test_archive_write(file_path: &str) {
 
     // Create an archive
     let archive = Archive::new(
-        ArchiveID::from("001"),
-        Version::from(1.0),
+        ArchiveID::from("002"),
+        Version::from(1.2),
         StrLrg::from("Test Archive"),
     );
 
@@ -149,6 +149,47 @@ pub fn test_write_form(file_path: &str) {
     }
 
     println!("---------------------------");   
+
+    let archive_info = read_archive_info(file_path);
+    let archive_data = archive_info.unwrap();
+    let new_desc = StrLrg::from("New Description");
+    
+    let mut new_archive = Archive::new(
+        archive_data.archive_id,
+        archive_data.version,
+        new_desc
+    );
+
+    new_archive.bytestart_data = archive_data.bytestart_data;
+    new_archive.bytestart_index = archive_data.bytestart_index;
+    new_archive.form_count = archive_data.form_count;
+
+    println!("New Archive: {:?}", new_archive);
+
+    write_archive_info(&file_path, &new_archive);
+
+    println!("---------------------------");
+
+    let archive_info2 = read_archive_info(file_path);
+    println!("New Archive Info: {:?}", archive_info2);
+
+    println!("---------------------------");
+
+    let read_form6 = read_form(file_path, FormID::from("00002"));
+    if read_form6.is_err() {
+        println!("Error reading form: {:?}", read_form6.err());
+    } else {
+        println!("Read Form: {:?}", read_form6.unwrap());
+    }
+    println!("---------------------------");
+
+    let lite_archive = read_lite_archive(file_path);
+    println!("Lite Archive: {:?}", lite_archive);
+
+    println!("---------------------------");
+
+    let form_exists1 = get_form_exists(file_path, FormID::from("00007"));
+    println!("Form Exists: {:?}", form_exists1);
 }
 
 

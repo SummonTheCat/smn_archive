@@ -1,4 +1,4 @@
-use crate::archive_tools::types::{ArchiveID, Version, StrLrg};
+use crate::archive_tools::types::{ArchiveID, FormID, FormType, StrLrg, StrSml, Version};
 use crate::archive_tools::structs::FormTrait;
 use std::fmt;
 
@@ -85,3 +85,43 @@ impl fmt::Debug for Archive {
 }
 
 
+pub struct LiteArchive {
+    pub archive_id: ArchiveID,
+    pub version: Version,
+    pub description: StrLrg,
+    pub form_count: u16,
+
+    pub archive_items: Vec<LiteArchiveItem>,
+}
+
+impl fmt::Debug for LiteArchive {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "Archive ID: {}, Version: {}, Description: {}, Form Count: {}, Archive Items: {:?}",
+            self.archive_id.to_string(),
+            self.version.to_string(),
+            self.description.to_string(),
+            self.form_count,
+            self.archive_items
+        )
+    }
+}
+
+pub struct LiteArchiveItem {
+    pub form_id: FormID,
+    pub form_name: StrSml,
+    pub form_type: FormType,
+}
+
+impl fmt::Debug for LiteArchiveItem {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "Form ID: {}, Form Name: {}, Form Type: {}",
+            self.form_id.to_string(),
+            self.form_name.to_string(),
+            self.form_type.to_string()
+        )
+    }
+}
