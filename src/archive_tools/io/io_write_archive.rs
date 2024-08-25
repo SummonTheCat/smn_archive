@@ -5,9 +5,6 @@ use crate::archive_tools::structs::*;
 use crate::archive_tools::io::{io_write_block::*, IOStructIndex};
 
 pub fn io_write_archive_skeleton(path: &str, archive: &Archive) {
-    println!("--- Writing Archive Skeleton ---");
-    println!("Writing archive skeleton to: {}", path);
-    println!("Archive Data: {:?}", archive);
 
     // Create the file
     let mut file = match File::create(path) {
@@ -22,9 +19,7 @@ pub fn io_write_archive_skeleton(path: &str, archive: &Archive) {
     if let Err(e) = write_block_header(&mut file, archive) {
         eprintln!("Failed to write header block: {}", e);
         return;
-    } else {
-        println!("Successfully wrote the header block to the file.");
-    }
+    } 
 
     // Get the current position in the file
     let bytestart_pos = match file.seek(std::io::SeekFrom::Current(0)) {
@@ -49,6 +44,5 @@ pub fn io_write_archive_skeleton(path: &str, archive: &Archive) {
         eprintln!("Failed to write index block: {}", e);
     }
 
-    println!("Skeleton write complete.");
 }
 
