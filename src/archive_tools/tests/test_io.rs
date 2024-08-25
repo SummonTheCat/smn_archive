@@ -103,7 +103,7 @@ pub fn test_write_form(file_path: &str) {
     let form3b = FormWorld::new(
         FormID::from("00004"),
         StrSml::from("Wrld4"),
-        StrSml::from("SnowyTundra"),
+        StrSml::from("undra"),
         vec![GlobalID::from("00100054")]
     );
 
@@ -296,8 +296,10 @@ pub fn test_form_delete(file_path: &str) {
 }
 
 #[allow(unused)]
-pub fn test_form_write2(file_path: &str) {
+pub fn test_form_override(file_path: &str) {
     println!("Writing to file: {}", file_path);
+
+    println!("---------------------------");
 
     // create the archive
     let archive = Archive::new(
@@ -305,8 +307,54 @@ pub fn test_form_write2(file_path: &str) {
         Version::from(1.0),
         StrLrg::from("Test Archive"),
     );
-
     io_write_archive_skeleton(file_path, &archive);
+
+    println!("---------------------------");
+
+    // Create forms
+    let form = FormWorld::new(
+        FormID::from("00002"),
+        StrSml::from("Wrld2"),
+        StrSml::from("Desert"),
+        vec![GlobalID::from("00100050")]
+    );
+
+    let write_result = write_form(file_path, &form);
+    println!("Write Result: {:?}", write_result);
+
+    let form2 = FormWorld::new(
+        FormID::from("00001"),
+        StrSml::from("Wrld1"),
+        StrSml::from("Jungle"),
+        vec![GlobalID::from("00100051")]
+    );
+
+    let write_result2 = write_form(file_path, &form2);
+    println!("Write Result: {:?}", write_result2);
     
     println!("---------------------------");
+
+    // Override a form
+    let form2b = FormWorld::new(
+        FormID::from("00001"),
+        StrSml::from("Wrld1"),
+        StrSml::from("JungleOfGreen"),
+        vec![GlobalID::from("00100051")]
+    );
+
+    let override_result = write_form(file_path, &form2b);
+    println!("Override Result: {:?}", override_result);
+
+    println!("---------------------------");
+
+    let form2c = FormWorld::new(
+        FormID::from("00001"),
+        StrSml::from("Wrld1"),
+        StrSml::from("Jngl"),
+        vec![GlobalID::from("00100051")]
+    );
+
+    let override_result2 = write_form(file_path, &form2c);
+    println!("Override Result: {:?}", override_result2);
+
 }
