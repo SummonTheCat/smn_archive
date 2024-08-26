@@ -355,6 +355,14 @@ pub fn test_form_perf(file_path: &str, form_count: u16) {
         }
     }
 
+    // Delete the last form
+    let last_form_id = FormID::from(1);
+    let delete_result = delete_form(file_path, last_form_id);
+    match delete_result {
+        Ok(_) => println!("Deleted FormID: {:?}", last_form_id),
+        Err(e) => println!("Error deleting FormID {:?}: {:?}", last_form_id, e),
+    }
+
     let read_duration = read_start.elapsed();
     println!("-- Finished Reading Forms --");
     println!("Time taken to read {} forms: {:?}", form_count, read_duration);

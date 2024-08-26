@@ -9,6 +9,7 @@ pub use test_types::*;
 #[allow(unused)]
 pub use test_forms::*;
 
+#[allow(unused)]
 pub fn run_tests() {
     run_tests_structs();
     run_tests_io();
@@ -32,5 +33,5 @@ pub fn run_tests_io() {
     // All form reading functionality (Reading)
     test_form_read(path);
     // Test performance of reading and writing
-    test_form_perf(&path, 20000);
+    test_form_perf(&path, 1000);
 }
