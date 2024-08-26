@@ -1,8 +1,9 @@
-use std::fmt;
 use std::fs::File;
 use std::io::Read;
-use crate::archive_tools::structs::struc_form::*;
-use crate::archive_tools::types::*;
+use std::fmt;
+
+use crate::archive_tools::structs::struc_form::{FormTrait, FormBase};
+use crate::archive_tools::types::{FormID, FormType, GlobalID, StrSml};
 
 #[derive(PartialEq, Eq, Clone)]
 pub struct FormWorld {

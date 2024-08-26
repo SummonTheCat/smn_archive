@@ -1,6 +1,6 @@
-use crate::archive_tools::types::{ArchiveID, FormID, FormType, StrLrg, StrSml, Version};
-use crate::archive_tools::structs::FormTrait;
 use std::fmt;
+
+use crate::archive_tools::types::{ArchiveID, FormID, FormType, StrLrg, StrSml, Version};
 
 pub struct Archive {
     // Required fields
@@ -10,8 +10,6 @@ pub struct Archive {
     pub form_count: u16,
 
     // Read fields
-    #[allow(unused)]
-    pub forms: Vec<Box<dyn FormTrait>>,
     #[allow(unused)]
     pub bytestart_index: u32,
     #[allow(unused)] 
@@ -25,7 +23,6 @@ impl Archive {
             version,
             description,
             form_count: 0,
-            forms: Vec::new(),
             bytestart_index: 0, 
             bytestart_data: 0,   
         }
@@ -83,7 +80,6 @@ impl fmt::Debug for Archive {
         )
     }
 }
-
 
 pub struct LiteArchive {
     pub archive_id: ArchiveID,

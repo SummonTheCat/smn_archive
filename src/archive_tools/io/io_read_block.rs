@@ -1,7 +1,7 @@
 use std::{fs::File, io::{self, Read, Seek}};
 
-use crate::archive_tools::types::*;
-use crate::archive_tools::io::*;
+use crate::archive_tools::io::{IOStructByteStarts, IOStructHeader, IOStructIndex, IOStructIndexItem};
+use crate::archive_tools::types::{ArchiveID, FormID, FormType, StrLrg, Version};
 
 pub fn read_block_header(file: &mut File) -> io::Result<IOStructHeader> {
     // Read ArchiveID
@@ -171,7 +171,6 @@ pub fn binary_search_for_index_item(
         left += item_size as u64;
         file.seek(std::io::SeekFrom::Start(left))?;
     }
-
     // If we reach here, the target FormID was not found
     Ok(None)
 }

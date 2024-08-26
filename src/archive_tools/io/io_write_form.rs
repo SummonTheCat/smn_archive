@@ -1,15 +1,11 @@
-use std::fs::File;
-use std::fs::OpenOptions;
-use std::io::Read;
-use std::io::Seek;
-use std::io::SeekFrom;
-use std::io::Write;
+use std::fs::{File, OpenOptions};
+use std::io::{Seek, SeekFrom, Write, Read};
 
-use crate::archive_tools::io::*;
-use crate::archive_tools::structs::*;
+use crate::archive_tools::io::{read_archive_info, read_block_index, write_block_header, write_block_bytestart, write_block_index, read_form};
+use crate::archive_tools::io::{IOStructIndex, IOStructIndexItem};
+use crate::archive_tools::structs::{Archive, FormBase, FormTrait};
 use crate::archive_tools::types::FormID;
 
-#[allow(unused)]
 pub fn write_form(file_path: &str, form: &dyn FormTrait) -> std::io::Result<()> {
     let mut archive_info = read_archive_info(file_path)?;
     let new_form_bytes = form.to_bytes();
@@ -32,6 +28,8 @@ pub fn write_form(file_path: &str, form: &dyn FormTrait) -> std::io::Result<()> 
         write_form_to_empty(&mut file, &archive_info, &new_form_bytes, &mut form_index)?;
     } else {
         // Search for the form in the index using binary search
+
+        
         file.seek(SeekFrom::Start(archive_info.bytestart_index as u64))?;
         let mut form_index = read_block_index(&mut file, archive_info.form_count)?;
 
@@ -40,6 +38,11 @@ pub fn write_form(file_path: &str, form: &dyn FormTrait) -> std::io::Result<()> 
             let form_bytepos = form_index.indexes[found_index_pos].data_start_offset + archive_info.bytestart_data;
             file.seek(SeekFrom::Start(form_bytepos as u64))?;
             let read_form = FormBase::read_from_bytes(&mut file)?;
+            // Check that the form type matches
+            if read_form.form_type() != form.form_type() {
+                return Err(std::io::Error::new(std::io::ErrorKind::InvalidData, "Form type mismatch"));
+            }
+
             let form_length_diff = form_length_new as i32 - read_form.get_byte_count() as i32;
 
             archive_info.bytestart_index = (archive_info.bytestart_index as i32 + form_length_diff) as u32;

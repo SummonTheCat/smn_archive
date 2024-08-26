@@ -1,8 +1,9 @@
 use std::io::Read;
-use std::{fmt, io};
 use std::fs::File;
+use std::{fmt, io};
+
 use crate::archive_tools::structs::{FormBase, FormTrait};
-use crate::archive_tools::types::*;
+use crate::archive_tools::types::{FormID, FormType, LangCode, StrLrg, StrSml};
 
 #[derive(PartialEq, Eq, Clone)]
 pub struct FormString {
@@ -12,7 +13,7 @@ pub struct FormString {
 }
 
 impl FormString {
-    pub const BYTE_COUNT_LANG_COUNT: usize = 1; // 1 byte to store the count of languages/strings
+    pub const BYTE_COUNT_LANG_COUNT: usize = 1; 
 
     pub fn new(form_id: FormID, form_name: StrSml, languages: Vec<LangCode>, strings: Vec<StrLrg>) -> Self {
         if languages.len() != strings.len() {
@@ -53,7 +54,7 @@ impl FormString {
     pub fn read_from_bytes(file: &mut File) -> io::Result<Self> {
         // Read the FormID and FormType
         let mut form_id_buffer = [0u8; FormID::BYTE_COUNT];
-        file.read_exact(&mut form_id_buffer)?;  // This reads the bytes into form_id_buffer
+        file.read_exact(&mut form_id_buffer)?;  
         let form_id = FormID::from(form_id_buffer);
 
         // Read the FormType

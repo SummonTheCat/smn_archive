@@ -1,7 +1,9 @@
-use std::{fmt, fs::File, io::{self, Read, Seek}};
-use crate::archive_tools::types::*;
-use crate::archive_tools::structs::*;
+use std::fs::File;
+use std::io::{self, Read, Seek};
+use std::fmt;
 
+use crate::archive_tools::types::{FormID, FormType, StrSml};
+use crate::archive_tools::structs::{FormString, FormWorld};
 
 pub trait FormTrait: fmt::Display + fmt::Debug {
     #[allow(unused)]
@@ -41,25 +43,19 @@ impl FormBase {
         Self::BYTE_COUNT_FORM_ID + Self::BYTE_COUNT_FORM_TYPE + self.form_name.get_byte_count()
     }
 
-    // Function to read a FormBase from a file and return the appropriate form struct.
     pub fn read_from_bytes(file: &mut File) -> io::Result<Box<dyn FormTrait>> {
-        // Save the current file position (checkpoint)
         let checkpoint = file.seek(std::io::SeekFrom::Current(0))?;
 
-        // Read the FormID and FormType
         let mut form_id_buffer = [0u8; FormID::BYTE_COUNT];
-        file.read_exact(&mut form_id_buffer)?;  // This reads the bytes into form_id_buffer
+        file.read_exact(&mut form_id_buffer)?;  
         let _form_id = FormID::from(form_id_buffer);
 
-        // Read the FormType
         let mut form_type_buffer = [0u8; FormType::BYTE_COUNT];
         file.read_exact(&mut form_type_buffer)?;
         let form_type = FormType::from(form_type_buffer[0]);
 
-        // Seek back to the checkpoint
         file.seek(std::io::SeekFrom::Start(checkpoint))?;
 
-        // Based on the form_type, return the appropriate form struct
         match form_type {
             FormType::STRING => {
                 let form_string = FormString::read_from_bytes(file)?;

@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{self, Seek};
 
 use crate::archive_tools::io::{read_block_bytestarts, read_block_header};
-use crate::archive_tools::structs::*;
+use crate::archive_tools::structs::{Archive, LiteArchive, LiteArchiveItem};
 use crate::archive_tools::types::{FormID, StrSml};
 
 use super::{read_block_index, read_form};
@@ -60,6 +60,7 @@ pub fn read_lite_archive(file_path: &str) -> io::Result<LiteArchive> {
     }
     Ok(archive_out)
 }
+
 
 pub fn get_form_exists(file_path: &str, target_form_id: FormID) -> io::Result<bool> {
     match read_form(file_path, target_form_id) {

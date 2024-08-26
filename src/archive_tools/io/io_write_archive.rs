@@ -1,26 +1,22 @@
 use std::fs::{File, OpenOptions};
 use std::io::{self, Read, Seek, SeekFrom, Write};
 
-use crate::archive_tools::structs::*;
-use crate::archive_tools::io::{io_write_block::*, read_block_index, IOStructIndex};
+use crate::archive_tools::structs::Archive;
+use crate::archive_tools::io::{write_block_header, write_block_bytestart, write_block_index, read_block_bytestarts, read_block_header, read_block_index};
+use crate::archive_tools::io::IOStructIndex;
 
-use super::{read_block_bytestarts, read_block_header};
-
-pub fn io_write_archive_skeleton(path: &str, archive: &Archive) {
+pub fn write_archive_skeleton(path: &str, archive: &Archive) -> io::Result<()>  {
 
     // Create the file
     let mut file = match File::create(path) {
         Ok(f) => f,
-        Err(e) => {
-            eprintln!("File creation error: {}", e);
-            return;
-        }
+        Err(e) => return Err(e),
     };
 
     // Write the HEADER block
     if let Err(e) = write_block_header(&mut file, archive) {
         eprintln!("Failed to write header block: {}", e);
-        return;
+        return Err(e);
     } 
 
     // Get the current position in the file
@@ -28,7 +24,7 @@ pub fn io_write_archive_skeleton(path: &str, archive: &Archive) {
         Ok(p) => p as u32,
         Err(e) => {
             eprintln!("Failed to get the current position in the file: {}", e);
-            return;
+            return Err(e);
         }
     };
     let bytestart_end = bytestart_pos + 8;
@@ -36,7 +32,7 @@ pub fn io_write_archive_skeleton(path: &str, archive: &Archive) {
     // Call the helper function to write the bytestart block
     if let Err(e) = write_block_bytestart(&mut file, bytestart_end, bytestart_end) {
         eprintln!("Failed to write bytestart block: {}", e);
-        return;
+        return Err(e);
     }
 
     // Write the INDEX block
@@ -44,6 +40,9 @@ pub fn io_write_archive_skeleton(path: &str, archive: &Archive) {
     let result_index = write_block_index(&mut file, &index_block);
     if let Err(e) = result_index {
         eprintln!("Failed to write index block: {}", e);
+        return Err(e);
+    } else {
+        Ok(())
     }
 }
 
@@ -60,9 +59,6 @@ pub fn write_archive_info(file_path: &str, archive: &Archive) -> io::Result<()> 
     file.seek(SeekFrom::Start(bytestart.bytestart_index as u64))?;
     let index = read_block_index(&mut file, header.form_count)?;
 
-    println!("Header: {:?}", header);
-    println!("Bytestart: {:?}", bytestart);
-    println!("Index: {:?}", index);
 
     // Calculate new description length difference
     let description_length_diff = archive.description.get_byte_count() as i32 - header.description.get_byte_count() as i32;
@@ -70,9 +66,6 @@ pub fn write_archive_info(file_path: &str, archive: &Archive) -> io::Result<()> 
     // Calculate new byte start positions
     let bytestart_index_new = (bytestart.bytestart_index as i32 + description_length_diff) as u32;
     let bytestart_data_new = (bytestart.bytestart_data as i32 + description_length_diff) as u32;
-
-    println!("New Bytestart Index: {}", bytestart_index_new);
-    println!("New Bytestart Data: {}", bytestart_data_new);
 
     let new_archive_id = header.archive_id;
     let new_archive_version = archive.version;
@@ -109,7 +102,6 @@ pub fn write_archive_info(file_path: &str, archive: &Archive) -> io::Result<()> 
         temp_file.write_all(&buffer[..bytes_read])?;
     }
 
-    println!("Remaining data has been copied to the temporary file.");
 
     // Start writing the new archive data to the original file
     file.seek(SeekFrom::Start(0))?;
