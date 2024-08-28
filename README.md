@@ -1,6 +1,6 @@
 # SMN Archive Library
 
-This library provides tools to create, manage, and interact with custom archive files in Rust. The library is designed to be efficient and is structured to allow easy integration with other languages through a C-compatible Foreign Function Interface (FFI).
+lorum ipsum dolor sit amet.
 
 ## Overview
 
@@ -11,41 +11,63 @@ The SMN Archive Library is intended for use cases where large collections of for
 - **FFI Compatibility**: Expose core functionality to other languages such as C or Python via a simple FFI interface.
 - **Modular Design**: Easily extend or modify components by leveraging Rust’s modular architecture.
 
-## Project Structure
-- **`smn_archive/`**: The main Rust library.
-  - **`src/io.rs`**: Handles reading and writing binary data.
-  - **`src/structs.rs`**: Defines the core structures used throughout the library.
-  - **`src/types.rs`**: Contains type definitions for various archive components.
-  - **`src/archive.rs`**: Implements the main archive operations.
-  - **`src/ffi.rs`**: Provides the FFI functions for external interaction.
-  - **`src/lib.rs`**: Entry point for the Rust library, organizing modules.
-  
-- **`smn_archive_py/`**: Python wrapper and interaction scripts.
-  - **`__init__.py`**: Initializes the Python package.
-  - **`smn_archive_interaction.py`**: Provides high-level Python functions for interacting with the archive.
-  - **`ctypes_wrapper.py`**: Handles the interaction between Python and the Rust FFI.
+- **`archive_tools/`**: Contains the tools related to archive operations.
+  - **`io/`**: Handles reading and writing binary data.
+    - **`io_delete_form.rs`**: Manages deletion of forms from the archive.
+    - **`io_read_archive.rs`**: Handles reading of archive data.
+    - **`io_read_block.rs`**: Manages reading blocks of data.
+    - **`io_read_form.rs`**: Handles reading individual forms.
+    - **`io_struct.rs`**: Defines structures related to I/O operations.
+    - **`io_write_archive.rs`**: Handles writing data to the archive.
+    - **`io_write_block.rs`**: Manages writing blocks of data.
+    - **`io_write_form.rs`**: Handles writing individual forms.
+  - **`mod.rs`**: Organizes modules within `archive_tools`.
 
-- **`smn_archive_py_test/`**: Contains tests and examples for using the library.
-  - **`test_smn_archive.py`**: Python test script for validating library functionality.
-  - **`data/`**: Contains sample data files for testing.
+- **`structs/`**: Defines the core structures used throughout the library.
+  - **`struc_archive.rs`**: Structure definitions for archive management.
+  - **`struc_form_string.rs`**: Handles string-based form structures.
+  - **`struc_form_world.rs`**: Manages world-based form structures.
+  - **`struc_form.rs`**: Defines general form structures.
+
+- **`tests/`**: Contains unit tests and validation scripts.
+  - **`test_archive.rs`**: Tests archive-related operations.
+  - **`test_forms.rs`**: Tests form handling and manipulation.
+  - **`test_types.rs`**: Tests different type definitions and their functionalities.
+
+- **`types/`**: Contains type definitions for various archive components.
+  - **`struc_types_id.rs`**: Defines ID types for forms and entries.
+  - **`struc_types_misc.rs`**: Miscellaneous type definitions.
+  - **`struc_types_str.rs`**: Defines string types used in the library.
+
+- **`interchange/`**: Handles data interchange and external interaction.
+  - **`interchange_io.rs`**: Manages data interchange I/O operations.
+
+- **`lib.rs`**: Entry point for the Rust library, organizing modules.
+
+- **`main.rs`**: Main entry point for running the application (if needed).
 
 ## Byte Structures
 
 The SMN Archive Library operates on specific byte structures. Below is an overview of the primary structures:
 
-- **Archive Header**:
-  - **Bytes 0-3**: Archive ID (4 bytes)
-  - **Bytes 4-7**: Version Number (4 bytes)
-  - **Bytes 8-11**: Number of Entries (4 bytes)
-  - **Bytes 12-15**: Index Offset (4 bytes)
+#### FormID Structure
+- **Element**: `FormID`
+- **Byte Size**: 2 bytes
+- **Description**: A unique 2-byte identifier used for identifying forms within an archive. This identifier is represented as an unsigned 16-bit integer (`u16`) in big-endian format.
 
-- **Entry Index**:
-  - **Bytes 0-3**: Entry ID (4 bytes)
-  - **Bytes 4-7**: Data Offset (4 bytes)
-  - **Bytes 8-11**: Data Length (4 bytes)
+#### ArchiveID Structure
+- **Element**: `ArchiveID`
+- **Byte Size**: 1 byte
+- **Description**: A unique 1-byte identifier used to distinguish between different archives. This identifier is represented as an unsigned 8-bit integer (`u8`).
 
-- **Form Data**:
-  - **Variable**: Binary data for the form, length defined in the Entry Index.
+#### GlobalID Structure
+- **Element**: `GlobalID`
+  - **Sub-elements**:
+    - `ArchiveID` (1 byte)
+    - `FormID` (2 bytes)
+- **Byte Size**: 3 bytes (1 byte for `ArchiveID` + 2 bytes for `FormID`)
+- **Description**: A composite identifier that combines both the `ArchiveID` and `FormID` to uniquely identify forms across different archives. This structure is represented by a total of 3 bytes.
+
 
 ## External Functions
 
