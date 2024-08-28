@@ -51,31 +51,31 @@ The SMN Archive Library is intended for use cases where large collections of for
 The SMN Archive Library operates on specific byte structures. Below is an overview of the primary structures:
 
 - **Element**: `FormID`
-- **Byte Size**: 2 bytes
-- **Description**: A unique 2-byte identifier used for identifying forms within an archive. This identifier is represented as an unsigned 16-bit integer (`u16`) in big-endian format.
+    - **Byte Size**: 2 bytes
+    - **Description**: A unique 2-byte identifier used for identifying forms within an archive. This identifier is represented as an unsigned 16-bit integer (`u16`) in big-endian format.
 
 - **Element**: `ArchiveID`
-- **Byte Size**: 1 byte
-- **Description**: A unique 1-byte identifier used to distinguish between different archives. This identifier is represented as an unsigned 8-bit integer (`u8`).
+    - **Byte Size**: 1 byte
+    - **Description**: A unique 1-byte identifier used to distinguish between different archives. This identifier is represented as an unsigned 8-bit integer (`u8`).
 
 - **Element**: `GlobalID`
-  - **Sub-elements**:
-    - `ArchiveID` (1 byte)
-    - `FormID` (2 bytes)
-- **Byte Size**: 3 bytes (1 byte for `ArchiveID` + 2 bytes for `FormID`)
-- **Description**: A composite identifier that combines both the `ArchiveID` and `FormID` to uniquely identify forms across different archives. This structure is represented by a total of 3 bytes.
+    - **Sub-elements**:
+        - `ArchiveID` (1 byte)
+        - `FormID` (2 bytes)
+    - **Byte Size**: 3 bytes (1 byte for `ArchiveID` + 2 bytes for `FormID`)
+    - **Description**: A composite identifier that combines both the `ArchiveID` and `FormID` to uniquely identify forms across different archives. This structure is represented by a total of 3 bytes.
 
 - **Element**: `StrSml`
-  - **Byte Size**: 
-    - 1 byte for character count
-    - 2 bytes per character (UTF-16 encoding)
-- **Description**: A small UTF-16 encoded string structure with a maximum length of 255 characters. The string length is stored in the first byte, followed by the UTF-16 encoded characters. The characters are stored as their decimal representation in UTF-16 encoding.
+    - **Byte Size**: 
+        - 1 byte for character count
+        - 2 bytes per character (UTF-16 encoding)
+    - **Description**: A small UTF-16 encoded string structure with a maximum length of 255 characters. The string length is stored in the first byte, followed by the UTF-16 encoded characters. The characters are stored as their decimal representation in UTF-16 encoding.
 
 - **Element**: `StrLrg`
-  - **Byte Size**: 
-    - 2 bytes for character count
-    - 2 bytes per character (UTF-16 encoding)
-- **Description**: A large UTF-16 encoded string structure with a maximum length of 65,535 characters. The string length is stored in the first two bytes, followed by the UTF-16 encoded characters. The characters are stored as their decimal representation in UTF-16 encoding.
+    - **Byte Size**: 
+        - 2 bytes for character count
+        - 2 bytes per character (UTF-16 encoding)
+    - **Description**: A large UTF-16 encoded string structure with a maximum length of 65,535 characters. The string length is stored in the first two bytes, followed by the UTF-16 encoded characters. The characters are stored as their decimal representation in UTF-16 encoding.
 
 - **Element**: `Version`
   - **Byte Size**:
