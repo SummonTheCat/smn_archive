@@ -69,6 +69,33 @@ impl StrSml {
 
         Ok(Self { value })
     }
+
+    // New function for reading from a byte buffer
+    pub fn read_from_byte_buffer(bytes: &[u8]) -> io::Result<(Self, usize)> {
+        let mut offset = 0;
+
+        // Read the length (1 byte)
+        if bytes.len() < 1 {
+            return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for string length"));
+        }
+        let char_count = bytes[offset] as usize;
+        offset += 1;
+
+        // Prepare a vector with capacity
+        let mut value = Vec::with_capacity(char_count);
+
+        // Read the characters (each character is 2 bytes)
+        for _ in 0..char_count {
+            if bytes.len() < offset + 2 {
+                return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for string characters"));
+            }
+            let char_buffer: [u8; 2] = bytes[offset..offset + 2].try_into().unwrap();
+            value.push(u16::from_be_bytes(char_buffer));
+            offset += 2;
+        }
+
+        Ok((Self { value }, offset))
+    }
 }
 
 impl fmt::Display for StrSml {
@@ -155,6 +182,35 @@ impl StrLrg {
         }
 
         Ok(Self { value })
+    }
+    
+    pub fn read_from_byte_buffer(bytes: &[u8]) -> io::Result<(Self, usize)> {
+        let mut offset = 0;
+
+        // Read the length (2 bytes)
+        if bytes.len() < 2 {
+            return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for string length"));
+        }
+        let length_buffer: [u8; 2] = bytes[offset..offset + 2].try_into().unwrap();
+        let char_count = u16::from_be_bytes(length_buffer) as usize;
+
+        offset += 2;
+
+        // Prepare a vector with capacity
+        let mut value = Vec::with_capacity(char_count);
+
+        // Read the characters (each character is 2 bytes)
+        for _ in 0..char_count {
+            if bytes.len() < offset + 2 {
+                return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for string characters"));
+            }
+            let char_buffer: [u8; 2] = bytes[offset..offset + 2].try_into().unwrap();
+
+            value.push(u16::from_be_bytes(char_buffer));
+            offset += 2;
+        }
+
+        Ok((Self { value }, offset))
     }
 }
 

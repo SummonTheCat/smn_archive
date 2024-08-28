@@ -103,7 +103,7 @@ pub fn test_types() {
     // - StrLrg - //
     println!("-- StrLrg --");
 
-    let str_lrg_1 = StrLrg::from("Test Sentence");
+    let str_lrg_1 = StrLrg::from("école");
 
     println!("StrLrg 1: {:?}", str_lrg_1);
     println!("StrLrg 1 as string: {:?}", str_lrg_1.to_string());

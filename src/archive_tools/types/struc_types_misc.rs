@@ -44,6 +44,16 @@ impl From<f32> for Version {
     }
 }
 
+impl From<(u8, u8)> for Version {
+    fn from(major_minor: (u8, u8)) -> Self {
+        Self {
+            major: major_minor.0,
+            minor: major_minor.1,
+        }
+    }
+}
+
+
 // - LangCode - //
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub enum LangCode {

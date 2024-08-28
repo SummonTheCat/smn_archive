@@ -51,6 +51,8 @@ impl FormString {
 }
 
 impl FormString {
+   
+
     pub fn read_from_bytes(file: &mut File) -> io::Result<Self> {
         // Read the FormID and FormType
         let mut form_id_buffer = [0u8; FormID::BYTE_COUNT];
@@ -95,9 +97,72 @@ impl FormString {
             strings,
         })
     }
+
+    pub fn read_from_byte_buffer(bytes: &[u8]) -> io::Result<(Self, usize)> {
+        let mut offset = 0;
+
+        // Read the FormID
+        if bytes.len() < offset + FormID::BYTE_COUNT {
+            return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for FormID"));
+        }
+        let form_id_array: [u8; FormID::BYTE_COUNT] = bytes[offset..offset + FormID::BYTE_COUNT].try_into().unwrap();
+        let form_id = FormID::from(form_id_array);
+        offset += FormID::BYTE_COUNT;
+
+        // Read the FormType
+        if bytes.len() < offset + FormType::BYTE_COUNT {
+            return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for FormType"));
+        }
+        let form_type = FormType::from(bytes[offset]);
+        offset += FormType::BYTE_COUNT;
+
+        // Read the FormName
+        let (form_name, consumed) = StrSml::read_from_byte_buffer(&bytes[offset..])?;
+        offset += consumed;
+
+        // Read the language count (1 byte)
+        if bytes.len() < offset + 1 {
+            return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for language count"));
+        }
+        let lang_count = bytes[offset] as usize;
+        offset += 1;
+
+        // Read the languages
+        let mut languages = Vec::with_capacity(lang_count);
+        for _ in 0..lang_count {
+            if bytes.len() < offset + 1 {
+                return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for language"));
+            }
+            let lang = LangCode::from(bytes[offset]);
+            offset += 1;
+            languages.push(lang);
+        }
+
+        // Read the strings
+        let mut strings = Vec::with_capacity(lang_count);
+        for _ in 0..lang_count {
+            let (string_data, consumed) = StrLrg::read_from_byte_buffer(&bytes[offset..])?;
+            offset += consumed;
+            strings.push(string_data);
+        }
+
+        Ok((
+            FormString {
+                base: FormBase {
+                    form_id,
+                    form_type,
+                    form_name,
+                },
+                languages,
+                strings,
+            },
+            offset,
+        ))
+    }
 }
 
 impl FormTrait for FormString {
+
     
     fn to_bytes(&self) -> Vec<u8> {
         self.to_bytes()
@@ -127,10 +192,11 @@ impl fmt::Display for FormString {
             .collect();
         write!(
             f,
-            "FormString {{ \nform_id: {}, \nform_type: {}, \nform_name: {}, \nstrings: [{}] \n}}",
+            "FormString {{ \nform_id: {}, \nform_type: {}, \nform_name: {}, langs: [{}] \n strings: [{}] \n}}",
             self.base.form_id.to_string(),
             self.base.form_type.to_string(),
             self.base.form_name.to_string(),
+            self.languages.iter().map(|l| l.to_string()).collect::<Vec<String>>().join(", "),
             strings_repr.join(", ")
         )
     }

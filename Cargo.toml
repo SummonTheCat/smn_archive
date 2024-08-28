@@ -5,3 +5,16 @@ edition = "2021"
 
 [dependencies]
 rand = "0.8"
+log = "0.4"
+env_logger = "0.9"  # or simple_logger = "1.11"
+libc = "0.2"
+
+[lib]
+name = "smn_archive_extern"
+crate-type = ["cdylib"]
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"

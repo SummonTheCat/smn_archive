@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::io::Read;
+use std::io::{self, Read};
 use std::fmt;
 
 use crate::archive_tools::structs::struc_form::{FormTrait, FormBase};
@@ -87,11 +87,74 @@ impl FormWorld {
             world_name,
             world_parts,
         })
+    }
 
+    pub fn read_from_byte_buffer(bytes: &[u8]) -> io::Result<(Self, usize)> {
+        let mut offset = 0;
+
+        // Read the FormID
+        if bytes.len() < offset + FormID::BYTE_COUNT {
+            return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for FormID"));
+        }
+        let form_id_array: [u8; FormID::BYTE_COUNT] = bytes[offset..offset + FormID::BYTE_COUNT].try_into().unwrap();
+        let form_id = FormID::from(form_id_array);
+        offset += FormID::BYTE_COUNT;
+
+        // Read the FormType
+        if bytes.len() < offset + FormType::BYTE_COUNT {
+            return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for FormType"));
+        }
+        let form_type = FormType::from(bytes[offset]);
+        offset += FormType::BYTE_COUNT;
+
+        // Read the FormName
+        let (form_name, consumed) = StrSml::read_from_byte_buffer(&bytes[offset..])?;
+        offset += consumed;
+
+        // Read the WorldName
+        let (world_name, consumed) = StrSml::read_from_byte_buffer(&bytes[offset..])?;
+        offset += consumed;
+
+        // Read the WorldParts count
+        if bytes.len() < offset + 1 {
+            return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for parts count"));
+        }
+        let parts_count = bytes[offset] as usize;
+        offset += 1;
+
+        // Read the WorldParts
+        let mut world_parts = Vec::with_capacity(parts_count);
+        for _ in 0..parts_count {
+            if bytes.len() < offset + GlobalID::BYTE_COUNT {
+                return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for world part"));
+            }
+    
+            // Convert the slice into a fixed-size array [u8; 3] and then into a GlobalID
+            let part_array: [u8; GlobalID::BYTE_COUNT] = bytes[offset..offset + GlobalID::BYTE_COUNT].try_into().unwrap();
+            let part = GlobalID::from(part_array);
+            offset += GlobalID::BYTE_COUNT;
+            
+            world_parts.push(part);
+        }
+        
+
+        Ok((
+            FormWorld {
+                base: FormBase {
+                    form_id,
+                    form_type,
+                    form_name,
+                },
+                world_name,
+                world_parts,
+            },
+            offset,
+        ))
     }
 }
 
 impl FormTrait for FormWorld {
+
     fn to_bytes(&self) -> Vec<u8> {
         self.to_bytes()
     }

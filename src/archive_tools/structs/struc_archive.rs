@@ -90,6 +90,33 @@ pub struct LiteArchive {
     pub archive_items: Vec<LiteArchiveItem>,
 }
 
+impl LiteArchive {
+    #[allow(unused)]
+    pub fn to_bytes(&self) -> Vec<u8> {
+        let mut bytes = Vec::new();
+        
+        // Convert archive_id to bytes and append
+        bytes.extend_from_slice(&self.archive_id.to_bytes());
+        
+        // Convert version to bytes and append
+        bytes.extend_from_slice(&self.version.to_bytes());
+        
+        // Convert description to bytes and append
+        bytes.extend_from_slice(&self.description.to_bytes());
+        
+        // Convert form_count to bytes and append
+        bytes.extend_from_slice(&self.form_count.to_be_bytes());
+        
+        // Convert each LiteArchiveItem to bytes and append
+        for item in &self.archive_items {
+            bytes.extend_from_slice(&item.to_bytes());
+        }
+        
+        bytes
+    }
+}
+
+
 impl fmt::Debug for LiteArchive {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
@@ -109,6 +136,24 @@ pub struct LiteArchiveItem {
     pub form_name: StrSml,
     pub form_type: FormType,
 }
+
+impl LiteArchiveItem {
+    pub fn to_bytes(&self) -> Vec<u8> {
+        let mut bytes = Vec::new();
+        
+        // Convert form_id to bytes and append
+        bytes.extend_from_slice(&self.form_id.to_bytes());
+        
+        // Convert form_name to bytes and append
+        bytes.extend_from_slice(&self.form_name.to_bytes());
+        
+        // Convert form_type to bytes and append
+        bytes.push(self.form_type.to_byte());
+        
+        bytes
+    }
+}
+
 
 impl fmt::Debug for LiteArchiveItem {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

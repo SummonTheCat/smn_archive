@@ -30,6 +30,7 @@ impl FormBase {
     pub const BYTE_COUNT_FORM_ID: usize = FormID::BYTE_COUNT;
     pub const BYTE_COUNT_FORM_TYPE: usize = FormType::BYTE_COUNT;
 
+
     // Convert FormBase to bytes
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = Vec::with_capacity(Self::BYTE_COUNT_FORM_ID + Self::BYTE_COUNT_FORM_TYPE + self.form_name.get_byte_count());
@@ -68,9 +69,48 @@ impl FormBase {
             
         }
     }
+
+    #[allow(unused)]
+    pub fn read_from_byte_buffer(bytes: &[u8]) -> io::Result<(Box<dyn FormTrait>, usize)> {
+        let mut offset = 0;
+
+        // Read the FormID
+        if bytes.len() < offset + FormID::BYTE_COUNT {
+            return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for FormID"));
+        }
+        let form_id_array: [u8; FormID::BYTE_COUNT] = bytes[offset..offset + FormID::BYTE_COUNT].try_into().unwrap();
+        let form_id = FormID::from(form_id_array);
+        offset += FormID::BYTE_COUNT;
+
+        // Read the FormType
+        if bytes.len() < offset + FormType::BYTE_COUNT {
+            return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for FormType"));
+        }
+
+        let byte_value = bytes[offset] as u8;
+        let form_type = FormType::from(byte_value);
+
+
+        offset += FormType::BYTE_COUNT;
+
+        // Depending on the FormType, call the appropriate constructor
+        match form_type {
+            FormType::STRING => {
+                let (form_string, consumed) = FormString::read_from_byte_buffer(bytes)?;
+                offset += consumed;
+                Ok((Box::new(form_string), offset))
+            }
+            FormType::WORLD => {
+                let (form_world, consumed) = FormWorld::read_from_byte_buffer(bytes)?;
+                offset += consumed;
+                Ok((Box::new(form_world), offset))
+            }
+        }
+    }
 }
 
 impl FormTrait for FormBase {
+
     fn to_bytes(&self) -> Vec<u8> {
         self.to_bytes()
     }
