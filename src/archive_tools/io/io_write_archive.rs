@@ -67,7 +67,7 @@ pub fn write_archive_info(file_path: &str, archive: &Archive) -> io::Result<()> 
     let bytestart_index_new = (bytestart.bytestart_index as i32 + description_length_diff) as u32;
     let bytestart_data_new = (bytestart.bytestart_data as i32 + description_length_diff) as u32;
 
-    let new_archive_id = header.archive_id;
+    let new_archive_id = archive.archive_id;
     let new_archive_version = archive.version;
     let new_arhive_description = archive.description.clone();
 
