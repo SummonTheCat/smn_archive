@@ -1,4 +1,4 @@
-use std::{io::Write, time::Instant};
+use std::{collections::HashSet, io::Write, time::Instant};
 
 use rand::Rng;
 
@@ -352,6 +352,111 @@ pub fn test_form_perf(file_path: &str, form_count: u16) {
         match read_form {
             Ok(_) => println!("Successfully read FormID: {}", form_id_str),
             Err(e) => println!("Error reading FormID {}: {:?}", form_id_str, e),
+        }
+    }
+
+    let read_duration = read_start.elapsed();
+    println!("-- Finished Reading Forms --");
+    println!("Time taken to read {} forms: {:?}", form_count, read_duration);
+
+    println!("-- Performance Test Completed --");
+    println!("Breakdown:");
+    println!("Write Duration: {:?}", write_duration);
+    println!("Read Duration: {:?}", read_duration);
+    println!("Total Duration: {:?}", write_duration + read_duration);
+    
+    // Print the time taken for each 10%
+    println!("-- Write Time per 10% --");
+    for (i, time) in tenth_percent_times.iter().enumerate() {
+        println!("Time to write {}%: {:?}", (i + 1) * 10, time);
+    }
+}
+
+
+#[allow(unused)]
+pub fn test_form_perf_random_order(file_path: &str, form_count: u16) {
+    println!("--- Performance Test: Writing {} Forms in Random Order without Storing All IDs ---", form_count);
+
+    let archive = Archive::new(
+        ArchiveID::from("001"),
+        Version::from(1.0),
+        StrLrg::from("Test Archive"),
+    );
+
+    write_archive_skeleton(file_path, &archive);
+
+    let mut rng = rand::thread_rng();
+    let mut used_ids = HashSet::new();
+
+    let mut tenth_percent_times = Vec::new();
+    let mut last_checkpoint = Instant::now();
+
+    println!("-- Started Writing Forms --");
+    let write_start = Instant::now();
+
+    for i in 1..=form_count {
+        // Generate a unique form ID
+        let form_id = loop {
+            let candidate_id = rng.gen_range(1..=form_count);
+            if !used_ids.contains(&candidate_id) {
+                used_ids.insert(candidate_id);
+                break FormID::from(candidate_id);
+            }
+        };
+
+        let form_name = format!("Wrld{}", form_id.to_u16());
+        let form_description = format!("Description{}", form_id.to_u16());
+
+        let world_parts_count = rng.gen_range(1..5);
+        let mut world_parts = Vec::new();
+        for _ in 0..world_parts_count {
+            let random_archive_id = ArchiveID::from(rng.gen_range(1..=200));
+            let random_form_id = FormID::from(rng.gen_range(1..=10000));
+            let random_global_id = GlobalID::from((random_archive_id, random_form_id));
+            world_parts.push(GlobalID::from(random_global_id));
+        }
+
+        let form = FormWorld::new(
+            form_id,
+            StrSml::from(form_name.as_str()),
+            StrSml::from(form_description.as_str()),
+            world_parts,
+        );
+
+        let write_result = write_form(file_path, &form);
+        if write_result.is_err() {
+            println!("Error writing form {}: {:?}", form_id.to_u16(), write_result.err());
+        } else {
+            // Update the progress bar
+            let progress = (i as f32 / form_count as f32) * 100.0;
+            print!("\rSuccessfully wrote FormID: {} Progress: [{:<50}] {:.2}%", form_id.to_u16(), "=".repeat((progress / 2.0) as usize), progress);
+            std::io::stdout().flush().unwrap();
+            println!();
+        }
+
+        // Record the time every 10%
+        if i as f32 % (form_count as f32 / 10.0) == 0.0 {
+            let now = Instant::now();
+            let segment_time = now.duration_since(last_checkpoint);
+            tenth_percent_times.push(segment_time);
+            last_checkpoint = now;
+        }
+    }
+
+    let write_duration = write_start.elapsed();
+    println!("-- Finished Writing Forms --");
+    println!("Time taken to write {} forms: {:?}", form_count, write_duration);
+
+    println!("-- Started Reading Forms --");
+    let read_start = Instant::now();
+
+    for id in used_ids {
+        let form_id = FormID::from(id);
+
+        let read_form = read_form(file_path, form_id);
+        match read_form {
+            Ok(_) => println!("Successfully read FormID: {}", form_id.to_u16()),
+            Err(e) => println!("Error reading FormID {}: {:?}", form_id.to_u16(), e),
         }
     }
 

@@ -9,12 +9,12 @@ pub use test_types::*;
 #[allow(unused)]
 pub use test_forms::*;
 
-use super::{io:: write_archive_skeleton, structs::Archive, types::{ArchiveID, StrLrg, Version}};
+use super::{io::{ read_form, write_archive_skeleton, write_form}, structs::{Archive, FormString}, types::{ArchiveID, FormID, LangCode, StrLrg, StrSml, Version}};
 
 #[allow(unused)]
 pub fn run_tests() {
-    run_tests_structs();
-    run_tests_io();
+    //run_tests_structs();
+    //run_tests_io();
     run_tests_flow();
 }
 
@@ -60,6 +60,154 @@ pub fn run_tests_flow() {
             println!("Error writing archive skeleton: {}", e);
         }
     }
+
+    // Test creating a new form, adding it to the archive, and reading it
+    let form_id = FormID::from(5);
+    let form_name = StrSml::from("Test Form");
+    let form_langs = vec![LangCode::EN, LangCode::FR];
+    let form_strings = vec![StrLrg::from("Hello"), StrLrg::from("Bonjour")];
+    let form1 = FormString::new(form_id, form_name, form_langs, form_strings);
+
+    let form_write_result = write_form(path, &form1);
+    match form_write_result {
+        Ok(_) => {
+            println!("Form written successfully");
+        },
+        Err(e) => {
+            println!("Error writing form: {}", e);
+        }
+    }
+
+    // Create a new form and add it to the start of the archive
+    let form_id = FormID::from(1);
+    let form_name = StrSml::from("Test Form at Start");
+    let form_langs = vec![LangCode::EN, LangCode::FR];
+    let form_strings = vec![StrLrg::from("Hello"), StrLrg::from("Bonjour")];
+    let form2 = FormString::new(form_id, form_name, form_langs, form_strings);
+
+    let form_write_result = write_form(path, &form2);
+    match form_write_result {
+        Ok(_) => {
+            println!("Form written successfully");
+        },
+        Err(e) => {
+            println!("Error writing form: {}", e);
+        }
+    }
+
+    // Write a new form at the end of the archive
+    let form_id = FormID::from(10);
+    let form_name = StrSml::from("Test Form at End");
+    let form_langs = vec![LangCode::EN, LangCode::FR];
+    let form_strings = vec![StrLrg::from("Hello"), StrLrg::from("Bonjour")];
+    let form3 = FormString::new(form_id, form_name, form_langs, form_strings);
+
+    let form_write_result = write_form(path, &form3);
+    match form_write_result {
+        Ok(_) => {
+            println!("Form written successfully");
+        },
+        Err(e) => {
+            println!("Error writing form: {}", e);
+        }
+    }
+
+    // Read the new form
+    let form_read_result = read_form(path, form_id);
+    match form_read_result {
+        Ok(form) => {
+            println!("Form read successfully: {:?}", form);
+        },
+        Err(e) => {
+            println!("Error reading form: {}", e);
+        }
+    }
+
+    // Write new form with id 7
+    let form_id = FormID::from(7);
+    let form_name = StrSml::from("Test Form at 7");
+    let form_langs = vec![LangCode::EN, LangCode::FR];
+    let form_strings = vec![StrLrg::from("Hello"), StrLrg::from("Bonjour")];
+    let form4 = FormString::new(form_id, form_name, form_langs, form_strings);
+
+    let form_write_result = write_form(path, &form4);
+    match form_write_result {
+        Ok(_) => {
+            println!("Form written successfully");
+        },
+        Err(e) => {
+            println!("Error writing form: {}", e);
+        }
+    }
+
+    // Read the new form
+    let form_read_result = read_form(path, FormID::from(7));
+    match form_read_result {
+        Ok(_form) => {
+            println!("Form read successfully: {:?}", FormID::from(7));
+        },
+        Err(e) => {
+            println!("Error reading form: {}", e);
+        }
+    }
+
+    // Overwrite the last form
+    let form_id = FormID::from(10);
+    let form_name = StrSml::from("Test Form at End Overwritten");
+    let form_langs = vec![LangCode::EN, LangCode::FR];
+    let form_strings = vec![StrLrg::from("Hello"), StrLrg::from("Bonjour")];
+    let form5 = FormString::new(form_id, form_name, form_langs, form_strings);
+
+    let form_write_result = write_form(path, &form5);
+    match form_write_result {
+        Ok(_) => {
+            println!("Form written successfully");
+        },
+        Err(e) => {
+            println!("Error writing form: {}", e);
+        }
+    }
+
+    // Read the new form
+    let form_read_result = read_form(path, FormID::from(10));
+    match form_read_result {
+        Ok(form) => {
+            println!("Form read successfully: {:?}", form);
+        },
+        Err(e) => {
+            println!("Error reading form: {}", e);
+        }
+    }
+
+    // Overwrite the middle form
+    let form_id = FormID::from(5);
+    let form_name = StrSml::from("Test Form at Middle Overwritten");
+    let form_langs = vec![LangCode::EN, LangCode::FR];
+    let form_strings = vec![StrLrg::from("Hello"), StrLrg::from("Bonjour")];
+    let form6 = FormString::new(form_id, form_name, form_langs, form_strings);
+
+    let form_write_result = write_form(path, &form6);
+    match form_write_result {
+        Ok(_) => {
+            println!("Form written successfully");
+        },
+        Err(e) => {
+            println!("Error writing form: {}", e);
+        }
+    }
+
+    // Read the new form
+    let form_read_result = read_form(path, FormID::from(5));
+    match form_read_result {
+        Ok(form) => {
+            println!("Form read successfully: {:?}", form);
+        },
+        Err(e) => {
+            println!("Error reading form: {}", e);
+        }
+    }
+
+    test_form_perf(path, 500);
 
 
 }

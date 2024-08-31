@@ -169,7 +169,7 @@ mod tests {
     // --- test_write_archive_skeleton --- //
     #[test]
     fn test_write_archive_skeleton_success() -> Result<()> {
-        let test_path = "test_archive.bin";
+        let test_path = "test_write_archive_skeleton_success.bin";
         let archive = Archive::new(
             ArchiveID::from(1),
             Version::from(1.0),
@@ -191,7 +191,7 @@ mod tests {
     // --- test_write_archive_info --- //
     #[test]
     fn test_write_archive_info_success() -> Result<()> {
-        let test_file_path = "test_archive_info.bin";
+        let test_file_path = "test_write_archive_info_success.bin";
 
         let initial_archive = Archive::new(
             ArchiveID::from(1),
@@ -220,7 +220,7 @@ mod tests {
 
     #[test]
     fn test_write_archive_info_invalid_path() {
-        let test_file_path = "test_archive_info.bin";
+        let test_file_path = "test_write_archive_info_invalid_path.bin";
 
         let initial_archive = Archive::new(
             ArchiveID::from(1),

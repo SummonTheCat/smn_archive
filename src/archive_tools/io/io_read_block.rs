@@ -1,4 +1,4 @@
-use std::{fs::File, io::{self, Read, Seek}};
+use std::{fs::File, io::{self, Read, Seek, SeekFrom}};
 
 use crate::archive_tools::io::{IOStructByteStarts, IOStructHeader, IOStructIndex, IOStructIndexItem};
 use crate::archive_tools::types::{ArchiveID, FormID, FormType, StrLrg, Version};
@@ -175,3 +175,100 @@ pub fn binary_search_for_index_item(
     Ok(None)
 }
 
+
+pub fn binary_search_for_index_item_and_position(
+    file: &mut File, 
+    target_form_id: FormID, 
+    form_count: u16
+) -> io::Result<Option<(u64, IOStructIndexItem)>> {
+    let item_size = FormID::BYTE_COUNT + 1 + 4; // 7 bytes per index item
+    let mut left = file.stream_position()?;  // Start at current file position (index block start)
+    let mut right = left + (item_size * form_count as usize) as u64;
+
+    let mut passes = 0;
+    let max_passes = 10;  // Number of binary search passes before switching to linear search
+
+    while passes < max_passes {
+        passes += 1;
+        let mid: u64;
+
+        // Check if the range is too small to continue
+        if right - left <= item_size as u64 {
+            break;
+        }
+
+        // Calculate mid position and align to the nearest multiple of item_size (7 bytes)
+        mid = left + (((right - left) / 2) / item_size as u64) * item_size as u64;
+
+        // Seek to the middle index item
+        file.seek(std::io::SeekFrom::Start(mid))?;
+
+        // Read FormID at mid
+        let mut form_id_buf = [0u8; FormID::BYTE_COUNT];
+        file.read_exact(&mut form_id_buf)?;
+        let form_id = FormID::from(form_id_buf);
+
+        if form_id == target_form_id {
+            // We found the target FormID, now read the whole index item
+            let mut form_type_buf = [0u8; 1];
+            file.read_exact(&mut form_type_buf)?;
+            let form_type = FormType::from(form_type_buf[0]);
+
+            let mut data_start_offset_buf = [0u8; 4];
+            file.read_exact(&mut data_start_offset_buf)?;
+            let data_start_offset = u32::from_be_bytes(data_start_offset_buf);
+
+            // Calculate the position in the index
+            let index_position = (mid - left) / item_size as u64;
+
+            return Ok(Some((index_position, IOStructIndexItem {
+                form_id,
+                form_type,
+                data_start_offset,
+            })));
+        } else if form_id < target_form_id {
+            // Move left up to the next item
+            left = mid + item_size as u64;
+        } else {
+            // Move right down to this item's start
+            right = mid;
+        }
+    }
+
+    // After binary search passes, perform a linear search from the left position to the right position
+    file.seek(std::io::SeekFrom::Start(left))?;
+    while left < right {
+        // Read FormID
+        let mut form_id_buf = [0u8; FormID::BYTE_COUNT];
+        file.read_exact(&mut form_id_buf)?;
+        let form_id = FormID::from(form_id_buf);
+
+        if form_id == target_form_id {
+            // Read FormType
+            let mut form_type_buf = [0u8; 1];
+            file.read_exact(&mut form_type_buf)?;
+            let form_type = FormType::from(form_type_buf[0]);
+
+            // Read Data Start Offset
+            let mut data_start_offset_buf = [0u8; 4];
+            file.read_exact(&mut data_start_offset_buf)?;
+            let data_start_offset = u32::from_be_bytes(data_start_offset_buf);
+
+            // Calculate the position in the index
+            let index_position = (left - file.stream_position()?) / item_size as u64;
+
+            return Ok(Some((index_position, IOStructIndexItem {
+                form_id,
+                form_type,
+                data_start_offset,
+            })));
+        }
+
+        // Move to the next item
+        left += item_size as u64;
+        file.seek(SeekFrom::Start(left))?;
+    }
+
+    // If we reach here, the target FormID was not found
+    Ok(None)
+}

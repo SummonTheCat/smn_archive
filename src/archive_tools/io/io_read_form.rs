@@ -22,7 +22,6 @@ pub fn read_form(file_path: &str, form_id: FormID) -> io::Result<Box<dyn FormTra
             file.seek(std::io::SeekFrom::Start(form_bytepos as u64))?;
 
             let read_form = FormBase::read_from_bytes(&mut file)?;
-
             Ok(read_form)
         }
         None => {

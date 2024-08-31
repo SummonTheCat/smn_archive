@@ -169,7 +169,7 @@ mod tests {
     // --- read_lite_archive --- //
     #[test]
     fn test_read_lite_archive_success() -> Result<()> {
-        let test_file_path = "test_read_lite_archive.bin";
+        let test_file_path = "test_read_lite_archive_success.bin";
 
         let archive = Archive::new(
             ArchiveID::from(1),
@@ -194,7 +194,7 @@ mod tests {
     // --- get_form_exists --- //
     #[test]
     fn test_get_form_exists_success() -> Result<()> {
-        let test_file_path = "test_get_form_exists.bin";
+        let test_file_path = "test_get_form_exists_success.bin";
         let form_id = FormID::from(1);
 
         let archive = Archive::new(
