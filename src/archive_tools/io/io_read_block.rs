@@ -182,6 +182,7 @@ pub fn binary_search_for_index_item_and_position(
     form_count: u16
 ) -> io::Result<Option<(u64, IOStructIndexItem)>> {
     let item_size = FormID::BYTE_COUNT + 1 + 4; // 7 bytes per index item
+    let start = file.stream_position()?;  // Start at current file position (index block start)
     let mut left = file.stream_position()?;  // Start at current file position (index block start)
     let mut right = left + (item_size * form_count as usize) as u64;
 
@@ -238,6 +239,9 @@ pub fn binary_search_for_index_item_and_position(
     // After binary search passes, perform a linear search from the left position to the right position
     file.seek(std::io::SeekFrom::Start(left))?;
     while left < right {
+        // Index position is (left - start)/ item_size(7)
+        let index_position = (left - start) / item_size as u64;
+
         // Read FormID
         let mut form_id_buf = [0u8; FormID::BYTE_COUNT];
         file.read_exact(&mut form_id_buf)?;
@@ -254,8 +258,6 @@ pub fn binary_search_for_index_item_and_position(
             file.read_exact(&mut data_start_offset_buf)?;
             let data_start_offset = u32::from_be_bytes(data_start_offset_buf);
 
-            // Calculate the position in the index
-            let index_position = (left - file.stream_position()?) / item_size as u64;
 
             return Ok(Some((index_position, IOStructIndexItem {
                 form_id,

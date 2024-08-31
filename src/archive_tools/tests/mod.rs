@@ -9,7 +9,7 @@ pub use test_types::*;
 #[allow(unused)]
 pub use test_forms::*;
 
-use super::{io::{ read_form, write_archive_skeleton, write_form}, structs::{Archive, FormString}, types::{ArchiveID, FormID, LangCode, StrLrg, StrSml, Version}};
+use super::{io::{ delete_form, get_form_exists, read_form, write_archive_skeleton, write_form}, structs::{Archive, FormString}, types::{ArchiveID, FormID, LangCode, StrLrg, StrSml, Version}};
 
 #[allow(unused)]
 pub fn run_tests() {
@@ -62,14 +62,14 @@ pub fn run_tests_flow() {
     }
 
     // Test creating a new form, adding it to the archive, and reading it
-    let form_id = FormID::from(5);
-    let form_name = StrSml::from("Test Form");
-    let form_langs = vec![LangCode::EN, LangCode::FR];
-    let form_strings = vec![StrLrg::from("Hello"), StrLrg::from("Bonjour")];
-    let form1 = FormString::new(form_id, form_name, form_langs, form_strings);
-
-    let form_write_result = write_form(path, &form1);
-    match form_write_result {
+    let form = FormString::new(
+        FormID::from(3),
+        StrSml::from("TestForm"),
+        vec![LangCode::EN, LangCode::ES],
+        vec![StrLrg::from("TestField1"), StrLrg::from("TestField2")],
+    );
+    let write_result = write_form(path, &form);
+    match write_result {
         Ok(_) => {
             println!("Form written successfully");
         },
@@ -78,43 +78,26 @@ pub fn run_tests_flow() {
         }
     }
 
-    // Create a new form and add it to the start of the archive
-    let form_id = FormID::from(1);
-    let form_name = StrSml::from("Test Form at Start");
-    let form_langs = vec![LangCode::EN, LangCode::FR];
-    let form_strings = vec![StrLrg::from("Hello"), StrLrg::from("Bonjour")];
-    let form2 = FormString::new(form_id, form_name, form_langs, form_strings);
-
-    let form_write_result = write_form(path, &form2);
-    match form_write_result {
+    // Overwrite the form
+    let form = FormString::new(
+        FormID::from(3),
+        StrSml::from("OWForm"),
+        vec![LangCode::EN, LangCode::ES],
+        vec![StrLrg::from("STRING"), StrLrg::from("NEW")],
+    );
+    let write_result = write_form(path, &form);
+    match write_result {
         Ok(_) => {
-            println!("Form written successfully");
+            println!("Form overwritten successfully");
         },
         Err(e) => {
-            println!("Error writing form: {}", e);
+            println!("Error overwriting form: {}", e);
         }
     }
 
-    // Write a new form at the end of the archive
-    let form_id = FormID::from(10);
-    let form_name = StrSml::from("Test Form at End");
-    let form_langs = vec![LangCode::EN, LangCode::FR];
-    let form_strings = vec![StrLrg::from("Hello"), StrLrg::from("Bonjour")];
-    let form3 = FormString::new(form_id, form_name, form_langs, form_strings);
-
-    let form_write_result = write_form(path, &form3);
-    match form_write_result {
-        Ok(_) => {
-            println!("Form written successfully");
-        },
-        Err(e) => {
-            println!("Error writing form: {}", e);
-        }
-    }
-
-    // Read the new form
-    let form_read_result = read_form(path, form_id);
-    match form_read_result {
+    // Read the form
+    let read = read_form(path, FormID::from(3));
+    match read {
         Ok(form) => {
             println!("Form read successfully: {:?}", form);
         },
@@ -123,91 +106,229 @@ pub fn run_tests_flow() {
         }
     }
 
-    // Write new form with id 7
-    let form_id = FormID::from(7);
-    let form_name = StrSml::from("Test Form at 7");
-    let form_langs = vec![LangCode::EN, LangCode::FR];
-    let form_strings = vec![StrLrg::from("Hello"), StrLrg::from("Bonjour")];
-    let form4 = FormString::new(form_id, form_name, form_langs, form_strings);
-
-    let form_write_result = write_form(path, &form4);
-    match form_write_result {
+    // Write a new form 00001
+    let form = FormString::new(
+        FormID::from(1),
+        StrSml::from("Test Form 00001"),
+        vec![LangCode::EN, LangCode::ES],
+        vec![StrLrg::from("Test Field 1"), StrLrg::from("Test Field 2")],
+    );
+    let write_result = write_form(path, &form);
+    match write_result {
         Ok(_) => {
-            println!("Form written successfully");
+            println!("Form 00001 written successfully");
         },
         Err(e) => {
-            println!("Error writing form: {}", e);
+            println!("Error writing form 00001: {}", e);
         }
     }
 
-    // Read the new form
-    let form_read_result = read_form(path, FormID::from(7));
-    match form_read_result {
-        Ok(_form) => {
-            println!("Form read successfully: {:?}", FormID::from(7));
-        },
-        Err(e) => {
-            println!("Error reading form: {}", e);
-        }
-    }
-
-    // Overwrite the last form
-    let form_id = FormID::from(10);
-    let form_name = StrSml::from("Test Form at End Overwritten");
-    let form_langs = vec![LangCode::EN, LangCode::FR];
-    let form_strings = vec![StrLrg::from("Hello"), StrLrg::from("Bonjour")];
-    let form5 = FormString::new(form_id, form_name, form_langs, form_strings);
-
-    let form_write_result = write_form(path, &form5);
-    match form_write_result {
+    // overwrite form 00001
+    let form = FormString::new(
+        FormID::from(1),
+        StrSml::from("Form00001"),
+        vec![LangCode::EN, LangCode::ES],
+        vec![StrLrg::from("ST"), StrLrg::from("NE")],
+    );
+    let write_result = write_form(path, &form);
+    match write_result {
         Ok(_) => {
-            println!("Form written successfully");
+            println!("Form 00001 overwritten successfully");
         },
         Err(e) => {
-            println!("Error writing form: {}", e);
+            println!("Error overwriting form 00001: {}", e);
         }
     }
 
-    // Read the new form
-    let form_read_result = read_form(path, FormID::from(10));
-    match form_read_result {
+    // Read form 00001
+    let read = read_form(path, FormID::from(1));
+    match read {
         Ok(form) => {
-            println!("Form read successfully: {:?}", form);
+            println!("Form 00001 read successfully: {:?}", form);
         },
         Err(e) => {
-            println!("Error reading form: {}", e);
+            println!("Error reading form 00001: {}", e);
         }
     }
 
-    // Overwrite the middle form
-    let form_id = FormID::from(5);
-    let form_name = StrSml::from("Test Form at Middle Overwritten");
-    let form_langs = vec![LangCode::EN, LangCode::FR];
-    let form_strings = vec![StrLrg::from("Hello"), StrLrg::from("Bonjour")];
-    let form6 = FormString::new(form_id, form_name, form_langs, form_strings);
-
-    let form_write_result = write_form(path, &form6);
-    match form_write_result {
+    // Add a form 00008
+    let form = FormString::new(
+        FormID::from(8),
+        StrSml::from("Form00008"),
+        vec![LangCode::EN, LangCode::ES],
+        vec![StrLrg::from("ST"), StrLrg::from("NE")],
+    );
+    let write_result = write_form(path, &form);
+    match write_result {
         Ok(_) => {
-            println!("Form written successfully");
+            println!("Form 00008 written successfully");
         },
         Err(e) => {
-            println!("Error writing form: {}", e);
+            println!("Error writing form 00008: {}", e);
         }
     }
 
-    // Read the new form
-    let form_read_result = read_form(path, FormID::from(5));
-    match form_read_result {
+    // Overwrite form 00008
+    let form = FormString::new(
+        FormID::from(8),
+        StrSml::from("Form00008"),
+        vec![LangCode::EN, LangCode::ES],
+        vec![StrLrg::from("STaDadwadwd"), StrLrg::from("NEAwdawdwd")],
+    );
+    let write_result = write_form(path, &form);
+    match write_result {
+        Ok(_) => {
+            println!("Form 00008 overwritten successfully");
+        },
+        Err(e) => {
+            println!("Error overwriting form 00008: {}", e);
+        }
+    }
+
+    // Read form 00008
+    let read = read_form(path, FormID::from(8));
+    match read {
         Ok(form) => {
-            println!("Form read successfully: {:?}", form);
+            println!("Form 00008 read successfully: {:?}", form);
         },
         Err(e) => {
-            println!("Error reading form: {}", e);
+            println!("Error reading form 00008: {}", e);
         }
     }
 
-    test_form_perf(path, 500);
+    // Read form 00001
+    let read = read_form(path, FormID::from(1));
+    match read {
+        Ok(form) => {
+            println!("Form 00001 read successfully: {:?}", form);
+        },
+        Err(e) => {
+            println!("Error reading form 00001: {}", e);
+        }
+    }
 
+    // Read form 00003
+    let read = read_form(path, FormID::from(3));
+    match read {
+        Ok(form) => {
+            println!("Form 00003 read successfully: {:?}", form);
+        },
+        Err(e) => {
+            println!("Error reading form 00003: {}", e);
+        }
+    }
+
+    //Write form 00005
+    let form = FormString::new(
+        FormID::from(5),
+        StrSml::from("Form00005"),
+        vec![LangCode::EN, LangCode::ES],
+        vec![StrLrg::from("STall"), StrLrg::from("NEed")],
+    );
+    let write_result = write_form(path, &form);
+    match write_result {
+        Ok(_) => {
+            println!("Form 00005 written successfully");
+        },
+        Err(e) => {
+            println!("Error writing form 00005: {}", e);
+        }
+    }
+
+    // Read form 00005
+    let read = read_form(path, FormID::from(5));
+    match read {
+        Ok(form) => {
+            println!("Form 00005 read successfully: {:?}", form);
+        },
+        Err(e) => {
+            println!("Error reading form 00005: {}", e);
+        }
+    }
+
+    // Overwrite form 00005
+    let form = FormString::new(
+        FormID::from(5),
+        StrSml::from("Fo05"),
+        vec![LangCode::EN, LangCode::ES],
+        vec![StrLrg::from("STawdawdall"), StrLrg::from("NEeAdawdd")],
+    );
+
+    let write_result = write_form(path, &form);
+    match write_result {
+        Ok(_) => {
+            println!("Form 00005 overwritten successfully");
+        },
+        Err(e) => {
+            println!("Error overwriting form 00005: {}", e);
+        }
+    }
+
+    // Delete form 00005
+    let delete_result = delete_form(&path, FormID::from(5));
+    match delete_result {
+        Ok(_) => {
+            println!("Form 00005 deleted successfully");
+        },
+        Err(e) => {
+            println!("Error deleting form 00005: {}", e);
+        }
+    }
+
+
+    // Check if form 00005 was deleted
+    let check_exists = get_form_exists(&path, FormID::from(5));
+    match check_exists {
+        Ok(exists) => {
+            println!("Form 00005 exists: {}", exists);
+        },
+        Err(e) => {
+            println!("Error checking if form 00005 exists: {}", e);
+        }
+    }
+
+    // Delete form 00001
+    let delete_result = delete_form(&path, FormID::from(1));
+    match delete_result {
+        Ok(_) => {
+            println!("Form 00001 deleted successfully");
+        },
+        Err(e) => {
+            println!("Error deleting form 00001: {}", e);
+        }
+    }
+
+    // Check if form 00001 was deleted
+    let check_exists = get_form_exists(&path, FormID::from(1));
+    match check_exists {
+        Ok(exists) => {
+            println!("Form 00001 exists: {}", exists);
+        },
+        Err(e) => {
+            println!("Error checking if form 00001 exists: {}", e);
+        }
+    }
+
+    // Delete form 00008
+    let delete_result = delete_form(&path, FormID::from(8));
+    match delete_result {
+        Ok(_) => {
+            println!("Form 00008 deleted successfully");
+        },
+        Err(e) => {
+            println!("Error deleting form 00008: {}", e);
+        }
+    }
+
+    // Check if form 00008 was deleted
+    let check_exists = get_form_exists(&path, FormID::from(8));
+    match check_exists {
+        Ok(exists) => {
+            println!("Form 00008 exists: {}", exists);
+        },
+        Err(e) => {
+            println!("Error checking if form 00008 exists: {}", e);
+        }
+    }
 
 }

@@ -191,7 +191,7 @@ fn write_form_existing_inner(file: &mut File, form: &dyn FormTrait, archive_info
 
         // Write the updated index back to the archive
         temp_index_file.seek(SeekFrom::Start(0))?; // Rewind temp index file to start
-        file.seek(SeekFrom::Start(archive_info.bytestart_index as u64 + form_length_diff as u64))?;
+        file.seek(SeekFrom::Start((archive_info.bytestart_index as i32 + form_length_diff)as u64 ))?;
         while let Ok(bytes_read) = temp_index_file.read(&mut buffer) {
             if bytes_read == 0 {
                 break; // End of file reached
@@ -200,7 +200,7 @@ fn write_form_existing_inner(file: &mut File, form: &dyn FormTrait, archive_info
         }
 
         // Trim the file to the new length
-        archive_info.bytestart_index += form_length_diff as u32;
+        archive_info.bytestart_index = (archive_info.bytestart_index as i32 + form_length_diff) as u32;
         file.set_len(archive_info.bytestart_index as u64 + archive_info.form_count as u64 * 7)?;
 
         // Write the new header to the archive
@@ -270,7 +270,7 @@ fn write_form_existing_last(file: &mut File, form: &dyn FormTrait, archive_info:
     }
 
     // Update the archive info
-    archive_info.bytestart_index += form_length_diff as u32;
+    archive_info.bytestart_index = (archive_info.bytestart_index as i32 + form_length_diff) as u32;
 
     // Trim the file to the new length
     file.set_len(archive_info.bytestart_index as u64 + archive_info.form_count as u64 * 7)?;
@@ -569,7 +569,7 @@ fn write_form_new_end(file: &mut File, form_bytes: &Vec<u8>, archive_info: &mut 
 
     // Step 5: Update the archive info
     let form_length_diff = form_bytes.len() as i32;
-    archive_info.bytestart_index += form_length_diff as u32;
+    archive_info.bytestart_index = (archive_info.bytestart_index as i32 + form_length_diff) as u32;
 
     // Write the new index item to the end of the index
     let new_form_offset = last_form_offset + last_form_length;
@@ -744,7 +744,7 @@ mod tests {
     #[test]
     fn test_write_form_new_first() -> Result<()> {
         // Setup: Create a temporary file path and an empty Archive instance
-        let test_file_path = "test_add_form_to_empty_archive.bin";
+        let path = "test_add_form_to_empty_archive.bin";
 
         // Create an empty archive
         let archive = Archive::new(
@@ -752,7 +752,7 @@ mod tests {
             Version::from(1.0),
             StrLrg::from("Empty Archive")
         );
-        write_archive_skeleton(test_file_path, &archive)?;
+        write_archive_skeleton(path, &archive)?;
 
         // Create a form to add to the empty archive
         let form = FormString::new(
@@ -763,15 +763,15 @@ mod tests {
         );
 
         // Call the function to add the form to the archive
-        let result = write_form(test_file_path, &form);
+        let result = write_form(path, &form);
         assert!(result.is_ok(), "Failed to write form to the empty archive.");
 
         // Read the form back to verify it was written correctly
-        let form_exists = get_form_exists(test_file_path, form.form_id())?;
+        let form_exists = get_form_exists(path, form.form_id())?;
         assert!(form_exists, "The form should exist in the archive.");
 
         // Clean up: Delete the temporary file
-        std::fs::remove_file(test_file_path)?;
+        std::fs::remove_file(path)?;
 
         Ok(())
     }
@@ -983,6 +983,8 @@ mod tests {
 
         assert_eq!(form.form_id(), FormID::from(3), "The form ID should be 3.");
 
+        // Clean up: Delete the temporary file
+        std::fs::remove_file(path)?;
 
         Ok(())
 
@@ -1065,6 +1067,9 @@ mod tests {
         let form = read.unwrap();
 
         assert_eq!(form.form_id(), FormID::from(5), "The form ID should be 5.");
+
+        // Clean up: Delete the temporary file
+        std::fs::remove_file(path)?;
 
         Ok(())
     }
@@ -1164,6 +1169,8 @@ mod tests {
         
         assert_eq!(form.form_id(), FormID::from(3), "The form ID should be 3.");
 
+        // Clean up: Delete the temporary file
+        std::fs::remove_file(path)?;
         Ok(())
     }
 }

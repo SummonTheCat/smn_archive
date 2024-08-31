@@ -244,6 +244,9 @@ mod tests {
         // Call the function and expect it to return an error
         let result = write_archive_info(invalid_path, &archive);
         assert!(result.is_err(), "Expected an error when using an invalid file path.");
+
+        fs::remove_file(test_file_path).unwrap();
+        
     }
 }
 
