@@ -9,7 +9,7 @@ pub use test_types::*;
 #[allow(unused)]
 pub use test_forms::*;
 
-use super::{io::{ read_archive_info, read_form, write_archive_info, write_archive_skeleton, write_form}, structs::{Archive, FormString}, types::{ArchiveID, FormID, LangCode, StrLrg, StrSml, Version}};
+use super::{io::{ read_archive_info, read_form, write_archive_info, write_archive_skeleton, write_form}, structs::{Archive, FormRefGroup, FormString}, types::{ArchiveID, FormID, GlobalID, LangCode, StrLrg, StrSml, Version}};
 
 #[allow(unused)]
 pub fn run_tests() {
@@ -38,7 +38,7 @@ pub fn run_tests_io() {
     // All form reading functionality (Reading)
     test_form_read(path);
     // Test performance of reading and writing
-    test_form_perf(&path, 1000);
+    test_form_perf(&path, 5000);
 }
 
 pub fn run_tests_flow() {
@@ -138,6 +138,30 @@ pub fn run_tests_flow() {
         }
     }
 
-    
+    //Write a new RefGroup form
+    let form = FormRefGroup::new(
+        FormID::from(2),
+        StrSml::from("RefWorlds"),
+        vec![GlobalID::from("00100005"), GlobalID::from("00100006")],
+    );
+    let write_result = write_form(path, &form);
+    match write_result {
+        Ok(_) => {
+            println!("RefGroup form written successfully");
+        },
+        Err(e) => {
+            println!("Error writing RefGroup form: {}", e);
+        }
+    }
 
+    // Read the form
+    let read = read_form(path, FormID::from(2));
+    match read {
+        Ok(form) => {
+            println!("RefGroup form read successfully: {:?}", form);
+        },
+        Err(e) => {
+            println!("Error reading RefGroup form: {}", e);
+        }
+    }
 }

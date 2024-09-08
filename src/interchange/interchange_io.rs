@@ -72,9 +72,6 @@ pub extern "C" fn smn_write_archive_info(path: *const i8, archive_id: u8, versio
         StrLrg::from(description_str),
     );
 
-    // Print out the archive to the console
-    println!("{}", archive);
-
     // Write the archive info to the specified path
     let result = write_archive_info(path_str, &archive);
     let was_successful = match result {

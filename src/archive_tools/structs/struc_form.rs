@@ -5,6 +5,8 @@ use std::fmt;
 use crate::archive_tools::types::{FormID, FormType, StrSml};
 use crate::archive_tools::structs::{FormString, FormWorld};
 
+use super::FormRefGroup;
+
 pub trait FormTrait: fmt::Display + fmt::Debug {
     #[allow(unused)]
     fn to_bytes(&self) -> Vec<u8>;
@@ -66,6 +68,10 @@ impl FormBase {
                 let form_world = FormWorld::read_from_bytes(file)?;
                 Ok(Box::new(form_world))
             }
+            FormType::REFGROUP => {
+                let form_refgroup = FormRefGroup::read_from_bytes(file)?;
+                Ok(Box::new(form_refgroup))
+            }
             
         }
     }
@@ -104,6 +110,11 @@ impl FormBase {
                 let (form_world, consumed) = FormWorld::read_from_byte_buffer(bytes)?;
                 offset += consumed;
                 Ok((Box::new(form_world), offset))
+            }
+            FormType::REFGROUP => {
+                let (form_refgroup, consumed) = FormRefGroup::read_from_byte_buffer(bytes)?;
+                offset += consumed;
+                Ok((Box::new(form_refgroup), offset))
             }
         }
     }

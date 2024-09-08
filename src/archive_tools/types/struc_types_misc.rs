@@ -119,6 +119,7 @@ impl From<LangCode> for u8 {
 pub enum FormType {
     STRING = 0,
     WORLD = 1,
+    REFGROUP = 2,
 }
 
 impl FormType {
@@ -128,6 +129,7 @@ impl FormType {
         match self {
             FormType::STRING => "STRING".to_string(),
             FormType::WORLD => "WORLD".to_string(),
+            FormType::REFGROUP => "REFGROUP".to_string(),
         }
     }
 
@@ -149,6 +151,7 @@ impl From<u8> for FormType {
         match byte {
             0 => FormType::STRING,
             1 => FormType::WORLD,
+            2 => FormType::REFGROUP,
             _ => panic!("Unknown FormType"),
         }
     }
@@ -159,6 +162,7 @@ impl From<&str> for FormType {
         match s {
             "STRING" => FormType::STRING,
             "WORLD" => FormType::WORLD,
+            "REFGROUP" => FormType::REFGROUP,
             _ => panic!("Unknown FormType"),
         }
     }

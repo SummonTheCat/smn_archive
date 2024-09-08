@@ -56,6 +56,19 @@ pub fn test_forms() {
     println!("FormWorld 1 as bytes: {:?}", form_world_1.to_bytes());
 
     println!();
+
+    // - FormRefGroup - //
+    println!("-- FormRefGroup --");
+
+    let form_refgroup_1 = FormRefGroup::new(
+        FormID::from("00003"),
+        StrSml::from("RefWorlds"),
+        vec![GlobalID::from("00100052"), GlobalID::from("00100053")]
+    );
+
+    println!("FormRefGroup 1: \n{:?}", form_refgroup_1.to_string());
+    println!("FormRefGroup 1 byte count: {}", form_refgroup_1.get_byte_count());
+    println!("FormRefGroup 1 as bytes: {:?}", form_refgroup_1.to_bytes());
 }
 
 
