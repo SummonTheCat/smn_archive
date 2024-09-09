@@ -3,7 +3,7 @@ use std::io::{self, Read};
 use std::fmt;
 
 use crate::archive_tools::structs::struc_form::{FormTrait, FormBase};
-use crate::archive_tools::types::{FormID, FormType, GlobalID, StrSml};
+use crate::archive_tools::structs::{FormID, FormType, GlobalID, StrSml};
 
 #[derive(PartialEq, Eq, Clone)]
 pub struct FormWorld {

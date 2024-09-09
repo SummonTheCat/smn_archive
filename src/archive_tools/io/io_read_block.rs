@@ -1,7 +1,7 @@
 use std::{fs::File, io::{self, Read, Seek, SeekFrom}};
 
 use crate::archive_tools::io::{IOStructByteStarts, IOStructHeader, IOStructIndex, IOStructIndexItem};
-use crate::archive_tools::types::{ArchiveID, FormID, FormType, StrLrg, Version};
+use crate::archive_tools::structs::{ArchiveID, FormID, FormType, StrLrg, Version};
 
 pub fn read_block_header(file: &mut File) -> io::Result<IOStructHeader> {
     // Read ArchiveID
@@ -33,12 +33,12 @@ pub fn read_block_header(file: &mut File) -> io::Result<IOStructHeader> {
 
 pub fn read_block_bytestarts(file: &mut File) -> io::Result<IOStructByteStarts> {
     // Read BYTESTART Index
-    let mut bytestart_index_buf = [0u8; 4]; // 4 bytes for u32
+    let mut bytestart_index_buf = [0u8; 4]; 
     file.read_exact(&mut bytestart_index_buf)?;
     let bytestart_index = u32::from_be_bytes(bytestart_index_buf);
 
     // Read BYTESTART Data
-    let mut bytestart_data_buf = [0u8; 4]; // 4 bytes for u32
+    let mut bytestart_data_buf = [0u8; 4]; 
     file.read_exact(&mut bytestart_data_buf)?;
     let bytestart_data = u32::from_be_bytes(bytestart_data_buf);
 

@@ -3,7 +3,7 @@ use std::io::{self, Seek, SeekFrom};
 
 use crate::archive_tools::io::{read_block_bytestarts, read_block_header};
 use crate::archive_tools::structs::{Archive, LiteArchive, LiteArchiveItem};
-use crate::archive_tools::types::{FormID, StrSml};
+use crate::archive_tools::structs::{FormID, StrSml};
 
 use super::{read_block_index, read_form};
 
@@ -127,122 +127,5 @@ pub fn get_form_exists(file_path: &str, target_form_id: FormID) -> io::Result<bo
                 Err(e)  // Other I/O error occurred
             }
         }
-    }
-}
-
-
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::archive_tools::io::{write_archive_skeleton, write_form};
-    use crate::archive_tools::structs::FormString;
-    use crate::archive_tools::types::{ArchiveID, LangCode, StrLrg, Version};
-    use std::fs;
-    use std::io::Result;
-
-    // --- read_archive_info --- //
-    #[test]
-    fn test_read_archive_info_success() -> Result<()> {
-        let test_file_path = "test_read_archive_info.bin";
-
-        let archive = Archive::new(
-            ArchiveID::from(1),
-            Version::from(1.0),
-            StrLrg::from("Test Archive")
-        );
-        write_archive_skeleton(test_file_path, &archive)?;
-
-        let read_result = read_archive_info(test_file_path);
-
-        assert!(read_result.is_ok());
-        let read_archive = read_result.unwrap();
-        assert_eq!(read_archive.archive_id, ArchiveID::from(1));
-        assert_eq!(read_archive.version, Version::from(1.0));
-        assert_eq!(read_archive.description, StrLrg::from("Test Archive"));
-
-        fs::remove_file(test_file_path)?;
-
-        Ok(())
-    }
-
-    // --- read_lite_archive --- //
-    #[test]
-    fn test_read_lite_archive_success() -> Result<()> {
-        let test_file_path = "test_read_lite_archive_success.bin";
-
-        let archive = Archive::new(
-            ArchiveID::from(1),
-            Version::from(1.0),
-            StrLrg::from("Test Archive")
-        );
-        write_archive_skeleton(test_file_path, &archive)?;
-
-        let lite_archive_result = read_lite_archive(test_file_path);
-
-        assert!(lite_archive_result.is_ok());
-        let lite_archive = lite_archive_result.unwrap();
-        assert_eq!(lite_archive.archive_id, ArchiveID::from(1));
-        assert_eq!(lite_archive.version, Version::from(1.0));
-        assert_eq!(lite_archive.description, StrLrg::from("Test Archive"));
-
-        fs::remove_file(test_file_path)?;
-
-        Ok(())
-    }
-
-    // --- get_form_exists --- //
-    #[test]
-    fn test_get_form_exists_success() -> Result<()> {
-        let test_file_path = "test_get_form_exists_success.bin";
-        let form_id = FormID::from(1);
-
-        let archive = Archive::new(
-            ArchiveID::from(1),
-            Version::from(1.0),
-            StrLrg::from("Test Archive")
-        );
-        write_archive_skeleton(test_file_path, &archive)?;
-
-        let form = FormString::new(
-            FormID::from(1),
-            StrSml::from("Test Form"),
-            vec![LangCode::EN, LangCode::FR],
-            vec![StrLrg::from("Test Description"), StrLrg::from("Description de test")]
-        );
-
-        let write_result = write_form(test_file_path, &form);
-        assert!(write_result.is_ok());
-
-        let form_exists_result = get_form_exists(test_file_path, form_id);
-
-        assert!(form_exists_result.is_ok());
-        assert!(form_exists_result.unwrap(), "The form should exist in the archive.");
-
-        fs::remove_file(test_file_path)?;
-
-        Ok(())
-    }
-
-    #[test]
-    fn test_get_form_exists_not_found() -> Result<()> {
-        let test_file_path = "test_get_form_exists_not_found.bin";
-        let non_existent_form_id = FormID::from(999);
-
-        let archive = Archive::new(
-            ArchiveID::from(1),
-            Version::from(1.0),
-            StrLrg::from("Test Archive")
-        );
-        write_archive_skeleton(test_file_path, &archive)?;
-
-        let form_exists_result = get_form_exists(test_file_path, non_existent_form_id);
-
-        assert!(form_exists_result.is_ok());
-        assert!(!form_exists_result.unwrap(), "The form should not exist in the archive.");
-
-        fs::remove_file(test_file_path)?;
-
-        Ok(())
     }
 }

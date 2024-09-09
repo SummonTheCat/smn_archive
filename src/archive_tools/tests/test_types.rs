@@ -1,4 +1,4 @@
-use crate::archive_tools::types::{ArchiveID, FormID, GlobalID, LangCode, StrLrg, StrSml, Version, FormType};
+use crate::archive_tools::structs::{ArchiveID, FormID, GlobalID, LangCode, StrLrg, StrSml, Version, FormType};
 
 #[allow(unused)]
 pub fn test_types() {

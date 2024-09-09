@@ -2,7 +2,7 @@ use std::{collections::HashSet, io::Write, time::Instant};
 
 use rand::Rng;
 
-use crate::archive_tools::{io::{delete_form, get_form_exists, read_form, read_lite_archive, write_archive_skeleton, write_form}, structs::*, types::*};
+use crate::archive_tools::{io::{delete_form, get_form_exists, read_form, read_lite_archive, write_archive_skeleton, write_form}, structs::*};
 
 #[allow(unused)]
 pub fn test_forms() {

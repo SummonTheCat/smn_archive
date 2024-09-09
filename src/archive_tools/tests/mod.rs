@@ -9,7 +9,7 @@ pub use test_types::*;
 #[allow(unused)]
 pub use test_forms::*;
 
-use super::{io::{ read_archive_info, read_form, write_archive_info, write_archive_skeleton, write_form}, structs::{Archive, FormRefGroup, FormString}, types::{ArchiveID, FormID, GlobalID, LangCode, StrLrg, StrSml, Version}};
+use super::{io::{ read_archive_info, read_form, write_archive_info, write_archive_skeleton, write_form}, structs::{Archive, FormRefGroup, FormString, ArchiveID, FormID, GlobalID, LangCode, StrLrg, StrSml, Version}};
 
 #[allow(unused)]
 pub fn run_tests() {

@@ -1,4 +1,4 @@
-// - Version - //
+// -----------------------------  Version -----------------------------  //
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub struct Version {
     major: u8,
@@ -54,7 +54,7 @@ impl From<(u8, u8)> for Version {
 }
 
 
-// - LangCode - //
+// -----------------------------  LangCode -----------------------------  //
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub enum LangCode {
     EN = 1,
@@ -114,7 +114,7 @@ impl From<LangCode> for u8 {
     }
 }
 
-// - FormType - //
+// ----------------------------- FormType ----------------------------- //
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum FormType {
     STRING = 0,

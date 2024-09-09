@@ -1,6 +1,5 @@
 use crate::archive_tools::io::{read_archive_info, read_lite_archive, write_archive_info, write_archive_skeleton, write_form};
-use crate::archive_tools::types::{ArchiveID, GlobalID, LangCode, StrLrg, StrSml, Version, FormID};
-use crate::archive_tools::structs::{Archive, FormString, FormWorld};
+use crate::archive_tools::structs::{Archive, FormString, FormWorld, ArchiveID, GlobalID, LangCode, StrLrg, StrSml, Version, FormID};
 
 #[allow(unused)]
 pub fn test_archive() {

@@ -1,6 +1,6 @@
 use std::{ffi::{c_void, CStr}, ptr};
 
-use crate::archive_tools::{io::{delete_form, get_form_exists, read_archive_info, read_form, read_lite_archive, write_archive_info, write_archive_skeleton, write_form}, structs::{Archive, FormBase}, types::{ArchiveID, FormID, StrLrg, Version}};
+use crate::archive_tools::{io::{delete_form, get_form_exists, read_archive_info, read_form, read_lite_archive, write_archive_info, write_archive_skeleton, write_form}, structs::{Archive, FormBase, ArchiveID, FormID, StrLrg, Version}};
 
 
 #[no_mangle]

@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::archive_tools::types::{ArchiveID, FormID, FormType, StrLrg, StrSml, Version};
+use crate::archive_tools::structs::{ArchiveID, FormID, FormType, StrLrg, StrSml, Version};
 
 pub struct Archive {
     // Required fields

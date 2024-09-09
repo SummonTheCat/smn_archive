@@ -1,4 +1,4 @@
-// --- FormID --- //
+// -----------------------------  FormID -----------------------------  //
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub struct FormID {
     value: u16, 
@@ -60,7 +60,7 @@ impl From<&GlobalID> for FormID {
 }
 
 
-// --- ArchiveID --- //
+// -----------------------------  ArchiveID -----------------------------  //
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub struct ArchiveID {
     value: u8,
@@ -121,7 +121,7 @@ impl From<&GlobalID> for ArchiveID {
 }
 
 
-// --- GlobalID --- //
+// -----------------------------  GlobalID -----------------------------  //
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub struct GlobalID {
     archive_id: ArchiveID,

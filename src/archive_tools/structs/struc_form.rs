@@ -2,8 +2,7 @@ use std::fs::File;
 use std::io::{self, Read, Seek};
 use std::fmt;
 
-use crate::archive_tools::types::{FormID, FormType, StrSml};
-use crate::archive_tools::structs::{FormString, FormWorld};
+use crate::archive_tools::structs::{FormString, FormWorld, FormID, FormType, StrSml};
 
 use super::FormRefGroup;
 

@@ -2,7 +2,7 @@ use std::fmt;
 use std::fs::File;
 use std::io::{self, Read};
 
-// --- StrSml --- //
+// -----------------------------  StrSml -----------------------------  //
 #[derive(PartialEq, Eq, Clone)]
 pub struct StrSml {
     value: Vec<u16>,
@@ -70,21 +70,17 @@ impl StrSml {
         Ok(Self { value })
     }
 
-    // New function for reading from a byte buffer
     pub fn read_from_byte_buffer(bytes: &[u8]) -> io::Result<(Self, usize)> {
         let mut offset = 0;
 
-        // Read the length (1 byte)
         if bytes.len() < 1 {
             return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for string length"));
         }
         let char_count = bytes[offset] as usize;
         offset += 1;
 
-        // Prepare a vector with capacity
         let mut value = Vec::with_capacity(char_count);
 
-        // Read the characters (each character is 2 bytes)
         for _ in 0..char_count {
             if bytes.len() < offset + 2 {
                 return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for string characters"));
@@ -117,7 +113,7 @@ impl fmt::Debug for StrSml {
 }
 
 
-// --- StrLrg --- //
+// -----------------------------  StrLrg -----------------------------  //
 #[derive(PartialEq, Eq, Clone)]
 pub struct StrLrg {
     value: Vec<u16>,
@@ -187,7 +183,6 @@ impl StrLrg {
     pub fn read_from_byte_buffer(bytes: &[u8]) -> io::Result<(Self, usize)> {
         let mut offset = 0;
 
-        // Read the length (2 bytes)
         if bytes.len() < 2 {
             return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for string length"));
         }
@@ -196,10 +191,8 @@ impl StrLrg {
 
         offset += 2;
 
-        // Prepare a vector with capacity
         let mut value = Vec::with_capacity(char_count);
 
-        // Read the characters (each character is 2 bytes)
         for _ in 0..char_count {
             if bytes.len() < offset + 2 {
                 return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for string characters"));

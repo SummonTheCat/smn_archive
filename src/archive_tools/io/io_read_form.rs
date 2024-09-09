@@ -2,7 +2,7 @@ use std::{fs::File, io::{self, Seek}};
 
 use crate::archive_tools::io::{binary_search_for_index_item, read_archive_info};
 use crate::archive_tools::structs::{FormBase, FormTrait};
-use crate::archive_tools::types::FormID;
+use crate::archive_tools::structs::FormID;
 
 
 pub fn read_form(file_path: &str, form_id: FormID) -> io::Result<Box<dyn FormTrait>> {

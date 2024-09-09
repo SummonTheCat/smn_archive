@@ -1,7 +1,7 @@
 use std::{fs::File, io::{self, Read, Seek, Write}};
 
 use crate::archive_tools::structs::{Archive, FormBase};
-use crate::archive_tools::types::FormID;
+use crate::archive_tools::structs::FormID;
 use crate::archive_tools::io::{read_archive_info, read_block_index, write_block_header, write_block_bytestart, write_block_index};
 
 pub fn delete_form(file_path: &str, form_id: FormID) -> Result<(), io::Error> {
