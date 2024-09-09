@@ -2,8 +2,7 @@ use std::io::Read;
 use std::fs::File;
 use std::{fmt, io};
 
-use crate::archive_tools::structs::{FormBase, FormTrait};
-use crate::archive_tools::structs::{FormID, FormType, LangCode, StrLrg, StrSml};
+use crate::archive_tools::structs::{forms::*, types::*};
 
 #[derive(PartialEq, Eq, Clone)]
 pub struct FormString {

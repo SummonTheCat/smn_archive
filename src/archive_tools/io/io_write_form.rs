@@ -1,7 +1,6 @@
 use std::{fs::{remove_file, File, OpenOptions}, io::{Read, Seek, SeekFrom, Write}};
-use crate::archive_tools::{io::{binary_search_for_index_item_and_position, get_index_form_id_last, get_new_form_index_pos, IOStructIndex, IOStructIndexItem}, structs::{Archive, FormBase, FormTrait, FormID}};
-use crate::archive_tools::io::{get_form_exists, get_index_form_id_first, read_block_bytestarts, read_block_header, write_block_bytestart, write_block_header, write_block_index};
-
+use crate::archive_tools::io::{*};
+use crate::archive_tools::structs::{*, forms::*, types::*};
 
 pub fn write_form(file_path: &str, form: &dyn FormTrait) -> std::io::Result<()> {
     let form_exists = get_form_exists(file_path, form.form_id())?;

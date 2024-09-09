@@ -2,6 +2,7 @@ pub mod test_archive;
 pub mod test_types;
 pub mod test_forms;
 
+
 #[allow(unused)]
 pub use test_archive::*;
 #[allow(unused)]
@@ -9,12 +10,13 @@ pub use test_types::*;
 #[allow(unused)]
 pub use test_forms::*;
 
-use super::{io::{ read_archive_info, read_form, write_archive_info, write_archive_skeleton, write_form}, structs::{Archive, FormRefGroup, FormString, ArchiveID, FormID, GlobalID, LangCode, StrLrg, StrSml, Version}};
+use super::io::{ read_archive_info, read_form, write_archive_info, write_archive_skeleton, write_form};
+use crate::archive_tools::structs::{*, forms::*, types::*};
 
 #[allow(unused)]
 pub fn run_tests() {
-    //run_tests_structs();
-    //run_tests_io();
+    run_tests_structs();
+    run_tests_io();
     run_tests_flow();
 }
 
@@ -38,7 +40,7 @@ pub fn run_tests_io() {
     // All form reading functionality (Reading)
     test_form_read(path);
     // Test performance of reading and writing
-    test_form_perf(&path, 5000);
+    test_form_perf(&path, 100);
 }
 
 pub fn run_tests_flow() {

@@ -1,7 +1,7 @@
 use std::{fs::File, io::{self, Read, Seek, SeekFrom}};
 
 use crate::archive_tools::io::{IOStructByteStarts, IOStructHeader, IOStructIndex, IOStructIndexItem};
-use crate::archive_tools::structs::{ArchiveID, FormID, FormType, StrLrg, Version};
+use crate::archive_tools::structs::types::*;
 
 pub fn read_block_header(file: &mut File) -> io::Result<IOStructHeader> {
     // Read ArchiveID

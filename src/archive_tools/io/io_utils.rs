@@ -1,6 +1,6 @@
 use std::{fs::File, io::{self, Read, Seek, SeekFrom}};
 
-use crate::archive_tools::structs::{FormID, FormType};
+use crate::archive_tools::structs::types::*;
 
 use super::IOStructIndexItem;
 

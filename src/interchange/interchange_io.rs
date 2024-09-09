@@ -1,7 +1,7 @@
 use std::{ffi::{c_void, CStr}, ptr};
 
-use crate::archive_tools::{io::{delete_form, get_form_exists, read_archive_info, read_form, read_lite_archive, write_archive_info, write_archive_skeleton, write_form}, structs::{Archive, FormBase, ArchiveID, FormID, StrLrg, Version}};
-
+use crate::archive_tools::io::{delete_form, get_form_exists, read_archive_info, read_form, read_lite_archive, write_archive_info, write_archive_skeleton, write_form};
+use crate::archive_tools::structs::{*, forms::*, types::*};
 
 #[no_mangle]
 pub extern "C" fn smn_write_archive_skeleton(path: *const i8, archive_id: u8, version_major: u8, version_minor: u8, description: *const i8) -> *const u8 {

@@ -2,8 +2,9 @@ use std::fs::File;
 use std::io::{self, Read};
 use std::fmt;
 
-use crate::archive_tools::structs::struc_form::{FormTrait, FormBase};
-use crate::archive_tools::structs::{FormID, FormType, GlobalID, StrSml};
+use crate::archive_tools::structs::{forms::*, types::*};
+
+use super::FormTrait;
 
 #[derive(PartialEq, Eq, Clone)]
 pub struct FormRefGroup {

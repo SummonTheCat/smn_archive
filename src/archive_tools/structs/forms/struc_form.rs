@@ -2,9 +2,7 @@ use std::fs::File;
 use std::io::{self, Read, Seek};
 use std::fmt;
 
-use crate::archive_tools::structs::{FormString, FormWorld, FormID, FormType, StrSml};
-
-use super::FormRefGroup;
+use crate::archive_tools::structs::{forms::*, types::*};
 
 pub trait FormTrait: fmt::Display + fmt::Debug {
     #[allow(unused)]

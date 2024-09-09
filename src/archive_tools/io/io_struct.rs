@@ -1,4 +1,4 @@
-use crate::archive_tools::structs::{ArchiveID, FormID, FormType, StrLrg, Version};
+use crate::archive_tools::structs::types::*;
 
 #[derive(Debug)]
 pub struct IOStructByteStarts {

@@ -2,8 +2,7 @@ use std::fs::File;
 use std::io::{self, Seek, SeekFrom};
 
 use crate::archive_tools::io::{read_block_bytestarts, read_block_header};
-use crate::archive_tools::structs::{Archive, LiteArchive, LiteArchiveItem};
-use crate::archive_tools::structs::{FormID, StrSml};
+use crate::archive_tools::structs::{*, types::*};
 
 use super::{read_block_index, read_form};
 
