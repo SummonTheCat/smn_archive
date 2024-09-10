@@ -1,6 +1,6 @@
 use std::{fs::{remove_file, File, OpenOptions}, io::{Read, Seek, SeekFrom, Write}};
-use crate::core::io::{*};
-use crate::core::structs::{*, forms::*, types::*};
+use crate::core::io::*;
+use crate::core::structs::*;
 
 pub fn write_form(file_path: &str, form: &dyn FormTrait) -> std::io::Result<()> {
     let form_exists = get_form_exists(file_path, form.form_id())?;

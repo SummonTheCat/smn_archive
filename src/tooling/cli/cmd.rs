@@ -50,4 +50,5 @@ fn cmd_test(args: Vec<String>) {
     println!("{:?}", args);
     test_types();
     test_forms();
+    test_io();
 }

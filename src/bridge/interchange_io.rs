@@ -1,20 +1,17 @@
 use std::{ffi::{c_void, CStr}, ptr};
 
 use crate::core::io::{delete_form, get_form_exists, read_archive_info, read_form, read_lite_archive, write_archive_info, write_archive_skeleton, write_form};
-use crate::core::structs::{*, forms::*, types::*};
+use crate::core::structs::*;
 
 #[no_mangle]
 pub extern "C" fn smn_write_archive_skeleton(path: *const i8, archive_id: u8, version_major: u8, version_minor: u8, description: *const i8) -> *const u8 {
-    // Convert the path from a raw pointer to a string
     let c_str = unsafe { CStr::from_ptr(path) };
     let path_str = c_str.to_str().unwrap_or("Invalid UTF-8");
 
-    // Convert the description from a raw pointer to a string
     let desc_c_str = unsafe { CStr::from_ptr(description) };
     let description_str = desc_c_str.to_str().unwrap_or("Invalid UTF-8");
 
 
-    // Write the archive skeleton to the specified path
     let archive = Archive::new(
         ArchiveID::from(archive_id),
         Version::from((version_major, version_minor)),
@@ -27,19 +24,15 @@ pub extern "C" fn smn_write_archive_skeleton(path: *const i8, archive_id: u8, ve
         Err(_) => false,
     };
 
-    // The size of the bool result in bytes
     let result_len = std::mem::size_of::<u8>();
 
-    // Total size: 4 bytes for the length + 1 byte for the bool
     let total_len = std::mem::size_of::<u32>() + result_len;
 
-    // Allocate memory for the length and the bool
     let ptr = unsafe { libc::malloc(total_len) as *mut u8 };
     if ptr.is_null() {
         return ptr::null();
     }
 
-    // Copy the length (1 byte for bool) into the first 4 bytes of the allocated memory
     unsafe {
         let len_ptr = ptr as *mut u32;
         *len_ptr = result_len as u32;

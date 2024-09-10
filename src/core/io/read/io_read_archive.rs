@@ -2,22 +2,11 @@ use std::fs::File;
 use std::io::{self, Seek, SeekFrom};
 
 use crate::core::io::{read_block_bytestarts, read_block_header};
-use crate::core::structs::{*, types::*};
+use crate::core::structs::*;
 
 use super::{read_block_index, read_form};
 
-/// Reads the archive information from the specified file.
-///
-/// Opens the file at `file_path`, reads the HEADER and BYTESTART blocks,
-/// and constructs an `Archive` instance with the retrieved data.
-///
-/// # Parameters
-/// - `file_path`: The path to the archive file to be read.
-///
-/// # Returns
-/// - `io::Result<Archive>`: The `Archive` instance on success, or an error on failure.
-///
-/// For more details, see the documentation in `io_read_archive.rs`.
+
 pub fn read_archive_info(file_path: &str) -> io::Result<Archive> {
     // Open the file for reading
     let mut file = File::open(file_path)?;
@@ -38,19 +27,6 @@ pub fn read_archive_info(file_path: &str) -> io::Result<Archive> {
     Ok(archive_out)
 }
 
-
-/// Reads a lite version of the archive from the specified file.
-///
-/// Opens the file at `file_path`, reads the HEADER and BYTESTART blocks,
-/// and constructs a `LiteArchive` instance with minimal information, including form metadata.
-///
-/// # Parameters
-/// - `file_path`: The path to the archive file to be read.
-///
-/// # Returns
-/// - `io::Result<LiteArchive>`: The `LiteArchive` instance on success, or an error on failure.
-///
-/// For more details, see the documentation in `io_read_archive.rs`.
 pub fn read_lite_archive(file_path: &str) -> io::Result<LiteArchive> {
     
     // Open the file for reading

@@ -1,6 +1,6 @@
 use std::{fs::File, io::{self, Read, Seek, Write}};
 
-use crate::core::structs::{*, forms::*, types::*};
+use crate::core::structs::*;
 use crate::core::io::{read_archive_info, read_block_index, write_block_header, write_block_bytestart, write_block_index};
 
 pub fn delete_form(file_path: &str, form_id: FormID) -> Result<(), io::Error> {

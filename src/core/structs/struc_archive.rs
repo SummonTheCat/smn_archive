@@ -27,6 +27,17 @@ impl Archive {
         }
     }
 
+    pub fn new_empty() -> Self {
+        Self {
+            archive_id: ArchiveID::from(0),
+            version: Version::from(0.1),
+            description: StrLrg::from("An empty archive"),
+            form_count: 0,
+            bytestart_index: 0,
+            bytestart_data: 0,
+        }
+    }
+
     pub fn get_form_count(&self) -> u16 {
         self.form_count as u16
     }
