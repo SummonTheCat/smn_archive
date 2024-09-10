@@ -1,7 +1,7 @@
-use archive_tools::tests::run_tests;
+mod core;
+mod tooling;
 
-mod archive_tools;
 
 fn main() {
-    run_tests();
+    
 }   

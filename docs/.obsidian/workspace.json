@@ -158,7 +158,7 @@
     "Structures_Types/Structures_Types_Str.md",
     "__ Docs Overview __.md",
     "Docs_API.md",
-    "Modules/archive_tools.md",
+    "Modules/core.md",
     "Modules/io/io_read_archive.md",
     "Modules/io/io_write_archive.md",
     "Modules/io",

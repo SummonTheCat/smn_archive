@@ -11,7 +11,7 @@ The SMN Archive Library is intended for use cases where large collections of for
 - **FFI Compatibility**: Expose core functionality to other languages such as C or Python via a simple FFI interface.
 - **Modular Design**: Easily extend or modify components by leveraging Rust’s modular architecture.
 
-- **`archive_tools/`**: Contains the tools related to archive operations.
+- **`core/`**: Contains the tools related to archive operations.
   - **`io/`**: Handles reading and writing binary data.
     - **`io_delete_form.rs`**: Manages deletion of forms from the archive.
     - **`io_read_archive.rs`**: Handles reading of archive data.
@@ -21,7 +21,7 @@ The SMN Archive Library is intended for use cases where large collections of for
     - **`io_write_archive.rs`**: Handles writing data to the archive.
     - **`io_write_block.rs`**: Manages writing blocks of data.
     - **`io_write_form.rs`**: Handles writing individual forms.
-  - **`mod.rs`**: Organizes modules within `archive_tools`.
+  - **`mod.rs`**: Organizes modules within `core`.
 
 - **`structs/`**: Defines the core structures used throughout the library.
   - **`struc_archive.rs`**: Structure definitions for archive management.
