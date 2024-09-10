@@ -48,7 +48,43 @@ fn validate_cmd(args: Vec<String>) -> bool {
 fn cmd_test(args: Vec<String>) {
     println!("Running Tests...");
     println!("{:?}", args);
+
+    if args.len() < 3 {
+        run_test_core();
+        return;
+    }
+
+    // Pull out the test type we want to run
+    let test_type = &args[2];
+
+    match test_type.as_str() {
+        "core" => {
+            run_test_core();
+        },
+        "manyforms" => {
+            // Pull out the number of forms we want to test
+            if args.len() < 4 {
+                println!("Please provide the number of forms to test");
+                return;
+            }
+
+            let num_forms = &args[3];
+            let num_forms: u16 = num_forms.parse().unwrap();
+
+            run_test_many_forms(num_forms);
+        },
+        _ => {
+            println!("Invalid test type: {}", test_type);
+        }
+    }
+}
+
+fn run_test_core(){
     test_types();
     test_forms();
     test_io();
+}
+
+fn run_test_many_forms(num_forms: u16){
+    test_many_forms(num_forms);
 }

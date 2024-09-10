@@ -51,3 +51,4 @@ fn test_forms_refgroup() {
     println!("{:?}", form_refgroup.to_bytes());
     println!("ByteCount: {:?}", form_refgroup.get_byte_count());
 }
+
