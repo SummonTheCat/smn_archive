@@ -19,8 +19,3 @@ panic = "abort"
 [profile.release]
 panic = "abort"
 
-[build]
-rustflags = []
-
-[env]
-RUST_TEST_THREADS = "1"

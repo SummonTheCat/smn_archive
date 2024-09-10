@@ -163,7 +163,7 @@ pub fn test_many_forms(form_count: u16) {
         StrLrg::from("Test Archive"),
     );
 
-    write_archive_skeleton(file_path, &archive);
+    let _ = write_archive_skeleton(file_path, &archive);
     
     let mut rng = rand::thread_rng();
 
