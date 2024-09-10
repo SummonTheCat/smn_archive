@@ -1,14 +1,14 @@
 use crate::core::structs::*;
 
 pub fn test_types() {
+    println!("------ TESTING TYPES ------");
     test_types_id();   
     test_types_str();
     test_types_misc();
 }
 
 fn test_types_id() {
-    println!("Testing ID Types...");
-
+    println!("------ Testing ID Types ------");
     let arch_id = ArchiveID::from(1);
     println!("{:?}", arch_id.to_string());
     println!("{:?}", arch_id.to_bytes());
@@ -28,7 +28,8 @@ fn test_types_id() {
 }
 
 fn test_types_str(){
-    println!("Testing String Types...");
+
+    println!("------ Testing String Types ------");
 
     let string_small = StrSml::from("Hello");
     println!("{:?}", string_small.to_string());
@@ -40,7 +41,7 @@ fn test_types_str(){
 }
 
 fn test_types_misc() {
-    println!("Testing Misc Types...");
+    println!("------ Testing Misc Types ------");
 
     let version = Version::from(1.3);
     println!("{:?}", version.to_string());

@@ -34,8 +34,6 @@ pub fn delete_form(file_path: &str, form_id: FormID) -> Result<(), io::Error> {
             file.seek(std::io::SeekFrom::Start(index_item.data_start_offset as u64 + archive_info.bytestart_data as u64))?;
             let found_form = FormBase::read_from_bytes(&mut file)?;
 
-            println!("--->Form found: {:?}", found_form);
-
             let form_length_old = found_form.get_byte_count() as u32;
             form_length_diff = 0 - form_length_old as i32;
             form_bytestart = index_item.data_start_offset + archive_info.bytestart_data;

@@ -99,7 +99,7 @@ pub extern "C" fn smn_write_archive_info(path: *const i8, archive_id: u8, versio
 
 
 #[no_mangle]
-pub extern "C" fn smn_read_archive_info(path: *const u8) -> *const u8 {
+pub extern "C" fn smn_read_archive_info(path: *const i8) -> *const u8 {
     // Convert the path from a raw pointer to a string
     let c_str = unsafe { CStr::from_ptr(path as *const i8) };
     let path_str = c_str.to_str().unwrap_or("Invalid UTF-8");
@@ -139,7 +139,7 @@ pub extern "C" fn smn_read_archive_info(path: *const u8) -> *const u8 {
 
 
 #[no_mangle]
-pub extern "C" fn smn_read_lite_archive(path: *const u8) -> *const u8 {
+pub extern "C" fn smn_read_lite_archive(path: *const i8) -> *const u8 {
     // Convert the path from a raw pointer to a string
     let c_str = unsafe { CStr::from_ptr(path as *const i8) };
     let path_str = c_str.to_str().unwrap_or("Invalid UTF-8");
@@ -179,7 +179,7 @@ pub extern "C" fn smn_read_lite_archive(path: *const u8) -> *const u8 {
 
 
 #[no_mangle]
-pub extern "C" fn smn_write_form(path: *const u8, form_data: *const u8, form_size: usize) -> *const u8 {
+pub extern "C" fn smn_write_form(path: *const i8, form_data: *const u8, form_size: usize) -> *const u8 {
     // Convert the path from a raw pointer to a string
     let c_str = unsafe { CStr::from_ptr(path as *const i8) };
     let path_str = c_str.to_str().unwrap_or("Invalid UTF-8");
@@ -222,7 +222,7 @@ pub extern "C" fn smn_write_form(path: *const u8, form_data: *const u8, form_siz
 
 
 #[no_mangle]
-pub extern "C" fn smn_delete_form(path: *const u8, form_id: u16) -> *const u8 {
+pub extern "C" fn smn_delete_form(path: *const i8, form_id: u16) -> *const u8 {
     // Convert the path from a raw pointer to a string
     let c_str = unsafe { CStr::from_ptr(path as *const i8) };
     let path_str = c_str.to_str().unwrap_or("Invalid UTF-8");
@@ -261,7 +261,7 @@ pub extern "C" fn smn_delete_form(path: *const u8, form_id: u16) -> *const u8 {
 
 
 #[no_mangle]
-pub extern "C" fn smn_get_form_exists(path: *const u8, form_id: u16) -> *const u8 {
+pub extern "C" fn smn_get_form_exists(path: *const i8, form_id: u16) -> *const u8 {
     // Convert the path from a raw pointer to a string
     let c_str = unsafe { CStr::from_ptr(path as *const i8) };
     let path_str = c_str.to_str().unwrap_or("Invalid UTF-8");
@@ -301,7 +301,7 @@ pub extern "C" fn smn_get_form_exists(path: *const u8, form_id: u16) -> *const u
 
 
 #[no_mangle]
-pub extern "C" fn smn_read_form(path: *const u8, form_id: u16) -> *const u8 {
+pub extern "C" fn smn_read_form(path: *const i8, form_id: u16) -> *const u8 {
     // Convert the path from a raw pointer to a string
     let c_str = unsafe { CStr::from_ptr(path as *const i8) };
     let path_str = c_str.to_str().unwrap_or("Invalid UTF-8");
@@ -338,7 +338,7 @@ pub extern "C" fn smn_read_form(path: *const u8, form_id: u16) -> *const u8 {
 
 
 #[no_mangle]
-pub extern "C" fn free_form(ptr: *mut c_void) {
+pub extern "C" fn free_ptr(ptr: *mut c_void) {
     unsafe {
         if !ptr.is_null() {
             libc::free(ptr);

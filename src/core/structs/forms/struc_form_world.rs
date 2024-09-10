@@ -8,14 +8,15 @@ use crate::core::structs::{forms::*, types::*};
 pub struct FormWorld {
     pub base: FormBase,
     pub world_name: StrSml,
+    pub world_map: StrSml,
     pub world_parts: Vec<GlobalID>,
 }
 
 #[allow(unused)]
 impl FormWorld {
-    pub const BYTE_COUNT_PARTS_COUNT: usize = 1;  // 1 byte for the count of world parts
+    pub const BYTE_COUNT_PARTS_COUNT: usize = 1;  
 
-    pub fn new(form_id: FormID, form_name: StrSml, world_name: StrSml, world_parts: Vec<GlobalID>) -> Self {
+    pub fn new(form_id: FormID, form_name: StrSml, world_name: StrSml, world_map: StrSml, world_parts: Vec<GlobalID>) -> Self {
         let base = FormBase {
             form_id,
             form_type: FormType::WORLD,
@@ -24,6 +25,7 @@ impl FormWorld {
         Self {
             base,
             world_name,
+            world_map,
             world_parts,
         }
     }
@@ -31,6 +33,7 @@ impl FormWorld {
     pub fn get_byte_count(&self) -> usize {
         self.base.get_byte_count()
             + self.world_name.get_byte_count()
+            + self.world_map.get_byte_count()
             + Self::BYTE_COUNT_PARTS_COUNT
             + (self.world_parts.len() * GlobalID::BYTE_COUNT)
     }
@@ -38,6 +41,7 @@ impl FormWorld {
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = self.base.to_bytes();
         bytes.extend_from_slice(&self.world_name.to_bytes());
+        bytes.extend_from_slice(&self.world_map.to_bytes());
         bytes.extend_from_slice(&(self.world_parts.len() as u8).to_be_bytes());
         for part in &self.world_parts {
             bytes.extend_from_slice(&part.to_bytes());
@@ -65,6 +69,9 @@ impl FormWorld {
         // Read the WorldName
         let world_name = StrSml::read_from_bytes(file)?;
 
+        // Read the WorldMap
+        let world_map = StrSml::read_from_bytes(file)?;
+
         // Read the WorldParts count
         let mut parts_count_buffer = [0u8; 1];
         file.read_exact(&mut parts_count_buffer)?;
@@ -86,6 +93,7 @@ impl FormWorld {
                 form_name,
             },
             world_name,
+            world_map,
             world_parts,
         })
     }
@@ -114,6 +122,10 @@ impl FormWorld {
 
         // Read the WorldName
         let (world_name, consumed) = StrSml::read_from_byte_buffer(&bytes[offset..])?;
+        offset += consumed;
+
+        // Read the WorldMap
+        let (world_map, consumed) = StrSml::read_from_byte_buffer(&bytes[offset..])?;
         offset += consumed;
 
         // Read the WorldParts count
@@ -147,6 +159,7 @@ impl FormWorld {
                     form_name,
                 },
                 world_name,
+                world_map,
                 world_parts,
             },
             offset,

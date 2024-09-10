@@ -1,12 +1,15 @@
 use crate::core::structs::*;
 
 pub fn test_forms() {
+    println!("------ TESTING FORMS ------");
     test_forms_string();
     test_forms_world();
     test_forms_refgroup();
 }
 
 fn test_forms_string() {
+    println!("------ Testing FormString ------");
+
     let form_string = FormString::new(
         FormID::from(1), 
         StrSml::from("Welcome"), 
@@ -20,10 +23,13 @@ fn test_forms_string() {
 }
 
 fn test_forms_world() {
+    println!("------ Testing FormWorld ------");
+
     let form_world = FormWorld::new(
         FormID::from(2), 
         StrSml::from("WrldBeach"),
         StrSml::from("The Beach"),
+        StrSml::from("MapBeach"),
         vec![GlobalID::from("00100543"), GlobalID::from("00100544")]
     );
 
@@ -33,6 +39,8 @@ fn test_forms_world() {
 }
 
 fn test_forms_refgroup() {
+    println!("------ Testing FormRefGroup ------");
+
     let form_refgroup = FormRefGroup::new(
         FormID::from(3),
         StrSml::from("RefWorlds"),

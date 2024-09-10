@@ -5,6 +5,7 @@ use crate::core::io::*;
 use crate::core::structs::*;
 
 pub fn test_io() {
+    println!("------ TESTING IO ------");
     // Get the current directory where the application is run from
     let current_dir: PathBuf = env::current_dir().expect("Failed to get current directory");
     let archive_path = current_dir.join("archives").join("test_io.smn");
@@ -15,6 +16,8 @@ pub fn test_io() {
 }
 
 fn test_io_archive(path: &str) {
+    println!("------ Testing Archive IO ------");
+
     // Write an archive
     let skeleton_archive = Archive::new_empty();
 
@@ -69,6 +72,7 @@ fn test_io_archive(path: &str) {
 }
 
 fn test_io_form(path: &str) {
+    println!("------ Testing Form IO ------");
     // Write a form
     let form1 = FormString::new(
         FormID::from(5),
