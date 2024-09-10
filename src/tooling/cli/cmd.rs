@@ -1,10 +1,11 @@
 use std::env;
 
-use crate::tooling::testing::*;
+use crate::tooling::{automation, testing::*};
 
 // Command list
-const CMD_LIST: [&str; 1] = [
-    "test"
+const CMD_LIST: [&str; 2] = [
+    "test",
+    "gen",
 ];
 
 pub fn run_cmd() {
@@ -20,8 +21,14 @@ pub fn run_cmd() {
         "test" => {
             cmd_test(args);
         },
+        "gen" => {
+            cmn_gen(args);
+        },
         _ => {
-            println!("Invalid command: Remove from cmd list!");
+            println!("Invalid command, available commands are:");
+            for cmd in CMD_LIST.iter() {
+                println!("-> {}", cmd);
+            }
         }
     }
 }
@@ -31,14 +38,6 @@ fn validate_cmd(args: Vec<String>) -> bool {
         println!("Please provide a command");
         return false;
     }
-
-    let cmd = &args[1];
-
-    if !CMD_LIST.contains(&cmd.as_str()) {
-        println!("Invalid command: Remove from cmd list!");
-        return false;
-    }
-
     return true;
 }
 
@@ -87,4 +86,37 @@ fn run_test_core(){
 
 fn run_test_many_forms(num_forms: u16){
     test_many_forms(num_forms);
+}
+
+// Formtype generation ---------------------------------------
+fn cmn_gen(args: Vec<String>) {
+    if args.len() < 3 {
+        println!("Please state the type of generation you want to perform");
+        return;
+    }
+
+    let gen_type = &args[2];
+
+    match gen_type.as_str() {
+        "formtype" => {
+            if args.len() < 4 {
+                println!("Please provide the name of the formtype you want to generate");
+                return;
+            }
+            let formtype_name = &args[3];
+            let _ = automation::formtype_management::formtype_add(formtype_name);
+        },
+        _ => {
+            println!("Invalid generation type: {}", gen_type);
+        }
+    }
+
+
+
+
+
+
+    
+
+    
 }

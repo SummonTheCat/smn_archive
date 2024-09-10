@@ -1,0 +1,152 @@
+use std::fs::File;
+use std::io::{self, Read};
+use std::fmt;
+
+use crate::core::structs::{forms::*, types::*};
+
+#[derive(PartialEq, Eq, Clone)]
+pub struct Form*FORMTYPE* {
+    pub base: FormBase,
+    // Add specific fields for *FORMTYPE*
+}
+
+#[allow(unused)]
+impl Form*FORMTYPE* {
+    pub const BYTE_COUNT_SPECIFIC_FIELDS: usize = 0;  // Placeholder for byte count of specific fields
+
+    pub fn new(form_id: FormID, form_name: StrSml /* Add other fields specific to Form*FORMTYPE* */) -> Self {
+        let base = FormBase {
+            form_id,
+            form_type: FormType::*FORMTYPE*,  // Set the form type
+            form_name,
+        };
+        Self {
+            base,
+            // Initialize other specific fields here
+        }
+    }
+
+    pub fn get_byte_count(&self) -> usize {
+        self.base.get_byte_count()  // Base byte count
+            + Self::BYTE_COUNT_SPECIFIC_FIELDS  // Add the byte count for specific fields
+            // Add calculations for other fields if applicable
+    }
+
+    pub fn to_bytes(&self) -> Vec<u8> {
+        let mut bytes = self.base.to_bytes();
+        // Add the byte conversion for specific fields here
+        bytes
+    }
+
+    pub fn read_from_bytes(file: &mut File) -> io::Result<Self> {
+        // Read the FormID and FormType
+        let mut form_id_buffer = [0u8; FormID::BYTE_COUNT];
+        file.read_exact(&mut form_id_buffer)?;
+        let form_id = FormID::from(form_id_buffer);
+
+        // Read the FormType
+        let mut form_type_buffer = [0u8; FormType::BYTE_COUNT];
+        file.read_exact(&mut form_type_buffer)?;
+        let form_type = FormType::from(form_type_buffer[0]);
+
+        // Read the FormName
+        let form_name = StrSml::read_from_bytes(file)?;
+
+        // Read specific fields for Form*FORMTYPE*
+
+        Ok(Form*FORMTYPE* {
+            base: FormBase {
+                form_id,
+                form_type,
+                form_name,
+            },
+            // Assign specific fields here
+        })
+    }
+
+    pub fn read_from_byte_buffer(bytes: &[u8]) -> io::Result<(Self, usize)> {
+        let mut offset = 0;
+
+        // Read the FormID
+        if bytes.len() < offset + FormID::BYTE_COUNT {
+            return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for FormID"));
+        }
+        let form_id_array: [u8; FormID::BYTE_COUNT] = bytes[offset..offset + FormID::BYTE_COUNT].try_into().unwrap();
+        let form_id = FormID::from(form_id_array);
+        offset += FormID::BYTE_COUNT;
+
+        // Read the FormType
+        if bytes.len() < offset + FormType::BYTE_COUNT {
+            return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for FormType"));
+        }
+        let form_type = FormType::from(bytes[offset]);
+        offset += FormType::BYTE_COUNT;
+
+        // Read the FormName
+        let (form_name, consumed) = StrSml::read_from_byte_buffer(&bytes[offset..])?;
+        offset += consumed;
+
+        // Read specific fields for Form*FORMTYPE*
+
+        Ok((
+            Form*FORMTYPE* {
+                base: FormBase {
+                    form_id,
+                    form_type,
+                    form_name,
+                },
+                // Assign specific fields here
+            },
+            offset,
+        ))
+    }
+}
+
+impl FormTrait for Form*FORMTYPE* {
+    fn to_bytes(&self) -> Vec<u8> {
+        self.to_bytes()
+    }
+
+    fn get_byte_count(&self) -> usize {
+        self.get_byte_count()
+    }
+
+    fn form_id(&self) -> FormID {
+        self.base.form_id
+    }
+
+    fn form_type(&self) -> FormType {
+        self.base.form_type
+    }
+
+    fn form_name(&self) -> StrSml {
+        self.base.form_name.clone()
+    }
+}
+
+impl fmt::Display for Form*FORMTYPE* {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "Form*FORMTYPE* {{ form_id: {}, form_type: {}, form_name: {} }}",
+            self.base.form_id.to_string(),
+            self.base.form_type.to_string(),
+            self.base.form_name.to_string()
+            // Add other specific fields if necessary
+        )
+    }
+}
+
+impl fmt::Debug for Form*FORMTYPE* {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "Form*FORMTYPE* {{ form_id: {}, form_type: {}, form_name: {}, byte_count: {} }}",
+            self.base.form_id.to_string(),
+            self.base.form_type.to_string(),
+            self.base.form_name.to_string(),
+            self.get_byte_count()
+            // Add other specific fields if necessary
+        )
+    }
+}
