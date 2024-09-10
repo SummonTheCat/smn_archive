@@ -25,6 +25,7 @@ pub struct FormBase {
     pub form_name: StrSml,
 }
 
+#[allow(unused)]
 impl FormBase {
     pub const BYTE_COUNT_FORM_ID: usize = FormID::BYTE_COUNT;
     pub const BYTE_COUNT_FORM_TYPE: usize = FormType::BYTE_COUNT;

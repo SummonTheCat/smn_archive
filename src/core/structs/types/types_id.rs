@@ -4,6 +4,7 @@ pub struct FormID {
     value: u16, 
 }
 
+#[allow(unused)]
 impl FormID {
     pub const BYTE_COUNT: usize = 2;
 
@@ -66,6 +67,7 @@ pub struct ArchiveID {
     value: u8,
 }
 
+#[allow(unused)]
 impl ArchiveID {
     pub const BYTE_COUNT: usize = 1;
 
@@ -128,6 +130,7 @@ pub struct GlobalID {
     form_id: FormID,
 }
 
+#[allow(unused)]
 impl GlobalID {
     pub const BYTE_COUNT: usize = ArchiveID::BYTE_COUNT + FormID::BYTE_COUNT;
 
@@ -178,5 +181,14 @@ impl From<[u8; GlobalID::BYTE_COUNT]> for GlobalID {
         let archive_id = ArchiveID::from([bytes[0]]);
         let form_id = FormID::from([bytes[1], bytes[2]]);
         Self { archive_id, form_id }
+    }
+}
+
+impl From<(&ArchiveID, &FormID)> for GlobalID {
+    fn from(ids: (&ArchiveID, &FormID)) -> Self {
+        Self {
+            archive_id: *ids.0,
+            form_id: *ids.1,
+        }
     }
 }

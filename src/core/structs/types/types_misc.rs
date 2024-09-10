@@ -5,6 +5,7 @@ pub struct Version {
     minor: u8,
 }
 
+#[allow(unused)]
 impl Version {
     pub const BYTE_COUNT: usize = 2;
 
@@ -122,6 +123,7 @@ pub enum FormType {
     REFGROUP = 2,
 }
 
+#[allow(unused)]
 impl FormType {
     pub const BYTE_COUNT: usize = 1;
 

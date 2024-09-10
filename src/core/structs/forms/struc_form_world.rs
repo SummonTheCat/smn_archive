@@ -11,6 +11,7 @@ pub struct FormWorld {
     pub world_parts: Vec<GlobalID>,
 }
 
+#[allow(unused)]
 impl FormWorld {
     pub const BYTE_COUNT_PARTS_COUNT: usize = 1;  // 1 byte for the count of world parts
 
@@ -45,6 +46,7 @@ impl FormWorld {
     }
 }
 
+#[allow(unused)]
 impl FormWorld {
     pub fn read_from_bytes(file: &mut File) -> std::io::Result<Self> {
         // Read the FormID and FormType

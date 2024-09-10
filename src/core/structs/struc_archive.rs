@@ -14,6 +14,7 @@ pub struct Archive {
     pub bytestart_data: u32,   
 }
 
+#[allow(unused)]
 impl Archive {
     pub fn new(archive_id: ArchiveID, version: Version, description: StrLrg) -> Self {
         Self {
@@ -88,6 +89,7 @@ pub struct LiteArchive {
     pub archive_items: Vec<LiteArchiveItem>,
 }
 
+#[allow(unused)]
 impl LiteArchive {
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = Vec::new();

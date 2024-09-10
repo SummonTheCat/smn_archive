@@ -12,6 +12,7 @@ pub struct FormRefGroup {
     pub form_references: Vec<GlobalID>,
 }
 
+#[allow(unused)]
 impl FormRefGroup {
     pub const BYTE_COUNT_REFERENCES_COUNT: usize = 1;  // 1 byte for the count of form references
 
@@ -43,6 +44,7 @@ impl FormRefGroup {
     }
 }
 
+#[allow(unused)]
 impl FormRefGroup {
     pub fn read_from_bytes(file: &mut File) -> std::io::Result<Self> {
         // Read the FormID and FormType

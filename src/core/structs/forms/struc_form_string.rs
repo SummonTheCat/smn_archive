@@ -11,6 +11,7 @@ pub struct FormString {
     pub strings: Vec<StrLrg>,
 }
 
+#[allow(unused)]
 impl FormString {
     pub const BYTE_COUNT_LANG_COUNT: usize = 1; 
 
@@ -51,7 +52,7 @@ impl FormString {
 
 impl FormString {
    
-
+    #[allow(unused)]
     pub fn read_from_bytes(file: &mut File) -> io::Result<Self> {
         // Read the FormID and FormType
         let mut form_id_buffer = [0u8; FormID::BYTE_COUNT];

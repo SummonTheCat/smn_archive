@@ -52,6 +52,7 @@ impl From<String> for StrSml {
     }
 }
 
+#[allow(unused)]
 impl StrSml {
     pub fn read_from_bytes(file: &mut File) -> io::Result<Self> {
         let mut length_buffer = [0u8; 1];
@@ -162,6 +163,7 @@ impl From<String> for StrLrg {
     }
 }
 
+#[allow(unused)]
 impl StrLrg {
     pub fn read_from_bytes(file: &mut File) -> io::Result<Self> {
         let mut length_buffer = [0u8; 2];
