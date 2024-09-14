@@ -53,24 +53,44 @@ fn cmd_test(args: Vec<String>) {
         return;
     }
 
-    // Pull out the test type we want to run
+    // Extract the test type from the arguments
     let test_type = &args[2];
 
     match test_type.as_str() {
         "core" => {
             run_test_core();
         },
-        "manyforms" => {
-            // Pull out the number of forms we want to test
-            if args.len() < 4 {
-                println!("Please provide the number of forms to test");
+        "manyformsthreaded" => {
+            // Check if we have enough arguments
+            if args.len() < 6 {
+                println!("Usage: test manyformsthreaded [r/w/rw/wr] [Form Count] [Thread Count]");
                 return;
             }
 
-            let num_forms = &args[3];
-            let num_forms: u16 = num_forms.parse().unwrap();
+            // Extract the operation type (r, w, rw, wr)
+            let operation_type = &args[3];
 
-            run_test_many_forms(num_forms);
+            // Extract the number of forms to test
+            let num_forms_str = &args[4];
+            let num_forms: u16 = match num_forms_str.parse() {
+                Ok(n) => n,
+                Err(_) => {
+                    println!("Invalid number of forms: {}", num_forms_str);
+                    return;
+                }
+            };
+
+            // Extract the number of threads to use
+            let num_threads_str = &args[5];
+            let num_threads: usize = match num_threads_str.parse() {
+                Ok(n) => n,
+                Err(_) => {
+                    println!("Invalid number of threads: {}", num_threads_str);
+                    return;
+                }
+            };
+
+            run_test_many_forms_threaded(operation_type, num_forms, num_threads);
         },
         _ => {
             println!("Invalid test type: {}", test_type);
@@ -78,15 +98,35 @@ fn cmd_test(args: Vec<String>) {
     }
 }
 
+fn run_test_many_forms_threaded(operation_type: &str, num_forms: u16, num_threads: usize) {
+    match operation_type {
+        "r" => {
+            test_read_forms_many_threaded(num_forms, num_threads)
+        },
+        "w" => {
+            test_write_forms_many_threaded(num_forms)
+        }, 
+        "rw" => {
+            test_write_forms_many_threaded(num_forms);
+            test_read_forms_many_threaded(num_forms, num_threads);
+        },
+        "wr" => {
+            test_write_forms_many_threaded(num_forms);
+            test_read_forms_many_threaded(num_forms, num_threads);
+        },
+        _ => {
+            println!("Invalid operation type: {}", operation_type);
+        }
+        
+    }
+}
 fn run_test_core(){
     test_types();
     test_forms();
     test_io();
 }
 
-fn run_test_many_forms(num_forms: u16){
-    test_many_forms(num_forms);
-}
+
 
 // Formtype generation ---------------------------------------
 fn cmn_gen(args: Vec<String>) {

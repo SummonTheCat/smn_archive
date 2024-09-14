@@ -1,4 +1,5 @@
 /target
 /archives
 /collects
+/docs
 *.lock

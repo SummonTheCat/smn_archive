@@ -9,13 +9,20 @@ log = "0.4"
 env_logger = "0.9"  # or simple_logger = "1.11"
 libc = "0.2"
 
+[features]
+c_api = []
+
 [lib]
 name = "smn_archive_extern"
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
+
+# Binary target for `cargo run`
+[[bin]]
+name = "smn_archive_bin"
+path = "src/main.rs"  # This is where the binary entry point (main.rs) will reside
 
 [profile.dev]
 panic = "abort"
 
 [profile.release]
 panic = "abort"
-

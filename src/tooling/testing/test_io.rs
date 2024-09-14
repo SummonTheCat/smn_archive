@@ -1,7 +1,13 @@
 use std::env;
+use std::io;
 use std::io::Write;
 use std::path::PathBuf;
+use std::sync::Arc;
+use std::thread;
 use std::time::Instant;
+use std::sync::atomic::{AtomicUsize, Ordering};
+use std::time::Duration;
+
 
 use rand::Rng;
 
@@ -148,31 +154,34 @@ fn test_io_form(path: &str) {
 
 }
 
-pub fn test_many_forms(form_count: u16) {
+
+
+pub fn test_write_forms_many_threaded(form_count: u16) {
     println!("--- Performance Test: Writing {} Forms ---", form_count);
-    
+
     let current_dir: PathBuf = env::current_dir().expect("Failed to get current directory");
     let archive_path = current_dir.join("archives").join("test_io.smn");
     println!("Archive Path: {:?}", archive_path);
 
-    let file_path = archive_path.to_str().unwrap();
+    let file_path = archive_path.to_str().unwrap().to_string();
 
+    // Write the archive skeleton
     let archive = Archive::new(
         ArchiveID::from("001"),
         Version::from(1.0),
         StrLrg::from("Test Archive"),
     );
 
-    let _ = write_archive_skeleton(file_path, &archive);
-    
+    let _ = write_archive_skeleton(&file_path, &archive);
+
     let mut rng = rand::thread_rng();
 
     let mut tenth_percent_times = Vec::new();
     let mut last_checkpoint = Instant::now();
 
-    println!("-- Started Writing Forms --");
+    println!("-- Started Forms Write --");
     let write_start = Instant::now();
-    
+
     for i in 1..=form_count {
         let form_id = FormID::from(i as u16);
 
@@ -197,15 +206,19 @@ pub fn test_many_forms(form_count: u16) {
             world_parts,
         );
 
-        let write_result = write_form(file_path, &form);
+        let write_result = write_form(&file_path, &form);
         if write_result.is_err() {
             println!("Error writing form {}: {:?}", i, write_result.err());
         } else {
             // Update the progress bar
             let progress = (i as f32 / form_count as f32) * 100.0;
-            print!("\rSuccessfully wrote FormID: {} Progress: [{:<50}] {:.2}%", i, "=".repeat((progress / 2.0) as usize), progress);
-            std::io::stdout().flush().unwrap();
-            println!();
+            print!(
+                "\rSuccessfully wrote FormID: {} Progress: [{:<50}] {:.2}%",
+                i,
+                "=".repeat((progress / 2.0) as usize),
+                progress
+            );
+            io::stdout().flush().unwrap(); // Ensure output is flushed immediately
         }
 
         // Record the time every 10%
@@ -218,37 +231,131 @@ pub fn test_many_forms(form_count: u16) {
     }
 
     let write_duration = write_start.elapsed();
-    println!("-- Finished Writing Forms --");
-    println!("Time taken to write {} forms: {:?}", form_count, write_duration);
+    println!();
 
-    println!("-- Started Reading Forms --");
+    // Print the time taken for each 10%
+    println!("-- Write Breakdown --");
+    println!("Write Duration: {:?}", write_duration);
+    println!("Write Time per 10%:");
+
+    // Print the top row (percentages)
+    print!("|{:^14}|", "Percent");
+    for i in 1..=tenth_percent_times.len() {
+        print!("{:^14}|", format!("{}%", i * 10));
+    }
+    println!();
+
+    // Print the second row (times)
+    print!("|{:^14}|", "Time");
+    for time in tenth_percent_times.iter() {
+        print!("{:^14}|", format!("{:?}", time));
+    }
+    println!();
+
+    println!("Successfully wrote {} forms.", form_count);
+}
+
+pub fn test_read_forms_many_threaded(form_count: u16, thread_count: usize) {
+    println!(
+        "--- Performance Test: Reading {} Forms with {} Threads ---",
+        form_count, thread_count
+    );
+
+    let current_dir: PathBuf = env::current_dir().expect("Failed to get current directory");
+    let archive_path = current_dir.join("archives").join("test_io.smn");
+    println!("Archive Path: {:?}", archive_path);
+
+    let file_path = archive_path.to_str().unwrap().to_string();
+
+    println!("-- Started Forms Read with Multiple Threads --");
     let read_start = Instant::now();
 
-    for i in 1..=form_count {
-        let form_id_str = format!("{:05}", i);
-        let form_id = FormID::from(form_id_str.as_str());
+    // Use Arc to safely share the file path between threads
+    let file_path = Arc::new(file_path);
 
-        let read_form = read_form(file_path, form_id);
-        match read_form {
-            Ok(_) => println!("Successfully read FormID: {}", form_id_str),
-            Err(e) => println!("Error reading FormID {}: {:?}", form_id_str, e),
+    // Use AtomicUsize to track the number of completed forms
+    let completed_forms = Arc::new(AtomicUsize::new(0));
+
+    // Create a vector to hold the thread handles
+    let mut handles = Vec::new();
+
+    // Divide form IDs across multiple threads
+    let forms_per_thread = (form_count as usize + thread_count - 1) / thread_count;
+
+    for thread_id in 0..thread_count {
+        let file_path = Arc::clone(&file_path);
+        let completed_forms = Arc::clone(&completed_forms);
+
+        // Calculate the start and end form IDs for this thread
+        let start_form = (thread_id * forms_per_thread + 1) as u16;
+        let end_form = std::cmp::min(start_form + forms_per_thread as u16 - 1, form_count);
+
+        let handle = thread::spawn(move || {
+            for i in start_form..=end_form {
+                let form_id = FormID::from(i);
+
+                let read_form = read_form(&file_path, form_id);
+                match read_form {
+                    Ok(_) => {
+                        // Increment the completed_forms counter
+                        completed_forms.fetch_add(1, Ordering::SeqCst);
+                    }
+                    Err(e) => {
+                        eprintln!(
+                            "Thread {}: Error reading FormID {}: {:?}",
+                            thread_id, i, e
+                        );
+                        // Even on error, increment the counter to not stall the progress bar
+                        completed_forms.fetch_add(1, Ordering::SeqCst);
+                    }
+                }
+            }
+        });
+
+        handles.push(handle);
+    }
+
+    // Main thread progress bar
+    let total_forms = form_count as usize;
+
+    // We'll use a loop to update the progress bar periodically
+    let mut last_completed = 0;
+    while last_completed < total_forms {
+        let current_completed = completed_forms.load(Ordering::SeqCst);
+        if current_completed != last_completed {
+            last_completed = current_completed;
+            let progress = (current_completed as f32 / total_forms as f32) * 100.0;
+            print!(
+                "\rProgress: [{:<50}] {:.2}%",
+                "=".repeat((progress / 2.0) as usize),
+                progress
+            );
+            io::stdout().flush().unwrap();
         }
+        thread::sleep(Duration::from_millis(100)); // Adjust the sleep duration as needed
     }
 
+    // Ensure the progress bar shows 100% when done
+    print!(
+        "\rProgress: [{:<50}] {:.2}%",
+        "=".repeat(50),
+        100.0
+    );
+    println!();
+
+    // Wait for all threads to finish
+    for handle in handles {
+        handle.join().expect("Thread failed to join");
+    }
+
+    // Capture the end time for reading
     let read_duration = read_start.elapsed();
-    println!("-- Finished Reading Forms --");
-    println!("Time taken to read {} forms: {:?}", form_count, read_duration);
 
-    println!("-- Performance Test Completed --");
-    println!("Breakdown:");
-    println!("Write Duration: {:?}", write_duration);
+    println!("-- Read Breakdown --");
     println!("Read Duration: {:?}", read_duration);
-    println!("Total Duration: {:?}", write_duration + read_duration);
-    
-    // Print the time taken for each 10%
-    println!("-- Write Time per 10% --");
-    for (i, time) in tenth_percent_times.iter().enumerate() {
-        println!("Time to write {}%: {:?}", (i + 1) * 10, time);
-    }
 
+    println!(
+        "Successfully read {} forms across {} threads.",
+        form_count, thread_count
+    );
 }
