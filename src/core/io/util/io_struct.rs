@@ -19,7 +19,7 @@ pub struct IOStructIndex {
     pub indexes: Vec<IOStructIndexItem>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct IOStructIndexItem {
     pub form_id: FormID,
     pub form_type: FormType,

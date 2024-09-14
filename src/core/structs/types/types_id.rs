@@ -1,5 +1,5 @@
 // -----------------------------  FormID -----------------------------  //
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash)]
 pub struct FormID {
     value: u16, 
 }

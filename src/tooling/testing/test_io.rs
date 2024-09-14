@@ -255,6 +255,10 @@ pub fn test_write_forms_many_threaded(form_count: u16) {
     println!("Successfully wrote {} forms.", form_count);
 }
 
+
+// Assuming necessary imports and types are defined elsewhere
+// use crate::{FormID, read_forms};
+
 pub fn test_read_forms_many_threaded(form_count: u16, thread_count: usize) {
     println!(
         "--- Performance Test: Reading {} Forms with {} Threads ---",
@@ -276,11 +280,11 @@ pub fn test_read_forms_many_threaded(form_count: u16, thread_count: usize) {
     // Use AtomicUsize to track the number of completed forms
     let completed_forms = Arc::new(AtomicUsize::new(0));
 
-    // Create a vector to hold the thread handles
-    let mut handles = Vec::new();
-
     // Divide form IDs across multiple threads
     let forms_per_thread = (form_count as usize + thread_count - 1) / thread_count;
+
+    // Create a vector to hold the thread handles
+    let mut handles = Vec::new();
 
     for thread_id in 0..thread_count {
         let file_path = Arc::clone(&file_path);
@@ -291,23 +295,22 @@ pub fn test_read_forms_many_threaded(form_count: u16, thread_count: usize) {
         let end_form = std::cmp::min(start_form + forms_per_thread as u16 - 1, form_count);
 
         let handle = thread::spawn(move || {
-            for i in start_form..=end_form {
-                let form_id = FormID::from(i);
+            // Collect the form IDs assigned to this thread
+            let form_ids: Vec<FormID> = (start_form..=end_form).map(FormID::from).collect();
 
-                let read_form = read_form(&file_path, form_id);
-                match read_form {
-                    Ok(_) => {
-                        // Increment the completed_forms counter
-                        completed_forms.fetch_add(1, Ordering::SeqCst);
-                    }
-                    Err(e) => {
-                        eprintln!(
-                            "Thread {}: Error reading FormID {}: {:?}",
-                            thread_id, i, e
-                        );
-                        // Even on error, increment the counter to not stall the progress bar
-                        completed_forms.fetch_add(1, Ordering::SeqCst);
-                    }
+            // Call the optimized batch read function
+            match read_forms(&file_path, form_ids) {
+                Ok(forms) => {
+                    // Update the completed_forms counter
+                    completed_forms.fetch_add(forms.len(), Ordering::SeqCst);
+                }
+                Err(e) => {
+                    eprintln!(
+                        "Thread {}: Error reading forms {} to {}: {:?}",
+                        thread_id, start_form, end_form, e
+                    );
+                    // Even on error, increment the counter to not stall the progress bar
+                    completed_forms.fetch_add((end_form - start_form + 1) as usize, Ordering::SeqCst);
                 }
             }
         });

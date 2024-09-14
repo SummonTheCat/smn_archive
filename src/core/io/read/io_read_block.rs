@@ -94,7 +94,7 @@ pub fn binary_search_for_index_item(
     let mut right = left + (item_size * form_count as usize) as u64;
 
     let mut passes = 0;
-    let max_passes = 10;  // Number of binary search passes before switching to linear search
+    let max_passes = 30;  // Number of binary search passes before switching to linear search
 
     while passes < max_passes {
         passes += 1;
@@ -273,4 +273,38 @@ pub fn binary_search_for_index_item_and_position(
 
     // If we reach here, the target FormID was not found
     Ok(None)
+}
+
+#[allow(unused)]
+pub fn binary_search_for_index_item_inmem(
+    target_form_ids: Vec<FormID>,
+    index: &IOStructIndex,
+) -> io::Result<Option<IOStructIndex>> {
+    let mut result_indexes = Vec::new();
+
+    // For each target FormID, perform binary search over the index
+    for target_form_id in target_form_ids {
+        match index.indexes.binary_search_by_key(&target_form_id, |item| item.form_id) {
+            Ok(pos) => {
+                // Found the item at position `pos`
+                let index_item = index.indexes[pos].clone();
+                result_indexes.push(index_item);
+            }
+            Err(_) => {
+                // FormID not found; return an error or handle as needed
+                return Err(io::Error::new(
+                    io::ErrorKind::NotFound,
+                    format!("FormID {} not found in archive.", target_form_id.to_string()),
+                ));
+            }
+        }
+    }
+
+    if result_indexes.is_empty() {
+        Ok(None)
+    } else {
+        Ok(Some(IOStructIndex {
+            indexes: result_indexes,
+        }))
+    }
 }
