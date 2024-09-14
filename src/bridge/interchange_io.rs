@@ -1,6 +1,6 @@
-use std::{ffi::{c_void, CStr}, ptr};
+use std::{ffi::{c_void, CStr}, ptr, slice};
 
-use crate::core::io::{delete_form, get_form_exists, read_archive_info, read_form, read_lite_archive, write_archive_info, write_archive_skeleton, write_form};
+use crate::core::io::{delete_form, get_form_exists, read_archive_info, read_form, read_forms, read_lite_archive, write_archive_info, write_archive_skeleton, write_form};
 use crate::core::structs::*;
 
 #[no_mangle]
@@ -44,8 +44,6 @@ pub extern "C" fn smn_write_archive_skeleton(path: *const i8, archive_id: u8, ve
 
     ptr as *const u8
 }
-
-
 
 #[no_mangle]
 pub extern "C" fn smn_write_archive_info(path: *const i8, archive_id: u8, version_major: u8, version_minor: u8, description: *const i8) -> *const u8 {
@@ -97,7 +95,6 @@ pub extern "C" fn smn_write_archive_info(path: *const i8, archive_id: u8, versio
     ptr as *const u8
 }
 
-
 #[no_mangle]
 pub extern "C" fn smn_read_archive_info(path: *const i8) -> *const u8 {
     // Convert the path from a raw pointer to a string
@@ -137,7 +134,6 @@ pub extern "C" fn smn_read_archive_info(path: *const i8) -> *const u8 {
     ptr as *const u8
 }
 
-
 #[no_mangle]
 pub extern "C" fn smn_read_lite_archive(path: *const i8) -> *const u8 {
     // Convert the path from a raw pointer to a string
@@ -175,8 +171,6 @@ pub extern "C" fn smn_read_lite_archive(path: *const i8) -> *const u8 {
     // Return the pointer to the allocated memory
     ptr as *const u8
 }
-
-
 
 #[no_mangle]
 pub extern "C" fn smn_write_form(path: *const i8, form_data: *const u8, form_size: usize) -> *const u8 {
@@ -219,8 +213,6 @@ pub extern "C" fn smn_write_form(path: *const i8, form_data: *const u8, form_siz
     ptr as *const u8
 }
 
-
-
 #[no_mangle]
 pub extern "C" fn smn_delete_form(path: *const i8, form_id: u16) -> *const u8 {
     // Convert the path from a raw pointer to a string
@@ -258,7 +250,6 @@ pub extern "C" fn smn_delete_form(path: *const i8, form_id: u16) -> *const u8 {
 
     ptr as *const u8
 }
-
 
 #[no_mangle]
 pub extern "C" fn smn_get_form_exists(path: *const i8, form_id: u16) -> *const u8 {
@@ -298,8 +289,6 @@ pub extern "C" fn smn_get_form_exists(path: *const i8, form_id: u16) -> *const u
     ptr as *const u8
 }
 
-
-
 #[no_mangle]
 pub extern "C" fn smn_read_form(path: *const i8, form_id: u16) -> *const u8 {
     // Convert the path from a raw pointer to a string
@@ -329,6 +318,50 @@ pub extern "C" fn smn_read_form(path: *const i8, form_id: u16) -> *const u8 {
         let len_ptr = ptr as *mut u32;
         *len_ptr = len;
         // Copy the form bytes into the allocated memory after the length
+        let data_ptr = ptr.add(std::mem::size_of::<u32>());
+        data_ptr.copy_from_nonoverlapping(form_bytes.as_ptr(), len as usize);
+    }
+
+    ptr as *const u8
+}
+
+#[no_mangle]
+pub extern "C" fn smn_read_forms(path: *const i8, form_ids: *const u8) -> *const u8 {
+    let c_str = unsafe { CStr::from_ptr(path as *const i8) };
+    let path_str = c_str.to_str().unwrap_or("Invalid UTF-8");
+
+    let form_count = unsafe { *(form_ids as *const u16) } as usize;
+    let form_id_bytes = unsafe { slice::from_raw_parts(form_ids.add(2), form_count * 2) };
+
+    let mut form_ids_vec = Vec::with_capacity(form_count);
+    for i in 0..form_count {
+        let form_id = u16::from_be_bytes([form_id_bytes[i * 2], form_id_bytes[i * 2 + 1]]);
+        form_ids_vec.push(FormID::from(form_id));
+    }
+
+    let forms = match read_forms(path_str, form_ids_vec) {
+        Ok(f) => f,
+        Err(_) => return ptr::null(),
+    };
+
+    let mut form_bytes = Vec::new();
+    for form in forms {
+        let form_data = form.to_bytes();
+        form_bytes.extend_from_slice(&form_data);
+    }
+
+    let len = form_bytes.len() as u32;
+
+    let total_len = std::mem::size_of::<u32>() + len as usize;
+    let ptr = unsafe { libc::malloc(total_len) as *mut u8 };
+    if ptr.is_null() {
+        return ptr::null();
+    }
+
+    unsafe {
+        let len_ptr = ptr as *mut u32;
+        *len_ptr = len;
+
         let data_ptr = ptr.add(std::mem::size_of::<u32>());
         data_ptr.copy_from_nonoverlapping(form_bytes.as_ptr(), len as usize);
     }

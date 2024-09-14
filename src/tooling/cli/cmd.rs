@@ -24,6 +24,9 @@ pub fn run_cmd() {
         "gen" => {
             cmn_gen(args);
         },
+        "buildfull" => {
+            cmd_buildfull(args);
+        },
         _ => {
             println!("Invalid command, available commands are:");
             for cmd in CMD_LIST.iter() {
@@ -41,9 +44,23 @@ fn validate_cmd(args: Vec<String>) -> bool {
     return true;
 }
 
-// Command functions ---------------------------------------
+// ---------------- Command functions ---------------- // 
 
-// Testing
+// Building --------------------------------------
+fn cmd_buildfull(args: Vec<String>) {
+    println!("Building Full...");
+    println!("{:?}", args);
+
+    // Takes no arguments
+    if args.len() > 2 {
+        println!("Usage: buildfull");
+        return;
+    }
+
+    automation::build::build_full();
+}
+
+// Testing  --------------------------------------
 fn cmd_test(args: Vec<String>) {
     println!("Running Tests...");
     println!("{:?}", args);
@@ -126,9 +143,7 @@ fn run_test_core(){
     test_io();
 }
 
-
-
-// Formtype generation ---------------------------------------
+// Formtype generation ----------------------------
 fn cmn_gen(args: Vec<String>) {
     if args.len() < 3 {
         println!("Please state the type of generation you want to perform");
