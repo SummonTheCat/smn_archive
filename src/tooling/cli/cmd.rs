@@ -77,6 +77,9 @@ fn cmd_test(args: Vec<String>) {
         "core" => {
             run_test_core();
         },
+        "sample" => {
+            test_sample();
+        },
         "manyformsthreaded" => {
             // Check if we have enough arguments
             if args.len() < 6 {

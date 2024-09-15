@@ -31,7 +31,7 @@ impl FormRefGroup {
     pub fn get_byte_count(&self) -> usize {
         self.base.get_byte_count()
             + Self::BYTE_COUNT_REFERENCES_COUNT
-            + (self.form_references.len() * FormID::BYTE_COUNT)
+            + (self.form_references.len() * GlobalID::BYTE_COUNT)
     }
 
     pub fn to_bytes(&self) -> Vec<u8> {

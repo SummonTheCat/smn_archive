@@ -194,11 +194,12 @@ impl fmt::Display for FormWorld {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "FormWorld {{ form_id: {}, form_type: {}, form_name: {}, world_name: {}, parts_count: {}, world_parts: {:?} }}",
+            "FormWorld {{ form_id: {}, form_type: {}, form_name: {}, world_name: {}, world_map: {}, world_parts_count: {}, world_parts: {:?} }}",
             self.base.form_id.to_string(),
             self.base.form_type.to_string(),
             self.base.form_name.to_string(),
             self.world_name.to_string(),
+            self.world_map.to_string(),
             self.world_parts.len(),
             self.world_parts,
         )
@@ -209,13 +210,14 @@ impl fmt::Debug for FormWorld {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "FormWorld {{ form_id: {}, form_type: {}, form_name: \"{}\", world_name: \"{}\", byte_count: {}, world_parts: {:?} }}",
+            "FormWorld {{ form_id: {}, form_type: {}, form_name: {}, world_name: {}, world_map: {}, world_parts_count: {}, world_parts: {:?} }}",
             self.base.form_id.to_string(),
             self.base.form_type.to_string(),
             self.base.form_name.to_string(),
             self.world_name.to_string(),
-            self.get_byte_count(),
-            self.world_parts
+            self.world_map.to_string(),
+            self.world_parts.len(),
+            self.world_parts,
         )
     }
 }
