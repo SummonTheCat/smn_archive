@@ -1,6 +1,6 @@
 [package]
 name = "smn_archive"
-version = "0.1.5"
+version = "0.1.6"
 authors = ["Julien Liakos <julien_andrew@outlook.com>"]
 edition = "2021"
 description = "An archive editor for a custom smnarchive format (.smn)"
@@ -19,7 +19,7 @@ libc = "0.2"
 c_api = []
 
 [lib]
-name = "smn_archive_extern"
+name = "smn_archive"
 crate-type = ["cdylib", "rlib"]
 
 # Binary target for `cargo run`
