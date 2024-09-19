@@ -1,12 +1,19 @@
 [package]
 name = "smn_archive"
-version = "0.1.0"
+version = "0.1.5"
 edition = "2021"
+authors = ["Julien Liakos <julien_andrew@outlook.com>"]
+edition = "2024"
+description = "An archive editor for a custom smnarchive format (.smn)"
+license = "SmnSource License V1.0 (Attached)"
+repository = "https://github.com/SummonTheCat/smn_archive"
+homepage = "https://summonthecat.com"
+documentation = "attached"
 
 [dependencies]
 rand = "0.8"
 log = "0.4"
-env_logger = "0.9"  # or simple_logger = "1.11"
+env_logger = "0.9"
 libc = "0.2"
 
 [features]
@@ -19,7 +26,7 @@ crate-type = ["cdylib", "rlib"]
 # Binary target for `cargo run`
 [[bin]]
 name = "smn_archive_bin"
-path = "src/main.rs"  # This is where the binary entry point (main.rs) will reside
+path = "src/main.rs" 
 
 [profile.dev]
 panic = "abort"
