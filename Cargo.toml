@@ -7,7 +7,7 @@ description = "An archive editor for a custom smnarchive format (.smn)"
 license-file = "LICENSE.md"
 repository = "https://github.com/SummonTheCat/smn_archive"
 homepage = "https://summonthecat.com"
-documentation = "N/A (Coming in future versions)"
+documentation = "https://summonthecat.com/docs/smn_archive"
 
 [dependencies]
 rand = "0.8"
