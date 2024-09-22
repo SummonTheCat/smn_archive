@@ -80,6 +80,9 @@ fn cmd_test(args: Vec<String>) {
         "sample" => {
             test_sample();
         },
+        "todictionary" => {
+            test_todict();
+        },
         "manyformsthreaded" => {
             // Check if we have enough arguments
             if args.len() < 6 {

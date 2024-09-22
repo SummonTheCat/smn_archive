@@ -2,6 +2,8 @@ use std::fs::File;
 use std::io::{self, Read};
 use std::fmt;
 
+use serde_json::{json, Value};
+
 use crate::core::structs::{forms::*, types::*};
 
 use super::FormTrait;
@@ -41,6 +43,15 @@ impl FormRefGroup {
             bytes.extend_from_slice(&reference.to_bytes());
         }
         bytes
+    }
+
+    pub fn to_dict(&self) -> Value {
+        json!({
+            "form_id": self.base.form_id.to_string(),
+            "form_type": self.base.form_type.to_string(),
+            "form_name": self.base.form_name.to_string(),
+            "form_references": self.form_references.iter().map(|reference| reference.to_string()).collect::<Vec<_>>(),
+        })
     }
 }
 
@@ -161,6 +172,10 @@ impl FormTrait for FormRefGroup {
 
     fn form_name(&self) -> StrSml {
         self.base.form_name.clone()
+    }
+
+    fn to_dict(&self) -> Value {
+        self.to_dict()
     }
 }
 

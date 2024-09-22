@@ -2,6 +2,8 @@ use std::fs::File;
 use std::io::{self, Read, Seek};
 use std::fmt;
 
+use serde_json::{json, Value};
+
 use crate::core::structs::{forms::*, types::*};
 
 pub trait FormTrait: fmt::Display + fmt::Debug {
@@ -15,7 +17,8 @@ pub trait FormTrait: fmt::Display + fmt::Debug {
     fn form_type(&self) -> FormType;
     #[allow(unused)]
     fn form_name(&self) -> StrSml;
-    
+    #[allow(unused)]
+    fn to_dict(&self) -> Value;
 }
 
 #[derive(PartialEq, Eq, Clone)]
@@ -116,6 +119,14 @@ impl FormBase {
             }
         }
     }
+
+    fn to_dict(&self) -> Value {
+        json!({
+            "form_id": self.form_id.to_string(),
+            "form_type": self.form_type.to_string(),
+            "form_name": self.form_name.to_string(),
+        })
+    }
 }
 
 impl FormTrait for FormBase {
@@ -138,6 +149,10 @@ impl FormTrait for FormBase {
 
     fn form_name(&self) -> StrSml {
         self.form_name.clone()
+    }
+
+    fn to_dict(&self) -> Value {
+        self.to_dict()
     }
 }
 

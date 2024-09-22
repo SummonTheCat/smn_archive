@@ -2,6 +2,8 @@ use std::fs::File;
 use std::io::{self, Read};
 use std::fmt;
 
+use serde_json::{json, Value};
+
 use crate::core::structs::{forms::*, types::*};
 
 #[derive(PartialEq, Eq, Clone)]
@@ -47,6 +49,17 @@ impl FormWorld {
             bytes.extend_from_slice(&part.to_bytes());
         }
         bytes
+    }
+
+    pub fn to_dict(&self) -> Value {
+        json!({
+            "form_id": self.base.form_id.to_string(),
+            "form_type": self.base.form_type.to_string(),
+            "form_name": self.base.form_name.to_string(),
+            "world_name": self.world_name.to_string(),
+            "world_map": self.world_map.to_string(),
+            "world_parts": self.world_parts.iter().map(|part| part.to_string()).collect::<Vec<_>>()
+        })
     }
 }
 
@@ -187,6 +200,10 @@ impl FormTrait for FormWorld {
 
     fn form_name(&self) -> StrSml {
         self.base.form_name.clone()
+    }
+
+    fn to_dict(&self) -> Value {
+        self.to_dict()
     }
 }
 

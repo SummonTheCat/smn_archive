@@ -2,6 +2,8 @@ use std::io::Read;
 use std::fs::File;
 use std::{fmt, io};
 
+use serde_json::{json, Value};
+
 use crate::core::structs::{forms::*, types::*};
 
 #[derive(PartialEq, Eq, Clone)]
@@ -47,6 +49,16 @@ impl FormString {
             bytes.extend_from_slice(&string.to_bytes());
         }
         bytes
+    }
+
+    pub fn to_dict(&self) -> Value {
+        json!({
+            "form_id": self.base.form_id.to_string(),
+            "form_type": self.base.form_type.to_string(),
+            "form_name": self.base.form_name.to_string(),
+            "languages": self.languages.iter().map(|lang| lang.to_string()).collect::<Vec<_>>(),
+            "strings": self.strings.iter().map(|string| string.to_string()).collect::<Vec<_>>()
+        })
     }
 }
 
@@ -182,6 +194,10 @@ impl FormTrait for FormString {
 
     fn form_name(&self) -> StrSml {
         self.base.form_name.clone()
+    }
+
+    fn to_dict(&self) -> Value {
+        self.to_dict()
     }
 }
 
