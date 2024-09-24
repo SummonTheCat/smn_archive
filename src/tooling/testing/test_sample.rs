@@ -1,6 +1,6 @@
 use std::{env, path::PathBuf};
 
-use crate::core::{io::{read_form, write_archive_skeleton, write_form}, structs::{Archive, ArchiveID, FormID, FormRefGroup, FormWorld, GlobalID, StrLrg, StrSml, Version}};
+use crate::core::{io::{read_form, write_archive_skeleton, write_form}, structs::{Archive, ArchiveID, FormID, FormRefGroup, FormWorld, GlobalID, StrLrg, StrSml, Version, FormString, LangCode}};
 
 pub fn test_sample() {
     // Write the archive
@@ -69,6 +69,17 @@ pub fn test_sample() {
     let _ = write_form(&path, &form);
 
     println!("------------------------");
+
+    let form_id = FormID::from(10);
+    let form_name = StrSml::from("StrTitle");
+    let languages = vec![LangCode::EN, LangCode::FR];
+    let strings = vec![
+        StrLrg::from("Welcome to NullPoint"),
+        StrLrg::from("Bienvenue à NullPoint")
+    ];
+
+    let form = FormString::new(form_id, form_name, languages, strings);
+    let _ = write_form(&path, &form);
 
     // Read the forms
     let form = read_form(&path, FormID::from(1));

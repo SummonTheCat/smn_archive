@@ -60,7 +60,6 @@ pub fn read_lite_archive(file_path: &str) -> io::Result<LiteArchive> {
     Ok(archive_out)
 }
 
-
 pub fn get_form_exists(file_path: &str, form_id: FormID) -> io::Result<bool> {
 
     let archive = read_archive_info(file_path)?;
