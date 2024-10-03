@@ -6,6 +6,8 @@ use serde_json::{json, Value};
 
 use crate::core::structs::{forms::*, types::*};
 
+/// A struct that represents a string form, which contains multiple language
+/// entries and associated strings.
 #[derive(PartialEq, Eq, Clone)]
 pub struct FormString {
     pub base: FormBase,
@@ -15,6 +17,7 @@ pub struct FormString {
 
 #[allow(unused)]
 impl FormString {
+    /// Byte count for the language count
     pub const BYTE_COUNT_LANG_COUNT: usize = 1; 
 
     pub fn new(form_id: FormID, form_name: StrSml, languages: Vec<LangCode>, strings: Vec<StrLrg>) -> Self {
@@ -33,12 +36,14 @@ impl FormString {
         }
     }
 
+    /// Calculates the total byte count needed to serialize the form
     pub fn get_byte_count(&self) -> usize {
         let lang_byte_size = 1 * self.languages.len();
         let string_byte_size: usize = self.strings.iter().map(|s| s.get_byte_count()).sum();
         self.base.get_byte_count() + Self::BYTE_COUNT_LANG_COUNT + lang_byte_size + string_byte_size
     }
 
+    /// Serializes the `FormString` into a byte array
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = self.base.to_bytes();
         bytes.extend_from_slice(&(self.languages.len() as u8).to_be_bytes());
@@ -51,6 +56,7 @@ impl FormString {
         bytes
     }
 
+    /// Converts the form into a dictionary-like JSON object for serialization
     pub fn to_dict(&self) -> Value {
         json!({
             "form_id": self.base.form_id.to_string(),
@@ -64,9 +70,10 @@ impl FormString {
 
 impl FormString {
    
+    /// Reads `FormString` from a binary file
     #[allow(unused)]
     pub fn read_from_bytes(file: &mut File) -> io::Result<Self> {
-        // Read the FormID and FormType
+        // Read the FormID
         let mut form_id_buffer = [0u8; FormID::BYTE_COUNT];
         file.read_exact(&mut form_id_buffer)?;  
         let form_id = FormID::from(form_id_buffer);
@@ -79,7 +86,7 @@ impl FormString {
         // Read the FormName
         let form_name = StrSml::read_from_bytes(file)?;
         
-        // Read the string count
+        // Read the language count
         let mut lang_count_buffer = [0u8; 1];
         file.read_exact(&mut lang_count_buffer)?;
         let lang_count = lang_count_buffer[0];
@@ -110,6 +117,7 @@ impl FormString {
         })
     }
 
+    /// Reads `FormString` from a byte buffer
     pub fn read_from_byte_buffer(bytes: &[u8]) -> io::Result<(Self, usize)> {
         let mut offset = 0;
 
@@ -173,9 +181,9 @@ impl FormString {
     }
 }
 
+/// Implementation of the `FormTrait` for `FormString`
 impl FormTrait for FormString {
 
-    
     fn to_bytes(&self) -> Vec<u8> {
         self.to_bytes()
     }
@@ -201,6 +209,7 @@ impl FormTrait for FormString {
     }
 }
 
+/// Display implementation for `FormString`
 impl fmt::Display for FormString {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let strings_repr: Vec<String> = self.languages.iter().zip(self.strings.iter())
@@ -218,6 +227,7 @@ impl fmt::Display for FormString {
     }
 }
 
+/// Debug implementation for `FormString`
 impl fmt::Debug for FormString {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(

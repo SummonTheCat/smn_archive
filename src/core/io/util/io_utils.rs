@@ -4,6 +4,7 @@ use crate::core::structs::types::*;
 
 use super::IOStructIndexItem;
 
+/// Reads the first form id from the index block
 pub fn get_index_form_id_first(file: &mut File) -> Result<FormID, std::io::Error> {
     // Read the first form id
     let first_form_id_buffer = &mut [0u8; 2];
@@ -16,6 +17,7 @@ pub fn get_index_form_id_first(file: &mut File) -> Result<FormID, std::io::Error
     Ok(first_form_id)
 }
 
+/// Reads the last form id from the index block
 pub fn get_index_form_id_last(file: &mut File, form_count: u16) -> Result<FormID, std::io::Error> {
     // Go to the last form_id: form_count * 7 (form_id:2 + form_type:1 + form_offset:4) - 7
     file.seek(std::io::SeekFrom::Current((form_count as i64 * 7) - 7))?;
@@ -29,6 +31,7 @@ pub fn get_index_form_id_last(file: &mut File, form_count: u16) -> Result<FormID
     Ok(last_form_id)
 }
 
+/// Reads the form id at a specific index position
 pub fn get_new_form_index_pos(
     file: &mut File, 
     form_count: u16, 
@@ -100,6 +103,7 @@ pub fn get_new_form_index_pos(
     Ok(None)
 }
 
+/// Reads an index item at a specific position
 fn read_index_item_at_position(file: &mut File, position: u64) -> io::Result<IOStructIndexItem> {
     file.seek(SeekFrom::Start(position))?;
 

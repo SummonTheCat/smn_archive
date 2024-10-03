@@ -1,5 +1,5 @@
 /target
 /archives
 /collects
-/docs
+/docs/.obsidian
 *.lock

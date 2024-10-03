@@ -1,5 +1,9 @@
 use crate::core::structs::types::*;
 
+/*
+    Structs specifically for IO operations
+*/
+
 #[derive(Debug)]
 pub struct IOStructByteStarts {
     pub bytestart_index: u32,

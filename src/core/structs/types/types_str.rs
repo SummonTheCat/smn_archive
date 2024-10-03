@@ -9,30 +9,36 @@ pub struct StrSml {
 }
 
 impl StrSml {
+    /// Number of bytes used to store the character count (1 byte).
     pub const CHAR_COUNT_BYTE_SIZE: usize = 1;
 
+    /// Converts `StrSml` to a byte array.
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = Vec::with_capacity(Self::CHAR_COUNT_BYTE_SIZE + self.value.len() * 2);
-        bytes.push(self.value.len() as u8);
+        bytes.push(self.value.len() as u8);  // Store length in 1 byte
         for &ch in &self.value {
-            bytes.extend_from_slice(&ch.to_be_bytes());
+            bytes.extend_from_slice(&ch.to_be_bytes());  // Add UTF-16 characters
         }
         bytes
     }
 
+    /// Converts `StrSml` to a string (assumes valid UTF-16).
     pub fn to_string(&self) -> String {
         String::from_utf16(&self.value).expect("Invalid UTF-16 sequence")
     }
 
+    /// Returns the byte count of the serialized `StrSml`.
     pub fn get_byte_count(&self) -> usize {
         Self::CHAR_COUNT_BYTE_SIZE + self.value.len() * 2
     }
 }
 
 impl From<&str> for StrSml {
+    /// Converts a UTF-8 string into a `StrSml`, ensuring no surrogate pairs.
     fn from(s: &str) -> Self {
         let utf16: Vec<u16> = s.encode_utf16().collect();
 
+        // Check for characters that require surrogate pairs.
         for &code_unit in &utf16 {
             if code_unit >= 0xD800 && code_unit <= 0xDFFF {
                 panic!("StrSml cannot contain characters that require more than 2 bytes in UTF-16.");
@@ -47,6 +53,7 @@ impl From<&str> for StrSml {
 }
 
 impl From<String> for StrSml {
+    /// Converts a `String` into `StrSml`.
     fn from(s: String) -> Self {
         Self::from(s.as_str())
     }
@@ -54,6 +61,7 @@ impl From<String> for StrSml {
 
 #[allow(unused)]
 impl StrSml {
+    /// Reads `StrSml` from a file, assuming UTF-16 encoding.
     pub fn read_from_bytes(file: &mut File) -> io::Result<Self> {
         let mut length_buffer = [0u8; 1];
         file.read_exact(&mut length_buffer)?;
@@ -70,6 +78,7 @@ impl StrSml {
         Ok(Self { value })
     }
 
+    /// Reads `StrSml` from a byte buffer.
     pub fn read_from_byte_buffer(bytes: &[u8]) -> io::Result<(Self, usize)> {
         let mut offset = 0;
 
@@ -95,12 +104,14 @@ impl StrSml {
 }
 
 impl fmt::Display for StrSml {
+    /// Formats the `StrSml` as a string.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.to_string())
     }
 }
 
 impl fmt::Debug for StrSml {
+    /// Formats the `StrSml` with additional details for debugging.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
@@ -120,30 +131,36 @@ pub struct StrLrg {
 }
 
 impl StrLrg {
+    /// Number of bytes used to store the character count (2 bytes).
     pub const CHAR_COUNT_BYTE_SIZE: usize = 2;
 
+    /// Converts `StrLrg` to a byte array.
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = Vec::with_capacity(Self::CHAR_COUNT_BYTE_SIZE + self.value.len() * 2);
-        bytes.extend_from_slice(&(self.value.len() as u16).to_be_bytes());
+        bytes.extend_from_slice(&(self.value.len() as u16).to_be_bytes());  // Store length in 2 bytes
         for &ch in &self.value {
-            bytes.extend_from_slice(&ch.to_be_bytes());
+            bytes.extend_from_slice(&ch.to_be_bytes());  // Add UTF-16 characters
         }
         bytes
     }
 
+    /// Converts `StrLrg` to a string (assumes valid UTF-16).
     pub fn to_string(&self) -> String {
         String::from_utf16(&self.value).expect("Invalid UTF-16 sequence")
     }
 
+    /// Returns the byte count of the serialized `StrLrg`.
     pub fn get_byte_count(&self) -> usize {
         Self::CHAR_COUNT_BYTE_SIZE + self.value.len() * 2
     }
 }
 
 impl From<&str> for StrLrg {
+    /// Converts a UTF-8 string into a `StrLrg`, ensuring no surrogate pairs.
     fn from(s: &str) -> Self {
         let utf16: Vec<u16> = s.encode_utf16().collect();
 
+        // Check for characters that require surrogate pairs.
         for &code_unit in &utf16 {
             if code_unit >= 0xD800 && code_unit <= 0xDFFF {
                 panic!("StrLrg cannot contain characters that require more than 2 bytes in UTF-16.");
@@ -158,6 +175,7 @@ impl From<&str> for StrLrg {
 }
 
 impl From<String> for StrLrg {
+    /// Converts a `String` into `StrLrg`.
     fn from(s: String) -> Self {
         Self::from(s.as_str())
     }
@@ -165,6 +183,7 @@ impl From<String> for StrLrg {
 
 #[allow(unused)]
 impl StrLrg {
+    /// Reads `StrLrg` from a file, assuming UTF-16 encoding.
     pub fn read_from_bytes(file: &mut File) -> io::Result<Self> {
         let mut length_buffer = [0u8; 2];
         file.read_exact(&mut length_buffer)?;
@@ -181,6 +200,7 @@ impl StrLrg {
         Ok(Self { value })
     }
     
+    /// Reads `StrLrg` from a byte buffer.
     pub fn read_from_byte_buffer(bytes: &[u8]) -> io::Result<(Self, usize)> {
         let mut offset = 0;
 
@@ -209,12 +229,14 @@ impl StrLrg {
 }
 
 impl fmt::Display for StrLrg {
+    /// Formats the `StrLrg` as a string.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.to_string())
     }
 }
 
 impl fmt::Debug for StrLrg {
+    /// Formats the `StrLrg` with additional details for debugging.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,

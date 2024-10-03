@@ -171,13 +171,4 @@ fn cmn_gen(args: Vec<String>) {
             println!("Invalid generation type: {}", gen_type);
         }
     }
-
-
-
-
-
-
-    
-
-    
 }

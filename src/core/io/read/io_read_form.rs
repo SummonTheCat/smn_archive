@@ -69,6 +69,7 @@ pub fn read_forms(file_path: &str, form_ids: Vec<FormID>) -> io::Result<Vec<Box<
         let mut file = File::open(file_path)?;
     
         file.seek(std::io::SeekFrom::Start(archive.bytestart_index as u64))?;
+        
         // Read the form index block to an IOStructIndex struct
         let index = read_block_index(&mut file, archive.form_count)?;
 

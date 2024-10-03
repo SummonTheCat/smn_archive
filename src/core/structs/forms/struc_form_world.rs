@@ -6,6 +6,7 @@ use serde_json::{json, Value};
 
 use crate::core::structs::{forms::*, types::*};
 
+/// A struct that represents a world form
 #[derive(PartialEq, Eq, Clone)]
 pub struct FormWorld {
     pub base: FormBase,
@@ -16,7 +17,9 @@ pub struct FormWorld {
 
 #[allow(unused)]
 impl FormWorld {
+    /// Byte count for the parts count (set to 1 byte, as it's a simple number).
     pub const BYTE_COUNT_PARTS_COUNT: usize = 1;  
+
 
     pub fn new(form_id: FormID, form_name: StrSml, world_name: StrSml, world_map: StrSml, world_parts: Vec<GlobalID>) -> Self {
         let base = FormBase {
@@ -32,6 +35,7 @@ impl FormWorld {
         }
     }
 
+    /// Returns the total byte count needed to serialize the form
     pub fn get_byte_count(&self) -> usize {
         self.base.get_byte_count()
             + self.world_name.get_byte_count()
@@ -40,6 +44,7 @@ impl FormWorld {
             + (self.world_parts.len() * GlobalID::BYTE_COUNT)
     }
 
+    /// Converts the form into a byte array for serialization
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = self.base.to_bytes();
         bytes.extend_from_slice(&self.world_name.to_bytes());
@@ -51,6 +56,7 @@ impl FormWorld {
         bytes
     }
 
+    /// Converts the form into a dictionary-like JSON object for serialization.
     pub fn to_dict(&self) -> Value {
         json!({
             "form_id": self.base.form_id.to_string(),
@@ -65,10 +71,11 @@ impl FormWorld {
 
 #[allow(unused)]
 impl FormWorld {
+    /// Reads `FormWorld` from a binary file
     pub fn read_from_bytes(file: &mut File) -> std::io::Result<Self> {
-        // Read the FormID and FormType
+        // Read the FormID
         let mut form_id_buffer = [0u8; FormID::BYTE_COUNT];
-        file.read_exact(&mut form_id_buffer)?;  // This reads the bytes into form_id_buffer
+        file.read_exact(&mut form_id_buffer)?;
         let form_id = FormID::from(form_id_buffer);
 
         // Read the FormType
@@ -76,21 +83,16 @@ impl FormWorld {
         file.read_exact(&mut form_type_buffer)?;
         let form_type = FormType::from(form_type_buffer[0]);
 
-        // Read the FormName
-        let form_name = StrSml::read_from_bytes(file)?;
-
-        // Read the WorldName
-        let world_name = StrSml::read_from_bytes(file)?;
-
-        // Read the WorldMap
-        let world_map = StrSml::read_from_bytes(file)?;
-
-        // Read the WorldParts count
+        // Read WorldParts count
         let mut parts_count_buffer = [0u8; 1];
         file.read_exact(&mut parts_count_buffer)?;
+
+        let form_name = StrSml::read_from_bytes(file)?;
+        let world_name = StrSml::read_from_bytes(file)?;
+        let world_map = StrSml::read_from_bytes(file)?;
         let parts_count = parts_count_buffer[0];
 
-        // Read the WorldParts
+        // Read WorldParts
         let mut world_parts = Vec::with_capacity(parts_count as usize);
         for _ in 0..parts_count {
             let mut part_data_buffer = [0u8; GlobalID::BYTE_COUNT];
@@ -99,6 +101,7 @@ impl FormWorld {
             world_parts.push(part_data);
         }
 
+        // Return the FormWorld instance
         Ok(FormWorld {
             base: FormBase {
                 form_id,
@@ -111,10 +114,11 @@ impl FormWorld {
         })
     }
 
+    /// Reads `FormWorld` from a byte buffer
     pub fn read_from_byte_buffer(bytes: &[u8]) -> io::Result<(Self, usize)> {
         let mut offset = 0;
 
-        // Read the FormID
+        // Read FormID
         if bytes.len() < offset + FormID::BYTE_COUNT {
             return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for FormID"));
         }
@@ -122,48 +126,45 @@ impl FormWorld {
         let form_id = FormID::from(form_id_array);
         offset += FormID::BYTE_COUNT;
 
-        // Read the FormType
+        // Read FormType
         if bytes.len() < offset + FormType::BYTE_COUNT {
             return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for FormType"));
         }
         let form_type = FormType::from(bytes[offset]);
         offset += FormType::BYTE_COUNT;
 
-        // Read the FormName
+        // Read FormName, WorldName, and WorldMap
         let (form_name, consumed) = StrSml::read_from_byte_buffer(&bytes[offset..])?;
         offset += consumed;
 
-        // Read the WorldName
         let (world_name, consumed) = StrSml::read_from_byte_buffer(&bytes[offset..])?;
         offset += consumed;
 
-        // Read the WorldMap
         let (world_map, consumed) = StrSml::read_from_byte_buffer(&bytes[offset..])?;
         offset += consumed;
 
-        // Read the WorldParts count
+        // Read WorldParts count
         if bytes.len() < offset + 1 {
             return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for parts count"));
         }
         let parts_count = bytes[offset] as usize;
         offset += 1;
 
-        // Read the WorldParts
+        // Read WorldParts
         let mut world_parts = Vec::with_capacity(parts_count);
         for _ in 0..parts_count {
             if bytes.len() < offset + GlobalID::BYTE_COUNT {
                 return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for world part"));
             }
-    
-            // Convert the slice into a fixed-size array [u8; 3] and then into a GlobalID
+
             let part_array: [u8; GlobalID::BYTE_COUNT] = bytes[offset..offset + GlobalID::BYTE_COUNT].try_into().unwrap();
             let part = GlobalID::from(part_array);
             offset += GlobalID::BYTE_COUNT;
             
             world_parts.push(part);
         }
-        
 
+        // Return the FormWorld instance
         Ok((
             FormWorld {
                 base: FormBase {
@@ -180,6 +181,7 @@ impl FormWorld {
     }
 }
 
+/// Implementation of the `FormTrait` for `FormWorld`
 impl FormTrait for FormWorld {
 
     fn to_bytes(&self) -> Vec<u8> {
@@ -207,6 +209,7 @@ impl FormTrait for FormWorld {
     }
 }
 
+/// Display implementation for `FormWorld`
 impl fmt::Display for FormWorld {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
@@ -223,6 +226,7 @@ impl fmt::Display for FormWorld {
     }
 }
 
+/// Debug implementation for `FormWorld`
 impl fmt::Debug for FormWorld {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(

@@ -2,6 +2,7 @@ use std::{fs::{remove_file, File, OpenOptions}, io::{Read, Seek, SeekFrom, Write
 use crate::core::io::*;
 use crate::core::structs::*;
 
+/// Writes a form to the archive file.
 pub fn write_form(file_path: &str, form: &dyn FormTrait) -> std::io::Result<()> {
     let form_exists = get_form_exists(file_path, form.form_id())?;
     if form_exists {
@@ -14,6 +15,7 @@ pub fn write_form(file_path: &str, form: &dyn FormTrait) -> std::io::Result<()> 
     Ok(())
 }
 
+/// Writes a form to the archive file if it is a new form.
 fn write_form_existing(file_path: &str, form: &dyn FormTrait) -> std::io::Result<()> {
     let mut file = File::options().read(true).write(true).open(file_path)?;
 
@@ -49,6 +51,7 @@ fn write_form_existing(file_path: &str, form: &dyn FormTrait) -> std::io::Result
     Ok(())
 }
 
+/// Writes a form to the archive file if it is an existing form.
 fn write_form_existing_inner(file: &mut File, form: &dyn FormTrait, archive_info: &mut Archive) -> std::io::Result<()> {
 
     // Find the offset of the form to overwrite
@@ -205,7 +208,7 @@ fn write_form_existing_inner(file: &mut File, form: &dyn FormTrait, archive_info
     Ok(())
 }
 
-
+/// Writes a form to the archive file if it is the last form.
 fn write_form_existing_last(file: &mut File, form: &dyn FormTrait, archive_info: &mut Archive, old_data_start_offset: u32) -> std::io::Result<()> {
 
     // Read old form data
@@ -276,6 +279,7 @@ fn write_form_existing_last(file: &mut File, form: &dyn FormTrait, archive_info:
     Ok(())
 }
 
+/// Writes a new form to the archive file.
 fn write_form_new(file_path: &str, form: &dyn FormTrait) -> std::io::Result<()> {
     let mut file = File::options().read(true).write(true).open(file_path)?;
     
@@ -332,6 +336,7 @@ fn write_form_new(file_path: &str, form: &dyn FormTrait) -> std::io::Result<()> 
     Ok(())
 }
 
+/// Writes a new form to the middle of the archive.
 fn write_form_new_mid(file: &mut File, form_bytes: &Vec<u8>, form_insert_position: u64, prev_form_item: IOStructIndexItem, archive_info: &mut Archive) -> std::io::Result<()> {
 
     // Seek to the start of file
@@ -476,8 +481,8 @@ fn write_form_new_mid(file: &mut File, form_bytes: &Vec<u8>, form_insert_positio
     Ok(())
 }
 
+/// Writes a new form to the end of the archive.
 fn write_form_new_end(file: &mut File, form_bytes: &Vec<u8>, archive_info: &mut Archive) -> std::io::Result<()> {
-    // Step 1: Get the last form's offset and length
     // Read the ID of the last form in the archive
     let form_count_u64 = archive_info.form_count as u64;
 
@@ -514,7 +519,7 @@ fn write_form_new_end(file: &mut File, form_bytes: &Vec<u8>, archive_info: &mut 
     let last_form = FormBase::read_from_bytes(file)?;
     let last_form_length = last_form.get_byte_count() as u32;
 
-    // Step 2: Write the old index to a temp file
+    // Write the old index to a temp file
     file.seek(SeekFrom::Start(archive_info.bytestart_index as u64))?;
     let temp_file_path = "temp_file.tmp"; // Temporary file path
     let mut temp_file = OpenOptions::new()
@@ -533,13 +538,13 @@ fn write_form_new_end(file: &mut File, form_bytes: &Vec<u8>, archive_info: &mut 
         temp_file.write_all(&buffer[..bytes_read])?;
     }   
 
-    // Step 3: Write the new form to the archive
+    // Write the new form to the archive
     file.seek(SeekFrom::Start(archive_info.bytestart_index as u64))?;
     file.write_all(form_bytes)?;
 
     let checkpoint = file.seek(SeekFrom::Current(0))?;
 
-    // Step 4: Write the old index back to the archive
+    // Write the old index back to the archive
     temp_file.seek(SeekFrom::Start(0))?;
     loop {
         let bytes_read = temp_file.read(&mut buffer)?;
@@ -571,20 +576,20 @@ fn write_form_new_end(file: &mut File, form_bytes: &Vec<u8>, archive_info: &mut 
     let new_form_offset_bytes = new_form_offset.to_be_bytes();
     file.write_all(&new_form_offset_bytes)?;
     
-    // Step 6: Write the new header to the archive
+    // Write the new header to the archive
     archive_info.form_count += 1;
     file.seek(SeekFrom::Start(0))?;
     write_block_header(file, archive_info)?;
     write_block_bytestart(file, archive_info.bytestart_index, archive_info.bytestart_data)?;
 
-    // Step 7: Remove the temp file
+    // Remove the temp file
     drop(temp_file);
     remove_file(temp_file_path)?;
 
     Ok(())
 }
 
-
+/// Writes a new form to the start of the archive.
 fn write_form_new_start(file: &mut File, form_bytes: &Vec<u8>, form: &dyn FormTrait, archive_info: &mut Archive) -> std::io::Result<()> {
 
     let form_bytes_len = form_bytes.len() as u32;
@@ -694,6 +699,7 @@ fn write_form_new_start(file: &mut File, form_bytes: &Vec<u8>, form: &dyn FormTr
     Ok(())
 }
 
+/// Writes a new form to the archive file if it is the first form.
 fn write_form_new_first(file: &mut File, form_bytes: &Vec<u8>, form: &dyn FormTrait, archive_info: &mut Archive) -> std::io::Result<()> {
 
     archive_info.form_count += 1;

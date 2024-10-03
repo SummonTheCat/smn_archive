@@ -5,31 +5,18 @@ use crate::core::structs::Archive;
 use crate::core::io::{write_block_header, write_block_bytestart, write_block_index, read_block_bytestarts, read_block_header, read_block_index};
 use crate::core::io::IOStructIndex;
 
-
-/// Writes the basic structure of an archive to a file.
-///
-/// Creates the file at `path` and writes the HEADER, BYTESTART, and INDEX blocks from `archive`.
-/// Returns an error if any part of the process fails.
-///
-/// # Parameters
-/// - `path`: The file path where the archive will be created.
-/// - `archive`: The archive data to write.
-///
-/// # Returns
-/// - `io::Result<()>`: Ok on success, or an error on failure.
-///
-/// For more details, see the documentation in `io_write_archive.rs`.
+/// Writes the archive skeleton to the specified file.
 pub fn write_archive_skeleton(path: &str, archive: &Archive) -> io::Result<()> {
     // Attempt to create the file at the given path
     let mut file = match File::create(path) {
         Ok(f) => f,
-        Err(e) => return Err(e), // Return an error if file creation fails
+        Err(e) => return Err(e), 
     };
 
     // Write the HEADER block to the file from the provided archive data
     if let Err(e) = write_block_header(&mut file, archive) {
         eprintln!("Failed to write header block: {}", e);
-        return Err(e); // Return an error if the HEADER block fails to write
+        return Err(e); 
     } 
 
     // Get the current position in the file for the BYTESTART block
@@ -37,42 +24,29 @@ pub fn write_archive_skeleton(path: &str, archive: &Archive) -> io::Result<()> {
         Ok(p) => p as u32,
         Err(e) => {
             eprintln!("Failed to get the current position in the file: {}", e);
-            return Err(e); // Return an error if seeking fails
+            return Err(e);
         }
     };
-    let bytestart_end = bytestart_pos + 8; // Calculate the end position for the BYTESTART block
+
+    let bytestart_end = bytestart_pos + 8; 
 
     // Write the BYTESTART block using the calculated start and end positions
     if let Err(e) = write_block_bytestart(&mut file, bytestart_end, bytestart_end) {
         eprintln!("Failed to write bytestart block: {}", e);
-        return Err(e); // Return an error if the BYTESTART block fails to write
+        return Err(e); 
     }
 
     // Prepare an empty INDEX block structure and write it to the file
     let index_block = IOStructIndex { indexes: Vec::new() };
     if let Err(e) = write_block_index(&mut file, &index_block) {
         eprintln!("Failed to write index block: {}", e);
-        return Err(e); // Return an error if the INDEX block fails to write
+        return Err(e); 
     }
-
-    // Return success if all blocks were written without errors
     Ok(())
 }
 
 
 /// Updates the archive information in the specified file.
-///
-/// Opens the file at `file_path` for reading and writing, updates the HEADER, BYTESTART, 
-/// and INDEX blocks based on the new `archive` data, and ensures the file's consistency.
-///
-/// # Parameters
-/// - `file_path`: The path to the archive file to be updated.
-/// - `archive`: The new archive data to write.
-///
-/// # Returns
-/// - `io::Result<()>`: Ok on success, or an error on failure.
-///
-/// For more details, see the documentation in `io_write_archive.rs`.
 pub fn write_archive_info(file_path: &str, archive: &Archive) -> io::Result<()> {
 
     // Open the file for reading and writing
@@ -105,17 +79,17 @@ pub fn write_archive_info(file_path: &str, archive: &Archive) -> io::Result<()> 
     new_archive.bytestart_data = bytestart_data_new;
 
     // Prepare a temporary file to store remaining file data
-    let temp_file_path = "temp_file.tmp"; // Path for the temporary file
+    let temp_file_path = "temp_file.tmp"; 
     let mut temp_file = OpenOptions::new()
         .read(true)
         .write(true)
         .create(true)
-        .truncate(true) // Ensure the file is empty
+        .truncate(true) 
         .open(temp_file_path)?;
 
     // Copy the data following the BYTESTART block to the temporary file
     file.seek(SeekFrom::Start(bytestart.bytestart_data as u64))?;
-    let mut buffer = [0u8; 8192]; // 8KB buffer for reading and writing in chunks
+    let mut buffer = [0u8; 8192]; 
     loop {
         let bytes_read = file.read(&mut buffer)?;
         if bytes_read == 0 {

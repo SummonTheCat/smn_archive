@@ -2,6 +2,7 @@ use std::fmt;
 
 use crate::core::structs::types::*;
 
+/// Struct that represents an archive.
 pub struct Archive {
     // Required fields
     pub archive_id: ArchiveID,
@@ -15,6 +16,7 @@ pub struct Archive {
 }
 
 #[allow(unused)]
+/// Implementation of `Archive`.
 impl Archive {
     pub fn new(archive_id: ArchiveID, version: Version, description: StrLrg) -> Self {
         Self {
@@ -27,6 +29,7 @@ impl Archive {
         }
     }
 
+    /// Create a new empty archive.
     pub fn new_empty() -> Self {
         Self {
             archive_id: ArchiveID::from(0),
@@ -38,10 +41,12 @@ impl Archive {
         }
     }
 
+    /// Create a new archive from bytes.
     pub fn get_form_count(&self) -> u16 {
         self.form_count as u16
     }
 
+    /// Create a new archive from bytes.
     pub fn get_header_byte_count(&self) -> usize {
         let byte_count = ArchiveID::BYTE_COUNT
             + Version::BYTE_COUNT
@@ -50,7 +55,7 @@ impl Archive {
         byte_count
     }
     
-
+    /// Create a new archive from bytes.
     pub fn header_to_bytes(&self) -> Vec<u8> {
         let mut bytes = Vec::with_capacity(self.get_header_byte_count());
         bytes.extend_from_slice(&self.archive_id.to_bytes());
@@ -61,6 +66,7 @@ impl Archive {
     }
 }
 
+/// Display implementation for `Archive`.
 impl fmt::Display for Archive {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
@@ -76,6 +82,7 @@ impl fmt::Display for Archive {
     }
 }
 
+/// Debug implementation for `Archive`.
 impl fmt::Debug for Archive {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
