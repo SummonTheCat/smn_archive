@@ -83,14 +83,16 @@ impl FormWorld {
         file.read_exact(&mut form_type_buffer)?;
         let form_type = FormType::from(form_type_buffer[0]);
 
-        // Read WorldParts count
-        let mut parts_count_buffer = [0u8; 1];
-        file.read_exact(&mut parts_count_buffer)?;
-
+        // Read the FormName, WorldName, and WorldMap
         let form_name = StrSml::read_from_bytes(file)?;
         let world_name = StrSml::read_from_bytes(file)?;
         let world_map = StrSml::read_from_bytes(file)?;
-        let parts_count = parts_count_buffer[0];
+
+        // Read WorldParts count
+        let mut parts_count_buffer = [0u8; 1];
+        file.read_exact(&mut parts_count_buffer)?;
+        
+        let parts_count = parts_count_buffer[0];        
 
         // Read WorldParts
         let mut world_parts = Vec::with_capacity(parts_count as usize);

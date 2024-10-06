@@ -80,6 +80,9 @@ fn cmd_test(args: Vec<String>) {
         "sample" => {
             test_sample();
         },
+        "basic" => {
+            test_basic();
+        },
         "todictionary" => {
             test_todict();
         },
