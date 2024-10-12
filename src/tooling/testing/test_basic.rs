@@ -1,6 +1,6 @@
 use std::{env, path::PathBuf};
 
-use crate::core::{io::{read_form, write_archive_skeleton, write_form}, structs::{Archive, ArchiveID, FormID, FormRefGroup, FormWorld, GlobalID, StrLrg, StrSml, Version, FormString, LangCode}};
+use crate::core::{io::{read_form, write_archive_skeleton, write_form}, structs::{Archive, ArchiveID, FormID, FormRefGroup, FormString, FormWorld, GlobalID, LangCode, StrLrg, StrSml, Vec3Int, Version}};
 
 pub fn test_basic() {
     // Write the archive
@@ -43,11 +43,15 @@ pub fn test_basic() {
     let form = FormWorld::new(
         form_id,
         form_name,
-        StrSml::from("Beach of Amonal"),
+        GlobalID::from((archive_id, FormID::from(200))),
         StrSml::from("BeachOfAmonal"),
         vec![
             GlobalID::from((archive_id, FormID::from(105))),
             GlobalID::from((archive_id, FormID::from(106)))
+        ],
+        vec![
+            Vec3Int::from((1, 2, 0)),
+            Vec3Int::from((1000, -300, 50)),
         ]
     );
 
@@ -60,12 +64,17 @@ pub fn test_basic() {
     let form = FormWorld::new(
         form_id,
         form_name,
-        StrSml::from("Forest of Amonal"),
+        GlobalID::from((archive_id, FormID::from(201))),
         StrSml::from("ForestOfAmonal"),
         vec![
             GlobalID::from((archive_id, FormID::from(106))),
             GlobalID::from((archive_id, FormID::from(107))),
             GlobalID::from((archive_id, FormID::from(108)))
+        ],
+        vec![
+            Vec3Int::from((1, 2, 0)),
+            Vec3Int::from((660, -600, 110)),
+            Vec3Int::from((-500, 8, 100))
         ]
     );
 

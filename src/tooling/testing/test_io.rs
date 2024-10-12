@@ -185,9 +185,13 @@ pub fn test_write_forms_many_threaded(form_count: u16) {
     for i in 1..=form_count {
         let form_id = FormID::from(i as u16);
 
-        let form_name = format!("Wrld{}", i);
-        let form_description = format!("Description{}", i);
-        let form_map = format!("Map{}", i);
+        // Generate random GlobalID for world_name_id
+        let world_name_id = GlobalID::from((
+            ArchiveID::from(rng.gen_range(1..=200)),
+            FormID::from(rng.gen_range(1..=10000)),
+        ));
+
+        let world_map = format!("Map{}", i);
 
         let world_parts_count = rng.gen_range(1..5);
         let mut world_parts = Vec::new();
@@ -198,12 +202,21 @@ pub fn test_write_forms_many_threaded(form_count: u16) {
             world_parts.push(GlobalID::from(random_global_id));
         }
 
+        let mut world_parts_origins = Vec::new();
+        for _ in 0..world_parts_count {
+            let random_x = rng.gen_range(-1000..=1000);
+            let random_y = rng.gen_range(-1000..=1000);
+            let random_z = rng.gen_range(-1000..=1000);
+            world_parts_origins.push(Vec3Int::from((random_x, random_y, random_z)));
+        }
+
         let form = FormWorld::new(
             form_id,
-            StrSml::from(form_name.as_str()),
-            StrSml::from(form_description.as_str()),
-            StrSml::from(form_map.as_str()),
+            StrSml::from("WorldName"), // Placeholder since world_name_id is now a GlobalID
+            world_name_id,              // Randomly generated GlobalID for the world name
+            StrSml::from(world_map.as_str()),
             world_parts,
+            world_parts_origins,
         );
 
         let write_result = write_form(&file_path, &form);

@@ -18,3 +18,7 @@ pub use types_misc::*;
 #[allow(unused)]
 pub mod types_formtype;
 pub use types_formtype::*;
+
+#[allow(unused)]
+pub mod types_vectors;
+pub use types_vectors::*;

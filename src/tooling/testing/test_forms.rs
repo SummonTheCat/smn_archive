@@ -28,9 +28,16 @@ fn test_forms_world() {
     let form_world = FormWorld::new(
         FormID::from(2), 
         StrSml::from("WrldBeach"),
-        StrSml::from("The Beach"),
+        GlobalID::from((ArchiveID::from(1), FormID::from(200))),
         StrSml::from("MapBeach"),
-        vec![GlobalID::from("00100543"), GlobalID::from("00100544")]
+        vec![
+            GlobalID::from("00100543"), 
+            GlobalID::from("00100544")
+        ],
+        vec![
+            Vec3Int::from((1, 2, 0)),
+            Vec3Int::from((1000, -300, 50)),
+        ]
     );
 
     println!("{:?}", form_world.to_string());

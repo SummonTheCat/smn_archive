@@ -1,6 +1,6 @@
 use std::{env, path::PathBuf};
 
-use crate::core::{io::{read_form, write_archive_skeleton, write_form}, structs::{Archive, ArchiveID, FormID, FormRefGroup, FormWorld, GlobalID, StrLrg, StrSml, Version, FormString, LangCode}};
+use crate::core::{io::{read_form, write_archive_skeleton, write_form}, structs::{Archive, ArchiveID, FormID, FormRefGroup, FormString, FormWorld, GlobalID, LangCode, StrLrg, StrSml, Vec3Int, Version}};
 
 pub fn test_sample() {
     // Write the archive
@@ -41,11 +41,15 @@ pub fn test_sample() {
     let form = FormWorld::new(
         form_id,
         form_name,
-        StrSml::from("Beach of Amonal"),
+        GlobalID::from((archive_id, FormID::from(200))),
         StrSml::from("BeachOfAmonal"),
         vec![
             GlobalID::from((archive_id, FormID::from(105))),
             GlobalID::from((archive_id, FormID::from(106)))
+        ],
+        vec![
+            Vec3Int::from((1, 2, 0)),
+            Vec3Int::from((1000, -300, 50)),
         ]
     );
 
@@ -57,12 +61,17 @@ pub fn test_sample() {
     let form = FormWorld::new(
         form_id,
         form_name,
-        StrSml::from("Forest of Amonal"),
+        GlobalID::from((archive_id, FormID::from(201))),
         StrSml::from("ForestOfAmonal"),
         vec![
             GlobalID::from((archive_id, FormID::from(106))),
             GlobalID::from((archive_id, FormID::from(107))),
             GlobalID::from((archive_id, FormID::from(108)))
+        ],
+        vec![
+            Vec3Int::from((15, 200, 0)),
+            Vec3Int::from((500, -3000, 100)),
+            Vec3Int::from((100, 200, 300))
         ]
     );
 
@@ -88,8 +97,26 @@ pub fn test_sample() {
     let form = read_form(&path, FormID::from(50));
     println!("{:?}", form);
 
-    //let form = read_form(&path, FormID::from(51));
-    //println!("{:?}", form);
+    let form = read_form(&path, FormID::from(51));
+    println!("{:?}", form);
+    
+    // Attempt to read the form and handle errors
+    let form = match read_form(&path, FormID::from(51)) {
+        Ok(f) => f,
+        Err(_) => {
+            println!("Form not found");
+            return;
+        }
+    };
+
+    // Convert the form to bytes
+    let form_bytes = form.to_bytes();
+    let len = form_bytes.len() as u32;
+    
+    // Print the form bytes
+    println!("Form Bytes: {:?}", form_bytes);
+    println!("Form Bytes Length: {}", len);
+
 
     println!("------------------------");
 }

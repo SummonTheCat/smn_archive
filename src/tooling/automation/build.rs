@@ -26,7 +26,7 @@ pub fn build_full() {
 
     // Step 2: Get the target library path
     let target_dir = "target\\release";
-    let lib_files = vec!["smn_archive_extern.dll", "smn_archive_extern.dll.exp", "smn_archive_extern.dll.lib", "smn_archive_extern.pdb"];
+    let lib_files = vec!["smn_archive.dll", "smn_archive.dll.exp", "smn_archive.dll.lib", "smn_archive.pdb"];
 
     // Step 3: Copy the compiled library files to each external project
     println!("Copying the compiled library files to each external project...");
