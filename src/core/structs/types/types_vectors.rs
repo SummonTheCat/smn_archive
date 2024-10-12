@@ -1,3 +1,5 @@
+use serde_json::json;
+
 // -----------------------------  Vec2Int -----------------------------  //
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub struct Vec2Int {
@@ -26,6 +28,13 @@ impl Vec2Int {
     /// Returns the byte count for `Vec2Int` (always 8 bytes).
     pub fn get_byte_count(&self) -> usize {
         Self::BYTE_COUNT
+    }
+
+    pub fn to_dict(&self) -> serde_json::Value {
+        json!({
+            "x": self.x,
+            "y": self.y,
+        })
     }
 }
 
@@ -80,6 +89,14 @@ impl Vec3Int {
     pub fn get_byte_count(&self) -> usize {
         Self::BYTE_COUNT
     }
+
+    pub fn to_dict(&self) -> serde_json::Value {
+        json!({
+            "x": self.x,
+            "y": self.y,
+            "z": self.z,
+        })
+    }
 }
 
 impl From<[u8; Vec3Int::BYTE_COUNT]> for Vec3Int {
@@ -133,6 +150,13 @@ impl Vec2Float {
     pub fn get_byte_count(&self) -> usize {
         Self::BYTE_COUNT
     }
+
+    pub fn to_dict(&self) -> serde_json::Value {
+        json!({
+            "x": self.x,
+            "y": self.y,
+        })
+    }
 }
 
 impl From<[u8; Vec2Float::BYTE_COUNT]> for Vec2Float {
@@ -185,6 +209,14 @@ impl Vec3Float {
     /// Returns the byte count for `Vec3Float` (always 12 bytes).
     pub fn get_byte_count(&self) -> usize {
         Self::BYTE_COUNT
+    }
+
+    pub fn to_dict(&self) -> serde_json::Value {
+        json!({
+            "x": self.x,
+            "y": self.y,
+            "z": self.z,
+        })
     }
 }
 

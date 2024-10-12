@@ -85,7 +85,7 @@ impl FormWorld {
             "world_name_id": self.world_name_id.to_string(),  // Changed from world_name to world_name_id
             "world_map": self.world_map.to_string(),
             "world_parts": self.world_parts.iter().map(|part| part.to_string()).collect::<Vec<_>>(),
-            "world_part_anchor": self.world_part_anchors.iter().map(|anchor| anchor.to_string()).collect::<Vec<_>>(), 
+            "world_part_anchor": self.world_part_anchors.iter().map(|anchor| anchor.to_dict()).collect::<Vec<_>>(), 
         })
     }
     
