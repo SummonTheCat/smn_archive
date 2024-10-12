@@ -4,6 +4,7 @@ pub enum FormType {
     STRING = 0,
     WORLD = 1,
     REFGROUP = 2,
+    WORLDPART = 3,  
 }
 
 #[allow(unused)]
@@ -17,6 +18,7 @@ impl FormType {
             FormType::STRING => "STRING".to_string(),
             FormType::WORLD => "WORLD".to_string(),
             FormType::REFGROUP => "REFGROUP".to_string(),
+            FormType::WORLDPART => "WORLDPART".to_string(),
         }
     }
 
@@ -43,6 +45,7 @@ impl From<u8> for FormType {
             0 => FormType::STRING,
             1 => FormType::WORLD,
             2 => FormType::REFGROUP,
+            3 => FormType::WORLDPART,
             _ => panic!("Unknown FormType"),
         }
     }
@@ -55,6 +58,7 @@ impl From<&str> for FormType {
             "STRING" => FormType::STRING,
             "WORLD" => FormType::WORLD,
             "REFGROUP" => FormType::REFGROUP,
+            "WORLDPART" => FormType::WORLDPART,
             _ => panic!("Unknown FormType"),
         }
     }

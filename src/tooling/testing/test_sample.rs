@@ -1,6 +1,5 @@
 use std::{env, path::PathBuf};
-
-use crate::core::{io::{read_form, write_archive_skeleton, write_form}, structs::{Archive, ArchiveID, FormID, FormRefGroup, FormString, FormWorld, GlobalID, LangCode, StrLrg, StrSml, Vec3Int, Version}};
+use crate::core::{io::{read_form, write_archive_skeleton, write_form}, structs::{Archive, ArchiveID, EntID, EntInstance, FormID, FormRefGroup, FormString, FormWorld, FormWorldPart, GlobalID, LangCode, StrLrg, StrSml, Vec3Float, Vec3Int, Version}};
 
 pub fn test_sample() {
     // Write the archive
@@ -64,9 +63,9 @@ pub fn test_sample() {
         GlobalID::from((archive_id, FormID::from(201))),
         StrSml::from("ForestOfAmonal"),
         vec![
-            GlobalID::from((archive_id, FormID::from(106))),
             GlobalID::from((archive_id, FormID::from(107))),
-            GlobalID::from((archive_id, FormID::from(108)))
+            GlobalID::from((archive_id, FormID::from(108))),
+            GlobalID::from((archive_id, FormID::from(109)))
         ],
         vec![
             Vec3Int::from((15, 200, 0)),
@@ -119,4 +118,149 @@ pub fn test_sample() {
 
 
     println!("------------------------");
+
+    // Write World Parts
+    let form_id = FormID::from(105);
+    let form_name = StrSml::from("WrldBeachPart1");
+
+    let form = FormWorldPart::new(
+        form_id,
+        form_name,
+        vec![
+            EntInstance::from(
+                (
+                EntID::from((GlobalID::from((archive_id, FormID::from(1000))), FormID::from(1001))),
+                Vec3Float::from((1.0, 2.0, 3.0)),
+                Vec3Float::from((0.0, 0.0, 0.0)),
+                1.0
+                )
+            ),
+            EntInstance::from(
+                (
+                EntID::from((GlobalID::from((archive_id, FormID::from(1000))), FormID::from(1002))),
+                Vec3Float::from((4.0, 5.0, 6.0)),
+                Vec3Float::from((0.0, 0.0, 0.0)),
+                1.0
+                )
+            ),
+        ]
+    );
+
+    let _ = write_form(&path, &form);
+
+    let form_id = FormID::from(106);
+    let form_name = StrSml::from("WrldBeachPart2");
+
+    let form = FormWorldPart::new(
+        form_id,
+        form_name,
+        vec![
+            EntInstance::from(
+                (
+                EntID::from((GlobalID::from((archive_id, FormID::from(1000))), FormID::from(1003))),
+                Vec3Float::from((7.0, 8.0, 9.0)),
+                Vec3Float::from((0.0, 0.0, 0.0)),
+                1.0
+                )
+            ),
+            EntInstance::from(
+                (
+                EntID::from((GlobalID::from((archive_id, FormID::from(1000))), FormID::from(1004))),
+                Vec3Float::from((10.0, 11.0, 12.0)),
+                Vec3Float::from((0.0, 0.0, 0.0)),
+                1.0
+                )
+            ),
+        ]
+    );
+
+    let _ = write_form(&path, &form);
+
+    let form_id = FormID::from(107);
+
+    let form = FormWorldPart::new(
+        form_id,
+        StrSml::from("WrldForestPart1"),
+        vec![
+            EntInstance::from(
+                (
+                EntID::from((GlobalID::from((archive_id, FormID::from(1001))), FormID::from(1005))),
+                Vec3Float::from((1.0, 2.0, 3.0)),
+                Vec3Float::from((0.0, 0.0, 0.0)),
+                1.0
+                )
+            ),
+            EntInstance::from(
+                (
+                EntID::from((GlobalID::from((archive_id, FormID::from(1001))), FormID::from(1006))),
+                Vec3Float::from((4.0, 5.0, 6.0)),
+                Vec3Float::from((0.0, 0.0, 0.0)),
+                1.0
+                )
+            ),
+        ]
+    );
+
+    let _ = write_form(&path, &form);
+
+    let form_id = FormID::from(108);
+
+    let form = FormWorldPart::new(
+        form_id,
+        StrSml::from("WrldForestPart2"),
+        vec![
+            EntInstance::from(
+                (
+                EntID::from((GlobalID::from((archive_id, FormID::from(1001))), FormID::from(1007))),
+                Vec3Float::from((7.0, 8.0, 9.0)),
+                Vec3Float::from((0.0, 0.0, 0.0)),
+                1.0
+                )
+            ),
+            EntInstance::from(
+                (
+                EntID::from((GlobalID::from((archive_id, FormID::from(1001))), FormID::from(1008))),
+                Vec3Float::from((10.0, 11.0, 12.0)),
+                Vec3Float::from((0.0, 0.0, 0.0)),
+                1.0
+                )
+            ),
+        ]
+    );
+
+    let _ = write_form(&path, &form);
+    
+    let form_id = FormID::from(109);
+
+    let form = FormWorldPart::new(
+        form_id,
+        StrSml::from("WrldForestPart3"),
+        vec![
+            EntInstance::from(
+                (
+                EntID::from((GlobalID::from((archive_id, FormID::from(1001))), FormID::from(1009))),
+                Vec3Float::from((1.0, 2.0, 3.0)),
+                Vec3Float::from((0.0, 0.0, 0.0)),
+                1.0
+                )
+            ),
+            EntInstance::from(
+                (
+                EntID::from((GlobalID::from((archive_id, FormID::from(1001))), FormID::from(1010))),
+                Vec3Float::from((4.0, 5.0, 6.0)),
+                Vec3Float::from((0.0, 0.0, 0.0)),
+                1.0
+                )
+            ),
+        ]
+    );
+
+    let _ = write_form(&path, &form);
+
+    // Read the world parts
+    for form_id in [105, 106, 107, 108, 109].iter() {
+        let form = read_form(&path, FormID::from(*form_id));
+        println!("{:?}", form);
+        println!();
+    }
 }

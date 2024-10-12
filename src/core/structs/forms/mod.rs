@@ -15,3 +15,6 @@ pub use struc_form_world::*;
 #[allow(unused)]
 pub mod struc_form_refgroup;
 pub use struc_form_refgroup::*;
+#[allow(unused)]
+pub mod struc_form_worldpart;
+pub use struc_form_worldpart::*;

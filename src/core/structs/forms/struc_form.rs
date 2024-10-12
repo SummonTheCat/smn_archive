@@ -73,6 +73,10 @@ impl FormBase {
                 let form_refgroup = FormRefGroup::read_from_bytes(file)?;
                 Ok(Box::new(form_refgroup))
             }
+            FormType::WORLDPART => {
+                let form_worldpart = FormWorldPart::read_from_bytes(file)?;
+                Ok(Box::new(form_worldpart))
+            }
         }
     }
 
@@ -113,6 +117,11 @@ impl FormBase {
                 let (form_refgroup, consumed) = FormRefGroup::read_from_byte_buffer(bytes)?;
                 offset += consumed;
                 Ok((Box::new(form_refgroup), offset))
+            }
+            FormType::WORLDPART => {
+                let (form_worldpart, consumed) = FormWorldPart::read_from_byte_buffer(bytes)?;
+                offset += consumed;
+                Ok((Box::new(form_worldpart), offset))
             }
         }
     }

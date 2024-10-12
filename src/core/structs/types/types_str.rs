@@ -2,10 +2,9 @@ use std::fmt;
 use std::fs::File;
 use std::io::{self, Read};
 
-// -----------------------------  StrSml -----------------------------  //
 #[derive(PartialEq, Eq, Clone)]
 pub struct StrSml {
-    value: Vec<u16>,
+    value: Vec<u8>,  // Now using u8 to store ASCII characters
 }
 
 impl StrSml {
@@ -14,41 +13,36 @@ impl StrSml {
 
     /// Converts `StrSml` to a byte array.
     pub fn to_bytes(&self) -> Vec<u8> {
-        let mut bytes = Vec::with_capacity(Self::CHAR_COUNT_BYTE_SIZE + self.value.len() * 2);
+        let mut bytes = Vec::with_capacity(Self::CHAR_COUNT_BYTE_SIZE + self.value.len());
         bytes.push(self.value.len() as u8);  // Store length in 1 byte
-        for &ch in &self.value {
-            bytes.extend_from_slice(&ch.to_be_bytes());  // Add UTF-16 characters
-        }
+        bytes.extend_from_slice(&self.value);  // Add ASCII characters
         bytes
     }
 
-    /// Converts `StrSml` to a string (assumes valid UTF-16).
+    /// Converts `StrSml` to a string (assumes valid ASCII).
     pub fn to_string(&self) -> String {
-        String::from_utf16(&self.value).expect("Invalid UTF-16 sequence")
+        String::from_utf8(self.value.clone()).expect("Invalid ASCII sequence")
     }
 
     /// Returns the byte count of the serialized `StrSml`.
     pub fn get_byte_count(&self) -> usize {
-        Self::CHAR_COUNT_BYTE_SIZE + self.value.len() * 2
+        Self::CHAR_COUNT_BYTE_SIZE + self.value.len()
     }
 }
 
 impl From<&str> for StrSml {
-    /// Converts a UTF-8 string into a `StrSml`, ensuring no surrogate pairs.
+    /// Converts a UTF-8 string into a `StrSml`, ensuring it only contains ASCII characters.
     fn from(s: &str) -> Self {
-        let utf16: Vec<u16> = s.encode_utf16().collect();
-
-        // Check for characters that require surrogate pairs.
-        for &code_unit in &utf16 {
-            if code_unit >= 0xD800 && code_unit <= 0xDFFF {
-                panic!("StrSml cannot contain characters that require more than 2 bytes in UTF-16.");
-            }
-        }
-
-        if utf16.len() > u8::MAX as usize {
+        if s.len() > u8::MAX as usize {
             panic!("StrSml can only contain up to 255 characters.");
         }
-        Self { value: utf16 }
+
+        // Check for non-ASCII characters.
+        if !s.is_ascii() {
+            panic!("StrSml can only contain ASCII characters.");
+        }
+
+        Self { value: s.as_bytes().to_vec() }
     }
 }
 
@@ -61,24 +55,7 @@ impl From<String> for StrSml {
 
 #[allow(unused)]
 impl StrSml {
-    /// Reads `StrSml` from a file, assuming UTF-16 encoding.
-    pub fn read_from_bytes(file: &mut File) -> io::Result<Self> {
-        let mut length_buffer = [0u8; 1];
-        file.read_exact(&mut length_buffer)?;
-
-        let char_count = length_buffer[0] as usize;
-        let mut value = Vec::with_capacity(char_count);
-
-        for _ in 0..char_count {
-            let mut char_buffer = [0u8; 2];
-            file.read_exact(&mut char_buffer)?;
-            value.push(u16::from_be_bytes(char_buffer));
-        }
-
-        Ok(Self { value })
-    }
-
-    /// Reads `StrSml` from a byte buffer.
+    /// Reads `StrSml` from a byte buffer, assuming ASCII encoding.
     pub fn read_from_byte_buffer(bytes: &[u8]) -> io::Result<(Self, usize)> {
         let mut offset = 0;
 
@@ -88,18 +65,33 @@ impl StrSml {
         let char_count = bytes[offset] as usize;
         offset += 1;
 
-        let mut value = Vec::with_capacity(char_count);
-
-        for _ in 0..char_count {
-            if bytes.len() < offset + 2 {
-                return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for string characters"));
-            }
-            let char_buffer: [u8; 2] = bytes[offset..offset + 2].try_into().unwrap();
-            value.push(u16::from_be_bytes(char_buffer));
-            offset += 2;
+        if bytes.len() < offset + char_count {
+            return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for string characters"));
         }
 
+        let value = bytes[offset..offset + char_count].to_vec();
+        offset += char_count;
+
         Ok((Self { value }, offset))
+    }
+
+    /// Reads `StrSml` from a file, assuming ASCII encoding.
+    pub fn read_from_bytes(file: &mut File) -> io::Result<Self> {
+        // First, read the length of the string (1 byte)
+        let mut length_buffer = [0u8; 1];
+        file.read_exact(&mut length_buffer)?;
+        let char_count = length_buffer[0] as usize;
+
+        // Now, read the ASCII characters (1 byte each)
+        let mut value = Vec::with_capacity(char_count);
+        for _ in 0..char_count {
+            let mut char_buffer = [0u8; 1];
+            file.read_exact(&mut char_buffer)?;
+            value.push(char_buffer[0]);
+        }
+
+        // Return the StrSml with the collected ASCII characters
+        Ok(Self { value })
     }
 }
 

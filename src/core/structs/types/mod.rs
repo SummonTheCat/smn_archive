@@ -22,3 +22,7 @@ pub use types_formtype::*;
 #[allow(unused)]
 pub mod types_vectors;
 pub use types_vectors::*;
+
+#[allow(unused)]
+pub mod types_entinstance;
+pub use types_entinstance::*;

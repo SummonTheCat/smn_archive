@@ -1,3 +1,5 @@
+use core::fmt;
+
 // -----------------------------  FormID -----------------------------  //
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash)]
 pub struct FormID {
@@ -144,7 +146,7 @@ impl From<&GlobalID> for ArchiveID {
 
 
 // -----------------------------  GlobalID -----------------------------  //
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub struct GlobalID {
     archive_id: ArchiveID,
     form_id: FormID,
@@ -219,5 +221,126 @@ impl From<(&ArchiveID, &FormID)> for GlobalID {
             archive_id: *ids.0,
             form_id: *ids.1,
         }
+    }
+}
+
+impl fmt::Display for GlobalID {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        // Format ArchiveID and FormID with the desired padding.
+        write!(
+            f,
+            "{} {}",
+            format!("{:03}", self.archive_id.to_u8()),  // ArchiveID formatted to 3 digits
+            format!("{:05}", self.form_id.to_u16())      // FormID formatted to 5 digits
+        )
+    }
+}
+
+impl fmt::Debug for GlobalID {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        // For debug, use the same format as Display
+        write!(f, "{}", self)
+    }
+}
+
+
+// -----------------------------  EntID -----------------------------  //
+#[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+pub struct EntID {
+    global_id: GlobalID,
+    reference_id: FormID,
+}
+
+#[allow(unused)]
+impl EntID {
+    /// Number of bytes for EntID (5 bytes: 3 for GlobalID + 2 for reference FormID).
+    pub const BYTE_COUNT: usize = GlobalID::BYTE_COUNT + FormID::BYTE_COUNT;
+
+    /// Converts EntID to a byte array.
+    pub fn to_bytes(&self) -> [u8; Self::BYTE_COUNT] {
+        let mut bytes = [0u8; Self::BYTE_COUNT];
+        bytes[..GlobalID::BYTE_COUNT].copy_from_slice(&self.global_id.to_bytes());
+        bytes[GlobalID::BYTE_COUNT..].copy_from_slice(&self.reference_id.to_bytes());
+        bytes
+    }
+
+    /// Converts EntID to a formatted string.
+    pub fn to_string(&self) -> String {
+        format!("{}{}", self.global_id.to_string(), self.reference_id.to_string())
+    }
+
+    /// Returns the byte count for EntID (always 5).
+    pub fn get_byte_count(&self) -> usize {
+        Self::BYTE_COUNT
+    }
+}
+
+impl From<(GlobalID, FormID)> for EntID {
+    /// Creates an EntID from a GlobalID and a reference FormID tuple.
+    fn from(ids: (GlobalID, FormID)) -> Self {
+        Self {
+            global_id: ids.0,
+            reference_id: ids.1,
+        }
+    }
+}
+
+impl From<&str> for EntID {
+    /// Creates an EntID from a 10-digit string (8 digits for GlobalID + 2 digits for reference FormID).
+    fn from(s: &str) -> Self {
+        if s.len() != 10 || !s.chars().all(|c| c.is_digit(10)) {
+            panic!("EntID string must be exactly 10 digits long and numeric.");
+        }
+        let global_id = GlobalID::from(&s[..8]);
+        let reference_id = FormID::from(&s[8..]);
+        Self { global_id, reference_id }
+    }
+}
+
+impl From<String> for EntID {
+    /// Converts a String to EntID.
+    fn from(s: String) -> Self {
+        Self::from(s.as_str())
+    }
+}
+
+impl From<[u8; EntID::BYTE_COUNT]> for EntID {
+    /// Converts a byte array to EntID.
+    fn from(bytes: [u8; EntID::BYTE_COUNT]) -> Self {
+        let global_id = GlobalID::from([bytes[0], bytes[1], bytes[2]]);
+        let reference_id = FormID::from([bytes[3], bytes[4]]);
+        Self { global_id, reference_id }
+    }
+}
+
+impl EntID {
+    /// Extracts the GlobalID from the EntID.
+    pub fn global_id(&self) -> GlobalID {
+        self.global_id
+    }
+
+    /// Extracts the reference FormID from the EntID.
+    pub fn reference_id(&self) -> FormID {
+        self.reference_id
+    }
+}
+
+
+impl fmt::Display for EntID {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        // Format GlobalID and reference FormID with the desired padding.
+        write!(
+            f,
+            "{} {}",   // Call the Display of GlobalID first
+            self.global_id,
+            format!("{:05}", self.reference_id.to_u16())  // FormID formatted to 5 digits for the reference ID
+        )
+    }
+}
+
+impl fmt::Debug for EntID {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        // For debug, use the same format as Display
+        write!(f, "{}", self)
     }
 }
