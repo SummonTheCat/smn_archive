@@ -286,9 +286,9 @@ impl From<(GlobalID, FormID)> for EntID {
 }
 
 impl From<&str> for EntID {
-    /// Creates an EntID from a 10-digit string (8 digits for GlobalID + 2 digits for reference FormID).
+    /// Creates an EntID from a 13-digit string (8 digits for GlobalID + 2 digits for reference FormID).
     fn from(s: &str) -> Self {
-        if s.len() != 10 || !s.chars().all(|c| c.is_digit(10)) {
+        if s.len() != 13 || !s.chars().all(|c| c.is_digit(10)) {
             panic!("EntID string must be exactly 10 digits long and numeric.");
         }
         let global_id = GlobalID::from(&s[..8]);
