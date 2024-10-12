@@ -55,7 +55,7 @@ impl FormWorldPart {
             "form_id": self.base.form_id.to_string(),
             "form_type": self.base.form_type.to_string(),
             "form_name": self.base.form_name.to_string(),
-            "entities": self.entities.iter().map(|ent_instance| ent_instance.to_string()).collect::<Vec<_>>(),
+            "entities": self.entities.iter().map(|ent_instance| ent_instance.to_dict()).collect::<Vec<_>>(),
         })
     }
 }

@@ -2,6 +2,8 @@ use std::fmt;
 use std::io;
 use std::io::Read;
 
+use serde_json::json;
+
 use crate::core::structs::types::EntID;
 use crate::core::structs::types::Vec3Float;
 
@@ -56,6 +58,16 @@ impl EntInstance {
             self.rotation.to_string(),
             self.scale,
         )
+    }
+
+    /// Converts the EntInstance to a dictionary-like JSON object.
+    pub fn to_dict(&self) -> serde_json::Value {
+        json!({
+            "entity_id": self.entity_id.to_string(),
+            "position": self.position.to_dict(),
+            "rotation": self.rotation.to_dict(),
+            "scale": self.scale,
+        })
     }
 
     /// Creates an EntInstance from a byte array.
