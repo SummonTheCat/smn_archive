@@ -1,6 +1,6 @@
 [package]
 name = "smn_archive"
-version = "0.2.3"
+version = "0.2.4"
 authors = ["Julien Liakos <julien_andrew@outlook.com>"]
 edition = "2021"
 description = "An archive editor for a custom smnarchive format (.smn)"
