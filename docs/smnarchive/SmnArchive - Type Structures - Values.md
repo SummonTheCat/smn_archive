@@ -1,3 +1,4 @@
+# Structures - Value Types
 Values in a SmnArchive are strictly defined for performance and standardization in read/write operations. Value types can be modularly added and form the backbone of value control in the system:
 
 ### **Overview**:

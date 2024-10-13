@@ -1,3 +1,4 @@
+# Structure - Binary Archive File 
 The SmnArchive (smn) file type is a binary file with various blocks for different content. It stores archive data and data for different form formats containing the form data.
 
 ## File Layout

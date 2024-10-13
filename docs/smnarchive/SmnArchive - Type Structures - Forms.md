@@ -1,3 +1,4 @@
+# Structures - Forms
 Forms are all structured with some shared Base Form fields, then additional fields per form type. For info on the structure of the fields that a form contains, reference [[SmnArchive - Type Structures - Values]]
 ### **FormBase**
 

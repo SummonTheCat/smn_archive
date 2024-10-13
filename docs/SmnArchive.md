@@ -1,9 +1,10 @@
+# SmnArchive
 A library for managing the SmnArchive (.smn) binary archive structure. The binary structure is set up for real-time streaming of data, with a focus on performant reading. 
 
 **Notable Info:**
-- [SmnArchive - Type Structures - Binary File](./SmnArchive_Type_Structures_Binary_File.md) - Describes the archive file's block-based layout.
-- [SmnArchive - Type Structures - Values](./SmnArchive_Type_Structures_Values.md) - Defines sizes and formats for a form's stored value types.
-- [SmnArchive - Type Structures - Forms](./SmnArchive_Type_Structures_Forms.md) - Describes structures for different form types.
+- [SmnArchive - Type Structures - Binary File](./smnarchive/SmnArchive_Type_Structures_Binary_File.md) - Describes the archive file's block-based layout.
+- [SmnArchive - Type Structures - Values](./smnarchive/SmnArchive_Type_Structures_Values.md) - Defines sizes and formats for a form's stored value types.
+- [SmnArchive - Type Structures - Forms](./smnarchive/SmnArchive_Type_Structures_Forms.md) - Describes structures for different form types.
 
 
 The library supports various CRUD operations on the archive:
