@@ -26,7 +26,7 @@ pub fn test_sample() {
     let form = FormRefGroup::new(
         form_id,
         form_name,
-        vec![GlobalID::from((archive_id, FormID::from(50))), GlobalID::from((archive_id, FormID::from(51)))]
+        vec![GlobalID::from((archive_id, FormID::from(52))), GlobalID::from((archive_id, FormID::from(51)))]
     );
 
     println!("{:?}", form.to_bytes());
@@ -34,7 +34,7 @@ pub fn test_sample() {
     let _ = write_form(&path, &form);
 
     // Write the worlds
-    let form_id = FormID::from(50);
+    let form_id = FormID::from(52);
     let form_name = StrSml::from("WrldBeach");
 
     let form = FormWorld::new(
@@ -259,6 +259,15 @@ pub fn test_sample() {
 
     // Read the world parts
     for form_id in [105, 106, 107, 108, 109].iter() {
+        let form = read_form(&path, FormID::from(*form_id));
+        println!("{:?}", form);
+        println!();
+    }
+
+
+    println!("------------------------");
+    // Read world forms
+    for form_id in [52, 51].iter() {
         let form = read_form(&path, FormID::from(*form_id));
         println!("{:?}", form);
         println!();

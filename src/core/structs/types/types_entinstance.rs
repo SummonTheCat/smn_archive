@@ -27,6 +27,7 @@ impl EntInstance {
     pub const BYTE_COUNT: usize = EntID::BYTE_COUNT + 2 * Vec3Float::BYTE_COUNT + 4;
 
     /// Converts the EntInstance to a byte array for serialization.
+    /// This uses big-endian for the scale value.
     pub fn to_bytes(&self) -> [u8; Self::BYTE_COUNT] {
         let mut bytes = [0u8; Self::BYTE_COUNT];
         let mut offset = 0;
@@ -43,8 +44,8 @@ impl EntInstance {
         bytes[offset..offset + Vec3Float::BYTE_COUNT].copy_from_slice(&self.rotation.to_bytes());
         offset += Vec3Float::BYTE_COUNT;
 
-        // Scale (f32) -> 4 bytes
-        bytes[offset..offset + 4].copy_from_slice(&self.scale.to_le_bytes());
+        // Scale (f32) -> 4 bytes (use big-endian for scale)
+        bytes[offset..offset + 4].copy_from_slice(&self.scale.to_be_bytes());
 
         bytes
     }
@@ -71,6 +72,7 @@ impl EntInstance {
     }
 
     /// Creates an EntInstance from a byte array.
+    /// This assumes the scale value is stored in big-endian format.
     pub fn from_bytes(bytes: &[u8]) -> Self {
         let mut offset = 0;
 
@@ -118,8 +120,8 @@ impl EntInstance {
         ]);
         offset += Vec3Float::BYTE_COUNT;
 
-        // Extract Scale (f32) (4 bytes)
-        let scale = f32::from_le_bytes([bytes[offset], bytes[offset + 1], bytes[offset + 2], bytes[offset + 3]]);
+        // Extract Scale (f32) (4 bytes, big-endian)
+        let scale = f32::from_be_bytes([bytes[offset], bytes[offset + 1], bytes[offset + 2], bytes[offset + 3]]);
 
         Self {
             entity_id,
@@ -130,6 +132,7 @@ impl EntInstance {
     }
 
     /// Creates an EntInstance from a byte buffer, returning the number of bytes read.
+    /// This assumes the scale value is stored in big-endian format.
     pub fn from_byte_buffer(bytes: &[u8]) -> io::Result<(Self, usize)> {
         let mut offset = 0;
 
@@ -182,8 +185,8 @@ impl EntInstance {
         ]);
         offset += Vec3Float::BYTE_COUNT;
 
-        // Extract Scale (f32) (4 bytes)
-        let scale = f32::from_le_bytes([bytes[offset], bytes[offset + 1], bytes[offset + 2], bytes[offset + 3]]);
+        // Extract Scale (f32) (4 bytes, big-endian)
+        let scale = f32::from_be_bytes([bytes[offset], bytes[offset + 1], bytes[offset + 2], bytes[offset + 3]]);
         offset += 4;
 
         Ok((Self {
