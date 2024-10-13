@@ -47,8 +47,8 @@ pub fn test_sample() {
             GlobalID::from((archive_id, FormID::from(106)))
         ],
         vec![
-            Vec3Int::from((1, 2, 0)),
-            Vec3Int::from((1000, -300, 50)),
+            Vec3Int::from((100, 300, 50)),
+            Vec3Int::from((-2000, 1000, 300)),
         ]
     );
 
@@ -68,9 +68,9 @@ pub fn test_sample() {
             GlobalID::from((archive_id, FormID::from(109)))
         ],
         vec![
-            Vec3Int::from((15, 200, 0)),
-            Vec3Int::from((500, -3000, 100)),
-            Vec3Int::from((100, 200, 300))
+            Vec3Int::from((500, -200, 100)),
+            Vec3Int::from((1500, -5000, 200)),
+            Vec3Int::from((-100, 6000, 300))
         ]
     );
 
@@ -116,7 +116,6 @@ pub fn test_sample() {
     println!("Form Bytes: {:?}", form_bytes);
     println!("Form Bytes Length: {}", len);
 
-
     println!("------------------------");
 
     // Write World Parts
@@ -130,7 +129,7 @@ pub fn test_sample() {
             EntInstance::from(
                 (
                 EntID::from((GlobalID::from((archive_id, FormID::from(1000))), FormID::from(1001))),
-                Vec3Float::from((1.0, 2.0, 3.0)),
+                Vec3Float::from((300.0, 400.0, 500.0)),
                 Vec3Float::from((0.0, 0.0, 0.0)),
                 1.0
                 )
@@ -138,7 +137,23 @@ pub fn test_sample() {
             EntInstance::from(
                 (
                 EntID::from((GlobalID::from((archive_id, FormID::from(1000))), FormID::from(1002))),
-                Vec3Float::from((4.0, 5.0, 6.0)),
+                Vec3Float::from((-5000.0, 600.0, 200.0)),
+                Vec3Float::from((0.0, 0.0, 0.0)),
+                1.0
+                )
+            ),
+            EntInstance::from(
+                (
+                EntID::from((GlobalID::from((archive_id, FormID::from(1000))), FormID::from(1003))),
+                Vec3Float::from((4500.0, -1000.0, 150.0)),
+                Vec3Float::from((0.0, 0.0, 0.0)),
+                1.0
+                )
+            ),
+            EntInstance::from(
+                (
+                EntID::from((GlobalID::from((archive_id, FormID::from(1000))), FormID::from(1004))),
+                Vec3Float::from((200.0, -500.0, 800.0)),
                 Vec3Float::from((0.0, 0.0, 0.0)),
                 1.0
                 )
@@ -157,16 +172,32 @@ pub fn test_sample() {
         vec![
             EntInstance::from(
                 (
-                EntID::from((GlobalID::from((archive_id, FormID::from(1000))), FormID::from(1003))),
-                Vec3Float::from((7.0, 8.0, 9.0)),
+                EntID::from((GlobalID::from((archive_id, FormID::from(1000))), FormID::from(1005))),
+                Vec3Float::from((3000.0, 2000.0, 1000.0)),
                 Vec3Float::from((0.0, 0.0, 0.0)),
                 1.0
                 )
             ),
             EntInstance::from(
                 (
-                EntID::from((GlobalID::from((archive_id, FormID::from(1000))), FormID::from(1004))),
-                Vec3Float::from((10.0, 11.0, 12.0)),
+                EntID::from((GlobalID::from((archive_id, FormID::from(1000))), FormID::from(1006))),
+                Vec3Float::from((-1500.0, -2500.0, 500.0)),
+                Vec3Float::from((0.0, 0.0, 0.0)),
+                1.0
+                )
+            ),
+            EntInstance::from(
+                (
+                EntID::from((GlobalID::from((archive_id, FormID::from(1000))), FormID::from(1007))),
+                Vec3Float::from((500.0, -5000.0, 800.0)),
+                Vec3Float::from((0.0, 0.0, 0.0)),
+                1.0
+                )
+            ),
+            EntInstance::from(
+                (
+                EntID::from((GlobalID::from((archive_id, FormID::from(1000))), FormID::from(1008))),
+                Vec3Float::from((-300.0, 250.0, 100.0)),
                 Vec3Float::from((0.0, 0.0, 0.0)),
                 1.0
                 )
@@ -184,16 +215,16 @@ pub fn test_sample() {
         vec![
             EntInstance::from(
                 (
-                EntID::from((GlobalID::from((archive_id, FormID::from(1001))), FormID::from(1005))),
-                Vec3Float::from((1.0, 2.0, 3.0)),
+                EntID::from((GlobalID::from((archive_id, FormID::from(1001))), FormID::from(1009))),
+                Vec3Float::from((500.0, 600.0, 700.0)),
                 Vec3Float::from((0.0, 0.0, 0.0)),
                 1.0
                 )
             ),
             EntInstance::from(
                 (
-                EntID::from((GlobalID::from((archive_id, FormID::from(1001))), FormID::from(1006))),
-                Vec3Float::from((4.0, 5.0, 6.0)),
+                EntID::from((GlobalID::from((archive_id, FormID::from(1001))), FormID::from(1010))),
+                Vec3Float::from((4000.0, -4000.0, 300.0)),
                 Vec3Float::from((0.0, 0.0, 0.0)),
                 1.0
                 )
@@ -211,16 +242,16 @@ pub fn test_sample() {
         vec![
             EntInstance::from(
                 (
-                EntID::from((GlobalID::from((archive_id, FormID::from(1001))), FormID::from(1007))),
-                Vec3Float::from((7.0, 8.0, 9.0)),
+                EntID::from((GlobalID::from((archive_id, FormID::from(1001))), FormID::from(1011))),
+                Vec3Float::from((250.0, -6000.0, 250.0)),
                 Vec3Float::from((0.0, 0.0, 0.0)),
                 1.0
                 )
             ),
             EntInstance::from(
                 (
-                EntID::from((GlobalID::from((archive_id, FormID::from(1001))), FormID::from(1008))),
-                Vec3Float::from((10.0, 11.0, 12.0)),
+                EntID::from((GlobalID::from((archive_id, FormID::from(1001))), FormID::from(1012))),
+                Vec3Float::from((-200.0, 1000.0, 1500.0)),
                 Vec3Float::from((0.0, 0.0, 0.0)),
                 1.0
                 )
@@ -229,7 +260,7 @@ pub fn test_sample() {
     );
 
     let _ = write_form(&path, &form);
-    
+
     let form_id = FormID::from(109);
 
     let form = FormWorldPart::new(
@@ -238,16 +269,16 @@ pub fn test_sample() {
         vec![
             EntInstance::from(
                 (
-                EntID::from((GlobalID::from((archive_id, FormID::from(1001))), FormID::from(1009))),
-                Vec3Float::from((1.0, 2.0, 3.0)),
+                EntID::from((GlobalID::from((archive_id, FormID::from(1001))), FormID::from(1013))),
+                Vec3Float::from((350.0, 500.0, 600.0)),
                 Vec3Float::from((0.0, 0.0, 0.0)),
                 1.0
                 )
             ),
             EntInstance::from(
                 (
-                EntID::from((GlobalID::from((archive_id, FormID::from(1001))), FormID::from(1010))),
-                Vec3Float::from((4.0, 5.0, 6.0)),
+                EntID::from((GlobalID::from((archive_id, FormID::from(1001))), FormID::from(1014))),
+                Vec3Float::from((6000.0, -2000.0, 300.0)),
                 Vec3Float::from((0.0, 0.0, 0.0)),
                 1.0
                 )
@@ -263,7 +294,6 @@ pub fn test_sample() {
         println!("{:?}", form);
         println!();
     }
-
 
     println!("------------------------");
     // Read world forms
