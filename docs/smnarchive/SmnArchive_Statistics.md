@@ -1,3 +1,4 @@
+# SmnArchive Performance Statistics
 Below lies the performance statistics for writing and reading operations on the SmnArchive, measured in various scenarios.
 
 ---
