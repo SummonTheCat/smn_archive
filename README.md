@@ -6,6 +6,12 @@ This tool is designed for managing a custom archive format, optimized for game d
 - The tool supports reading from and writing to archives, with a focus on real-time data access to accommodate performance-critical environments like games.
 
 ---
+
+### Docs
+We have more detailed documentation available for the project in the `docs` directory:
+**[SmnArchive Docs](./docs/SmnArchive.md)**: Describes the layout of the archive file, including blocks and their contents.
+
+---
 ### Usage
 This project is designed to be flexible and can be integrated into both Rust and C++/C environments, providing robust control over custom archive formats.
 
