@@ -36,4 +36,5 @@ The **Data Block** holds the actual form data for each form in the archive. Each
 | `form_id`           | `FormID`      | 4             | Unique identifier for each form in the list.                        | `67890`     |
 | `form_type`         | `FormType`    | 1             | Type of each form, indicating the structure or data format.         | `1`         |
 | `byte_start_offset` | `u32`         | 4             | Offset from the **Data Block's Bytestart**, where form data starts. | `256`       |
-This is a ***list***, where each item follows the structure above. The list size is determined by the number of forms in the archive, as indicated by the `form_count` field.
+
+The index is a ***list***, where each item follows the structure above. The list size is determined by the number of forms in the archive, as indicated by the `form_count` field.
