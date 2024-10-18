@@ -2,7 +2,7 @@
 // ArchiveID: 1
 //
 // FormRefGroup (World List):
-//   CollWrldList: FormID 100
+//   CollWrldList: FormID 1
 //
 // FormStrings:
 //   StrTitle: FormID 1000
@@ -64,7 +64,7 @@ pub fn test_sample() {
 
     // Create and write a FormRefGroup (World List)
     let form_refgroup = FormRefGroup::new(
-        FormID::from(100), // FormID for RefGroup
+        FormID::from(1), // FormID for RefGroup
         StrSml::from("CollWrldList"),
         vec![
             GlobalID::from((archive_id, FormID::from(2000))), // WrldBeach
