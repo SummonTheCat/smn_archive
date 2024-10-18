@@ -26,3 +26,7 @@ pub use types_vectors::*;
 #[allow(unused)]
 pub mod types_entinstance;
 pub use types_entinstance::*;
+
+#[allow(unused)]
+pub mod types_color;
+pub use types_color::*;

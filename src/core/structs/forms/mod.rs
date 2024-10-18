@@ -18,3 +18,6 @@ pub use struc_form_refgroup::*;
 #[allow(unused)]
 pub mod struc_form_worldpart;
 pub use struc_form_worldpart::*;
+#[allow(unused)]
+pub mod struc_form_weather;
+pub use struc_form_weather::*;

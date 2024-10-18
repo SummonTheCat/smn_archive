@@ -229,7 +229,7 @@ impl fmt::Display for GlobalID {
         // Format ArchiveID and FormID with the desired padding.
         write!(
             f,
-            "{} {}",
+            "{}{}",
             format!("{:03}", self.archive_id.to_u8()),  // ArchiveID formatted to 3 digits
             format!("{:05}", self.form_id.to_u16())      // FormID formatted to 5 digits
         )

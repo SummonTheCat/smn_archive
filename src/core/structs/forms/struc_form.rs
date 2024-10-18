@@ -77,6 +77,10 @@ impl FormBase {
                 let form_worldpart = FormWorldPart::read_from_bytes(file)?;
                 Ok(Box::new(form_worldpart))
             }
+            FormType::WEATHER => {
+                let form_weather = FormWeather::read_from_bytes(file)?;
+                Ok(Box::new(form_weather))
+            }
         }
     }
 
@@ -122,6 +126,11 @@ impl FormBase {
                 let (form_worldpart, consumed) = FormWorldPart::read_from_byte_buffer(bytes)?;
                 offset += consumed;
                 Ok((Box::new(form_worldpart), offset))
+            }
+            FormType::WEATHER => {
+                let (form_weather, consumed) = FormWeather::read_from_byte_buffer(bytes)?;
+                offset += consumed;
+                Ok((Box::new(form_weather), offset))
             }
         }
     }
