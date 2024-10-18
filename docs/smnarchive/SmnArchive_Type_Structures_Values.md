@@ -354,3 +354,45 @@ EntInstance represents an entity instance, consisting of an entity ID, position,
     - `from_bytes()`: Creates an `EntInstance` from a byte array.
     - `read_from_bytes()`: Reads an `EntInstance` from a file or byte buffer.
     - `get_byte_count()`: Returns the byte size of `EntInstance` (always 33 bytes).
+
+---
+
+### **SmlColor** (Small Color)
+
+`SmlColor` represents a color with 8-bit (1-byte) channels for red, green, blue, and alpha. It is efficient for handling color data when high precision is not necessary.
+
+| Data Type | Byte Size | Description                                | Reading Rules                                  | Example                 |
+|-----------|-----------|--------------------------------------------|------------------------------------------------|-------------------------|
+| SmlColor  | 4         | RGBA color with 8-bit channels (1 byte per channel). | [u8: r] [u8: g] [u8: b] [u8: a]               | `RGBA(255, 128, 64, 255)` |
+
+#### **Usage:**
+
+- **Creation (From variants):**
+    - `From<(u8, u8, u8, u8)>`: Combines 4 `u8` values into an `SmlColor`.
+    - `From<[u8; 4]>`: Converts a 4-byte array into an `SmlColor`.
+  
+- **Methods:**
+    - `to_bytes()`: Converts the `SmlColor` into a 4-byte array.
+    - `to_string()`: Converts the `SmlColor` into a string format `RGBA(r, g, b, a)`.
+    - `get_byte_count()`: Returns the byte size of `SmlColor` (always 4 bytes).
+
+---
+
+### **LrgColor** (Large Color)
+
+`LrgColor` represents a color with 16-bit (2-byte) channels for red, green, blue, and alpha. It is used for higher precision color representation.
+
+| Data Type | Byte Size | Description                                | Reading Rules                                  | Example                        |
+|-----------|-----------|--------------------------------------------|------------------------------------------------|--------------------------------|
+| LrgColor  | 8         | RGBA color with 16-bit channels (2 bytes per channel). | [u16: r] [u16: g] [u16: b] [u16: a] (Big Endian) | `RGBA(65535, 32768, 16384, 65535)` |
+
+#### **Usage:**
+
+- **Creation (From variants):**
+    - `From<(u16, u16, u16, u16)>`: Combines 4 `u16` values into an `LrgColor`.
+    - `From<[u8; 8]>`: Converts an 8-byte array into an `LrgColor`.
+
+- **Methods:**
+    - `to_bytes()`: Converts the `LrgColor` into an 8-byte array.
+    - `to_string()`: Converts the `LrgColor` into a string format `RGBA(r, g, b, a)`.
+    - `get_byte_count()`: Returns the byte size of `LrgColor` (always 8 bytes).

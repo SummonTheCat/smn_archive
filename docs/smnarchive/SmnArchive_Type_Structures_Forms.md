@@ -131,3 +131,49 @@ Forms are all structured with some shared Base Form fields, then additional fiel
 
 **Description:**  
 `FormWorldPart` handles the data for parts of the game world, specifically related to entities within that part. Each world part contains a list of entity instances (`EntInstance`), allowing for efficient management of areas in the world, including their associated entities.
+
+---
+
+### **FormWeather**
+
+| Data Field              | Data Type         | Byte Size                       | Description                                                                        | Reading Rules                                          | Example                          |
+|-------------------------|-------------------|---------------------------------|------------------------------------------------------------------------------------|--------------------------------------------------------|----------------------------------|
+| `form_id`               | `FormID`          | 2                               | Unique identifier for the form, `u16` value.                                       | Stored as `u16` (Big Endian).                          | `12345`                          |
+| `form_type`             | `FormType`        | 1                               | Enum representing the form type (`WEATHER` = 4), `u8` value.                       | Stored as `u8`.                                        | `4` (for `WEATHER`)              |
+| `form_name`             | `StrSml`          | 1 + (1 * chars)                 | Small string (ASCII) representing the form name.                                   | First byte (`u8`) for length, followed by ASCII chars.  | `"weather_form"`                 |
+| `gi_lighting_color`      | `SmlColor[4]`     | 4 * `SmlColor` byte size        | Array of 4 lighting colors (Day, Dusk, Night, Dawn).                               | Stored as 4 `SmlColor` values.                         | `[(255,255,255), ...]`           |
+| `gi_lighting_intensity`  | `f32[4]`          | 4 * 4                           | Array of 4 lighting intensity values.                                              | Stored as 4 `f32` values.                              | `[1.0, 0.8, 0.6, 0.4]`           |
+| `gi_shadow_intensity`    | `f32[4]`          | 4 * 4                           | Array of 4 shadow intensity values.                                                | Stored as 4 `f32` values.                              | `[0.5, 0.3, 0.2, 0.1]`           |
+| `precipitation_preset`   | `GlobalID[4]`     | 4 * 3                           | Array of 4 `GlobalID` values for precipitation presets.                            | Stored as 4 `GlobalID` values.                         | `["00112345", ...]`              |
+| `precipitation_intensity`| `f32[4]`          | 4 * 4                           | Array of 4 precipitation intensity values.                                         | Stored as 4 `f32` values.                              | `[0.1, 0.3, 0.5, 0.7]`           |
+| `wind_speed`             | `f32[4]`          | 4 * 4                           | Array of 4 wind speed values.                                                      | Stored as 4 `f32` values.                              | `[10.0, 8.0, 6.0, 4.0]`          |
+| `wind_turbulence`        | `f32[4]`          | 4 * 4                           | Array of 4 wind turbulence values.                                                 | Stored as 4 `f32` values.                              | `[1.0, 0.8, 0.6, 0.4]`           |
+| `wind_direction`         | `Vec3Float[4]`    | 4 * 12                          | Array of 4 wind direction vectors.                                                 | Stored as 4 `Vec3Float` values.                        | `[(1.0, 0.0, 0.0), ...]`         |
+| `skybox_texture`         | `StrSml[4]`       | Sum of each `StrSml` byte size  | Array of 4 skybox texture names.                                                   | Stored as 4 `StrSml` values.                           | `["day_sky", "night_sky", ...]`  |
+| `skybox_cloud_density`   | `f32[4]`          | 4 * 4                           | Array of 4 cloud density values.                                                   | Stored as 4 `f32` values.                              | `[0.5, 0.7, 0.9, 1.0]`           |
+| `skybox_sun_color`       | `SmlColor[4]`     | 4 * `SmlColor` byte size        | Array of 4 sun colors.                                                             | Stored as 4 `SmlColor` values.                         | `[(255,255,100), ...]`           |
+| `skybox_sun_intensity`   | `f32[4]`          | 4 * 4                           | Array of 4 sun intensity values.                                                   | Stored as 4 `f32` values.                              | `[1.0, 0.8, 0.6, 0.4]`           |
+| `fog_density`            | `f32[4]`          | 4 * 4                           | Array of 4 fog density values.                                                     | Stored as 4 `f32` values.                              | `[0.1, 0.2, 0.3, 0.4]`           |
+| `fog_height`             | `f32[4]`          | 4 * 4                           | Array of 4 fog height values.                                                      | Stored as 4 `f32` values.                              | `[100.0, 120.0, 140.0, 160.0]`   |
+| `fog_scattering`         | `f32[4]`          | 4 * 4                           | Array of 4 fog scattering values.                                                  | Stored as 4 `f32` values.                              | `[0.5, 0.6, 0.7, 0.8]`           |
+| `fog_color`              | `SmlColor[4]`     | 4 * `SmlColor` byte size        | Array of 4 fog colors.                                                             | Stored as 4 `SmlColor` values.                         | `[(200,200,200), ...]`           |
+| `sound_ambient_profile`  | `GlobalID[4]`     | 4 * 3                           | Array of 4 sound ambient profile `GlobalID` values.                                | Stored as 4 `GlobalID` values.                         | `["00112345", ...]`              |
+| `sound_env_reverb`       | `f32[4]`          | 4 * 4                           | Array of 4 sound environment reverb values.                                        | Stored as 4 `f32` values.                              | `[0.8, 0.6, 0.4, 0.2]`           |
+| `sound_env_dampening`    | `f32[4]`          | 4 * 4                           | Array of 4 sound environment dampening values.                                     | Stored as 4 `f32` values.                              | `[0.3, 0.5, 0.7, 0.9]`           |
+| `sound_env_echo_delay`   | `f32[4]`          | 4 * 4                           | Array of 4 sound environment echo delay values.                                    | Stored as 4 `f32` values.                              | `[0.1, 0.2, 0.3, 0.4]`           |
+
+#### **Methods:**
+
+- `to_bytes()`: Converts the `FormWeather` into a byte array.
+- `get_byte_count()`: Returns the total byte count of the `FormWeather`.
+- `read_from_bytes(file: &mut File)`: Reads the `FormWeather` from a file.
+- `read_from_byte_buffer(bytes: &[u8])`: Reads the `FormWeather` from a byte buffer.
+- `to_dict()`: Converts the `FormWeather` into a JSON dictionary.
+
+#### **Creation (`::from` variants):**
+
+- `FormWeather::from(form_id: FormID, form_name: StrSml, gi_lighting_color: Vec<SmlColor>, gi_lighting_intensity: Vec<f32>, ...)`: Creates a `FormWeather` from the given parameters.
+
+**Description:**  
+`FormWeather` handles weather-related configurations, such as lighting, precipitation, wind, skybox properties, fog, and ambient sound profiles. Each weather form is divided into day, dusk, night, and dawn cycles, with specific configurations for each time period.
+
