@@ -1,18 +1,13 @@
-# SmnArchive Documentation
+# SmnArchive
 
-Welcome to the **SmnArchive** library documentation! This guide will help you get started with using the library by explaining how to import and utilize its core modules effectively.
+A library for managing the SmnArchive (`.smn`) binary archive structure. The binary structure is set up for real-time streaming of data, with a focus on performant reading.
 
-## Table of Contents
-
-1. [Overview](#overview)
-2. [Crate Module Imports](#crate-module-imports)
-    - [Core Modules](#core-modules)
-        - [IO Module](#io-module)
-        - [Structs Module](#structs-module)
-3. [Usage Example](#usage-example)
-4. [Further Resources](#further-resources)
-
----
+**Notable Info:**
+- [SmnArchive - Type Structures - Binary File](./smnarchive/SmnArchive_Type_Structures_Binary_File.md) - Describes the archive file's block-based layout.
+- [SmnArchive - Type Structures - Values](./smnarchive/SmnArchive_Type_Structures_Values.md) - Defines sizes and formats for a form's stored value types.
+- [SmnArchive - Type Structures - Forms](./smnarchive/SmnArchive_Type_Structures_Forms.md) - Describes structures for different form types.
+- [SmnArchive - Glossary](./smnarchive/SmnArchive_Glossary.md) - Glossary of terms used in the SmnArchive library.
+- [SmnArchive - Statistics](./smnarchive/SmnArchive_Statistics.md) - Performance statistics for reading and writing forms.
 
 ## Overview
 
@@ -20,7 +15,7 @@ Welcome to the **SmnArchive** library documentation! This guide will help you ge
 
 ## Crate Module Imports
 
-To leverage the full capabilities of the **SmnArchive** library, you need to import the necessary modules and components from the crate. Below is a reference snippet commonly used in main documentation:
+To effectively utilize the **SmnArchive** library, it's essential to understand how to import its core modules and components. Below is a reference snippet commonly used in the main documentation:
 
 ```rust
 use crate::core::{
@@ -35,7 +30,7 @@ use crate::core::{
 
 ### Core Modules
 
-The `core` module is the heart of the **SmnArchive** library, containing essential submodules and components required for archive management. It is divided into two primary submodules: `io` and `structs`.
+The `core` module is the foundation of the **SmnArchive** library, containing essential submodules and components required for archive management. It is divided into two primary submodules: `io` and `structs`.
 
 #### IO Module
 
@@ -122,6 +117,102 @@ if archive.get_form_exists(&form_id) {
     }
 }
 ```
+    
+## Library Functionalities
+
+The library supports various CRUD operations on the archive, categorized into **Archive** and **Forms** operations.
+
+### Archive
+
+These functions allow you to perform CRUD operations on the entire archive.
+
+- **`write_archive_skeleton`**
+  - **Purpose:** Creates a new archive structure.
+  - **Usage Scenario:** Initializing a new `.smn` archive file before adding any data.
+
+- **`read_archive_info`**
+  - **Purpose:** Retrieves information about the archive.
+  - **Usage Scenario:** Fetching metadata or summary details of the archive for display or processing.
+
+- **`write_archive_info`**
+  - **Purpose:** Writes or updates the archive's information.
+  - **Usage Scenario:** Modifying metadata or updating summary details of the archive.
+
+- **`read_lite_archive`**
+  - **Purpose:** Retrieves a lightweight version of the archive, containing a list of simple form data.
+  - **Usage Scenario:** Quick access to form identifiers and basic information without loading full form details.
+
+### Forms
+
+These functions handle CRUD operations for individual forms within the archive.
+
+- **`read_form`**
+  - **Purpose:** Retrieves data for a specific form.
+  - **Usage Scenario:** Accessing detailed information of a single form based on its identifier.
+
+- **`read_forms`**
+  - **Purpose:** Retrieves data for multiple forms simultaneously.
+  - **Usage Scenario:** Batch processing or loading multiple forms at once for efficiency.
+
+- **`write_form`**
+  - **Purpose:** Adds or updates data for a specific form.
+  - **Usage Scenario:** Inserting new form data or modifying existing form information within the archive.
+
+- **`delete_form`**
+  - **Purpose:** Removes a specific form from the archive.
+  - **Usage Scenario:** Deleting obsolete or unnecessary form data to maintain archive integrity.
+
+- **`get_form_exists`**
+  - **Purpose:** Checks if a specific form exists within the archive.
+  - **Usage Scenario:** Validating the presence of a form before attempting read or write operations.
+
+## Data Structures
+
+The library includes various structures to safely and efficiently manage different types of forms and their content.
+
+### Form Structures
+
+These structures define the layout and components of different form types.
+
+- **`struc_form`**
+  - **Description:** The base form structure that serves as the foundation for all form types.
+  - **Usage:** Inherited by other specific form structures to ensure consistency.
+
+- **`struc_form_world`**
+  - **Description:** Structure tailored for *WORLD* forms.
+  - **Usage:** Managing and organizing data related to world configurations or environments.
+
+- **`struc_form_string`**
+  - **Description:** Structure for *STRING* forms.
+  - **Usage:** Handling textual data or string-based information within the archive.
+
+- **`struc_form_refgroup`**
+  - **Description:** Structure for *REFGROUP* forms.
+  - **Usage:** Managing groups of references, possibly for linking related data.
+
+- **`struc_form_worldpart`**
+  - **Description:** Structure for *WORLDPART* forms.
+  - **Usage:** Handling subdivisions or components of a world within the archive.
+
+### Type Structures
+
+These structures define various data types used within forms, ensuring type safety and consistency.
+
+- **`types_id`**
+  - **Description:** Defines different ID types such as *ArchiveID*, *FormID*, and *GlobalID*.
+  - **Usage:** Unique identifiers for archives, forms, and global entities.
+
+- **`types_misc`**
+  - **Description:** Defines miscellaneous types like *FormType* and *LangCode*.
+  - **Usage:** Categorizing forms and specifying language codes for localization.
+
+- **`types_str`**
+  - **Description:** Defines different string types such as *StrSml* and *StrLrg*.
+  - **Usage:** Handling small and large strings efficiently based on their size.
+
+- **`types_vector`**
+  - **Description:** Defines different vector types like *Vec2Int*, *Vec3Int*, *Vec2Float*, and *Vec3Float*.
+  - **Usage:** Managing numerical data in 2D and 3D space with integer and floating-point precision.
 
 ## Usage Example
 
@@ -172,5 +263,3 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 - **[SmnArchive - Statistics](./smnarchive/SmnArchive_Statistics.md)**
 
 ---
-
-Feel free to explore the detailed documentation linked above to gain a deeper understanding of each component and how to utilize the **SmnArchive** library effectively in your projects. If you have any questions or need further assistance, don't hesitate to reach out to the community or the development team.
