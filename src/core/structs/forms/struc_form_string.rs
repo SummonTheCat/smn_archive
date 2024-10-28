@@ -46,7 +46,7 @@ impl FormString {
     /// Serializes the `FormString` into a byte array
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = self.base.to_bytes();
-        bytes.extend_from_slice(&(self.languages.len() as u8).to_be_bytes());
+        bytes.push(self.languages.len() as u8);
         for lang in &self.languages {
             bytes.push(lang.to_byte());
         }

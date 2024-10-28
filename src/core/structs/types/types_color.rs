@@ -46,6 +46,19 @@ impl From<(u8, u8, u8, u8)> for SmlColor {
     }
 }
 
+impl From<[u8; 4]> for SmlColor {
+    /// Creates a `SmlColor` from a byte array `[u8; 4]`.
+    fn from(arr: [u8; 4]) -> Self {
+        Self {
+            r: arr[0],
+            g: arr[1],
+            b: arr[2],
+            a: arr[3],
+        }
+    }
+}
+
+
 impl Display for SmlColor {
     /// Formats `SmlColor` as a string in the format `RGBA(r, g, b, a)`.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -65,23 +78,25 @@ impl LrgColor {
     /// Number of bytes for LrgColor (2 bytes per component, 8 bytes total).
     pub const BYTE_COUNT: usize = 8;
 
-    /// Converts `LrgColor` to a byte array (RGBA format, using big-endian).
+    /// Converts `LrgColor` to a byte array (RGBA format, using Little-Endian).
     pub fn to_bytes(&self) -> [u8; Self::BYTE_COUNT] {
         let mut bytes = [0u8; Self::BYTE_COUNT];
-        bytes[..2].copy_from_slice(&self.r.to_be_bytes());
-        bytes[2..4].copy_from_slice(&self.g.to_be_bytes());
-        bytes[4..6].copy_from_slice(&self.b.to_be_bytes());
-        bytes[6..].copy_from_slice(&self.a.to_be_bytes());
+        // Changed to Little-Endian
+        bytes[..2].copy_from_slice(&self.r.to_le_bytes());
+        bytes[2..4].copy_from_slice(&self.g.to_le_bytes());
+        bytes[4..6].copy_from_slice(&self.b.to_le_bytes());
+        bytes[6..].copy_from_slice(&self.a.to_le_bytes());
         bytes
     }
 
     /// Creates a `LrgColor` from a byte array.
     pub fn from_bytes(bytes: [u8; Self::BYTE_COUNT]) -> Self {
         Self {
-            r: u16::from_be_bytes([bytes[0], bytes[1]]),
-            g: u16::from_be_bytes([bytes[2], bytes[3]]),
-            b: u16::from_be_bytes([bytes[4], bytes[5]]),
-            a: u16::from_be_bytes([bytes[6], bytes[7]]),
+            // Changed to Little-Endian
+            r: u16::from_le_bytes([bytes[0], bytes[1]]),
+            g: u16::from_le_bytes([bytes[2], bytes[3]]),
+            b: u16::from_le_bytes([bytes[4], bytes[5]]),
+            a: u16::from_le_bytes([bytes[6], bytes[7]]),
         }
     }
 

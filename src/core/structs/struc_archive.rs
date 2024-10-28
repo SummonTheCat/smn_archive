@@ -41,27 +41,28 @@ impl Archive {
         }
     }
 
-    /// Create a new archive from bytes.
+    /// Get the form count.
     pub fn get_form_count(&self) -> u16 {
         self.form_count as u16
     }
 
-    /// Create a new archive from bytes.
+    /// Get the total byte count of the header.
     pub fn get_header_byte_count(&self) -> usize {
         let byte_count = ArchiveID::BYTE_COUNT
             + Version::BYTE_COUNT
             + self.description.get_byte_count()
-            + 2; 
+            + 2; // 2 bytes for form_count
         byte_count
     }
     
-    /// Create a new archive from bytes.
+    /// Convert the header to bytes.
     pub fn header_to_bytes(&self) -> Vec<u8> {
         let mut bytes = Vec::with_capacity(self.get_header_byte_count());
         bytes.extend_from_slice(&self.archive_id.to_bytes());
         bytes.extend_from_slice(&self.version.to_bytes());
         bytes.extend_from_slice(&self.description.to_bytes());
-        bytes.extend_from_slice(&(self.get_form_count() as u16).to_be_bytes());
+        // Use Little-Endian for form_count
+        bytes.extend_from_slice(&(self.get_form_count() as u16).to_le_bytes());
         bytes
     }
 }
@@ -121,8 +122,8 @@ impl LiteArchive {
         // Convert description to bytes and append
         bytes.extend_from_slice(&self.description.to_bytes());
         
-        // Convert form_count to bytes and append
-        bytes.extend_from_slice(&self.form_count.to_be_bytes());
+        // Convert form_count to bytes and append (Use Little-Endian)
+        bytes.extend_from_slice(&self.form_count.to_le_bytes());
         
         // Convert each LiteArchiveItem to bytes and append
         for item in &self.archive_items {

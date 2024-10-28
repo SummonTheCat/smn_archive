@@ -20,8 +20,8 @@ impl Vec2Int {
     /// Converts `Vec2Int` to a byte array.
     pub fn to_bytes(&self) -> [u8; Self::BYTE_COUNT] {
         let mut bytes = [0u8; Self::BYTE_COUNT];
-        bytes[..4].copy_from_slice(&self.x.to_be_bytes());
-        bytes[4..].copy_from_slice(&self.y.to_be_bytes());
+        bytes[..4].copy_from_slice(&self.x.to_le_bytes());
+        bytes[4..].copy_from_slice(&self.y.to_le_bytes());
         bytes
     }
 
@@ -41,8 +41,8 @@ impl Vec2Int {
 impl From<[u8; Vec2Int::BYTE_COUNT]> for Vec2Int {
     /// Creates a `Vec2Int` from a byte array.
     fn from(bytes: [u8; Vec2Int::BYTE_COUNT]) -> Self {
-        let x = i32::from_be_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]);
-        let y = i32::from_be_bytes([bytes[4], bytes[5], bytes[6], bytes[7]]);
+        let x = i32::from_le_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]);
+        let y = i32::from_le_bytes([bytes[4], bytes[5], bytes[6], bytes[7]]);
         Self { x, y }
     }
 }
@@ -79,9 +79,9 @@ impl Vec3Int {
     /// Converts `Vec3Int` to a byte array.
     pub fn to_bytes(&self) -> [u8; Self::BYTE_COUNT] {
         let mut bytes = [0u8; Self::BYTE_COUNT];
-        bytes[..4].copy_from_slice(&self.x.to_be_bytes());
-        bytes[4..8].copy_from_slice(&self.y.to_be_bytes());
-        bytes[8..].copy_from_slice(&self.z.to_be_bytes());
+        bytes[..4].copy_from_slice(&self.x.to_le_bytes());
+        bytes[4..8].copy_from_slice(&self.y.to_le_bytes());
+        bytes[8..].copy_from_slice(&self.z.to_le_bytes());
         bytes
     }
 
@@ -102,9 +102,9 @@ impl Vec3Int {
 impl From<[u8; Vec3Int::BYTE_COUNT]> for Vec3Int {
     /// Creates a `Vec3Int` from a byte array.
     fn from(bytes: [u8; Vec3Int::BYTE_COUNT]) -> Self {
-        let x = i32::from_be_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]);
-        let y = i32::from_be_bytes([bytes[4], bytes[5], bytes[6], bytes[7]]);
-        let z = i32::from_be_bytes([bytes[8], bytes[9], bytes[10], bytes[11]]);
+        let x = i32::from_le_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]);
+        let y = i32::from_le_bytes([bytes[4], bytes[5], bytes[6], bytes[7]]);
+        let z = i32::from_le_bytes([bytes[8], bytes[9], bytes[10], bytes[11]]);
         Self { x, y, z }
     }
 }
@@ -141,8 +141,8 @@ impl Vec2Float {
     /// Converts `Vec2Float` to a byte array.
     pub fn to_bytes(&self) -> [u8; Self::BYTE_COUNT] {
         let mut bytes = [0u8; Self::BYTE_COUNT];
-        bytes[..4].copy_from_slice(&self.x.to_be_bytes());
-        bytes[4..].copy_from_slice(&self.y.to_be_bytes());
+        bytes[..4].copy_from_slice(&self.x.to_le_bytes());
+        bytes[4..].copy_from_slice(&self.y.to_le_bytes());
         bytes
     }
 
@@ -162,8 +162,8 @@ impl Vec2Float {
 impl From<[u8; Vec2Float::BYTE_COUNT]> for Vec2Float {
     /// Creates a `Vec2Float` from a byte array.
     fn from(bytes: [u8; Vec2Float::BYTE_COUNT]) -> Self {
-        let x = f32::from_be_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]);
-        let y = f32::from_be_bytes([bytes[4], bytes[5], bytes[6], bytes[7]]);
+        let x = f32::from_le_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]);
+        let y = f32::from_le_bytes([bytes[4], bytes[5], bytes[6], bytes[7]]);
         Self { x, y }
     }
 }
@@ -200,9 +200,9 @@ impl Vec3Float {
     /// Converts `Vec3Float` to a byte array.
     pub fn to_bytes(&self) -> [u8; Self::BYTE_COUNT] {
         let mut bytes = [0u8; Self::BYTE_COUNT];
-        bytes[..4].copy_from_slice(&self.x.to_be_bytes());
-        bytes[4..8].copy_from_slice(&self.y.to_be_bytes());
-        bytes[8..].copy_from_slice(&self.z.to_be_bytes());
+        bytes[..4].copy_from_slice(&self.x.to_le_bytes());
+        bytes[4..8].copy_from_slice(&self.y.to_le_bytes());
+        bytes[8..].copy_from_slice(&self.z.to_le_bytes());
         bytes
     }
 
@@ -223,9 +223,9 @@ impl Vec3Float {
 impl From<[u8; Vec3Float::BYTE_COUNT]> for Vec3Float {
     /// Creates a `Vec3Float` from a byte array.
     fn from(bytes: [u8; Vec3Float::BYTE_COUNT]) -> Self {
-        let x = f32::from_be_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]);
-        let y = f32::from_be_bytes([bytes[4], bytes[5], bytes[6], bytes[7]]);
-        let z = f32::from_be_bytes([bytes[8], bytes[9], bytes[10], bytes[11]]);
+        let x = f32::from_le_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]);
+        let y = f32::from_le_bytes([bytes[4], bytes[5], bytes[6], bytes[7]]);
+        let z = f32::from_le_bytes([bytes[8], bytes[9], bytes[10], bytes[11]]);
         Self { x, y, z }
     }
 }

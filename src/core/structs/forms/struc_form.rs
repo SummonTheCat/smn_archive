@@ -28,33 +28,33 @@ impl FormBase {
     pub const BYTE_COUNT_FORM_ID: usize = FormID::BYTE_COUNT;
     pub const BYTE_COUNT_FORM_TYPE: usize = FormType::BYTE_COUNT;
 
-    /// Convert `FormBase` into a byte array
+    /// Convert `FormBase` into a byte array (Little-Endian).
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = Vec::with_capacity(Self::BYTE_COUNT_FORM_ID + Self::BYTE_COUNT_FORM_TYPE + self.form_name.get_byte_count());
-        bytes.extend_from_slice(&self.form_id.to_bytes());
-        bytes.push(self.form_type.to_byte());
-        bytes.extend_from_slice(&self.form_name.to_bytes());
+        bytes.extend_from_slice(&self.form_id.to_bytes()); // Assumes `FormID::to_bytes` uses LE
+        bytes.push(self.form_type.to_byte()); // Single byte, endianess irrelevant
+        bytes.extend_from_slice(&self.form_name.to_bytes()); // Assumes `StrSml::to_bytes` uses LE if needed
         bytes
     }
 
-    /// Calculate the total byte count required to serialize the form
+    /// Calculate the total byte count required to serialize the form.
     pub fn get_byte_count(&self) -> usize {
         Self::BYTE_COUNT_FORM_ID + Self::BYTE_COUNT_FORM_TYPE + self.form_name.get_byte_count()
     }
 
-    /// Read `FormBase` from a binary file and return a boxed `FormTrait` based on the form type
+    /// Read `FormBase` from a binary file and return a boxed `FormTrait` based on the form type.
     pub fn read_from_bytes(file: &mut File) -> io::Result<Box<dyn FormTrait>> {
         let checkpoint = file.seek(std::io::SeekFrom::Current(0))?;
 
         // Read the form ID from the file.
         let mut form_id_buffer = [0u8; FormID::BYTE_COUNT];
         file.read_exact(&mut form_id_buffer)?;
-        let _form_id = FormID::from(form_id_buffer);
+        let _form_id = FormID::from(form_id_buffer); // Assumes `FormID::from` uses LE
 
         // Read the form type.
         let mut form_type_buffer = [0u8; FormType::BYTE_COUNT];
         file.read_exact(&mut form_type_buffer)?;
-        let form_type = FormType::from(form_type_buffer[0]);
+        let form_type = FormType::from(form_type_buffer[0]); // Assuming FormType is 1 byte
 
         // Rewind file position before handling form-specific deserialization.
         file.seek(std::io::SeekFrom::Start(checkpoint))?;
@@ -84,7 +84,7 @@ impl FormBase {
         }
     }
 
-    /// Read `FormBase` from a byte buffer and return a boxed `FormTrait`
+    /// Read `FormBase` from a byte buffer and return a boxed `FormTrait`.
     pub fn read_from_byte_buffer(bytes: &[u8]) -> io::Result<(Box<dyn FormTrait>, usize)> {
         let mut offset = 0;
 
@@ -93,7 +93,7 @@ impl FormBase {
             return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for FormID"));
         }
         let form_id_array: [u8; FormID::BYTE_COUNT] = bytes[offset..offset + FormID::BYTE_COUNT].try_into().unwrap();
-        let form_id = FormID::from(form_id_array);
+        let form_id = FormID::from(form_id_array); // Assumes `FormID::from` uses LE
         offset += FormID::BYTE_COUNT;
 
         // Read FormType from the byte buffer.
@@ -102,7 +102,7 @@ impl FormBase {
         }
 
         let byte_value = bytes[offset] as u8;
-        let form_type = FormType::from(byte_value);
+        let form_type = FormType::from(byte_value); // Single byte, endianess irrelevant
         offset += FormType::BYTE_COUNT;
 
         // Handle deserialization based on the form type.

@@ -119,26 +119,12 @@ impl FormWeather {
     /// Calculates the byte count needed for serialization.
     pub fn get_byte_count(&self) -> usize {
         self.base.get_byte_count()
-            + (std::mem::size_of::<SmlColor>() * 4)          // gi_lighting_color
-            + (std::mem::size_of::<f32>() * 4)               // gi_lighting_intensity
-            + (std::mem::size_of::<f32>() * 4)               // gi_shadow_intensity
-            + (GlobalID::BYTE_COUNT * 4)                     // precipitation_preset
-            + (std::mem::size_of::<f32>() * 4)               // precipitation_intensity
-            + (std::mem::size_of::<f32>() * 4)               // wind_speed
-            + (std::mem::size_of::<f32>() * 4)               // wind_turbulence
-            + (std::mem::size_of::<Vec3Float>() * 4)         // wind_direction
+            + (SmlColor::BYTE_COUNT * 4)              // gi_lighting_color
+            + (std::mem::size_of::<f32>() * 4 * 13)   // f32 arrays (13 arrays of 4 elements)
+            + (GlobalID::BYTE_COUNT * 4 * 2)          // precipitation_preset and sound_ambient_profile
+            + (Vec3Float::BYTE_COUNT * 4)             // wind_direction
             + self.skybox_texture.iter().map(|s| s.get_byte_count()).sum::<usize>() // skybox_texture
-            + (std::mem::size_of::<f32>() * 4)               // skybox_cloud_density
-            + (std::mem::size_of::<SmlColor>() * 4)          // skybox_sun_color
-            + (std::mem::size_of::<f32>() * 4)               // skybox_sun_intensity
-            + (std::mem::size_of::<f32>() * 4)               // fog_density
-            + (std::mem::size_of::<f32>() * 4)               // fog_height
-            + (std::mem::size_of::<f32>() * 4)               // fog_scattering
-            + (std::mem::size_of::<SmlColor>() * 4)          // fog_color
-            + (GlobalID::BYTE_COUNT * 4)                     // sound_ambient_profile
-            + (std::mem::size_of::<f32>() * 4)               // sound_env_reverb
-            + (std::mem::size_of::<f32>() * 4)               // sound_env_dampening
-            + (std::mem::size_of::<f32>() * 4)               // sound_env_echo_delay
+            + (SmlColor::BYTE_COUNT * 4 * 2)          // skybox_sun_color and fog_color
     }
 
     /// Serializes `FormWeather` to a byte array.
@@ -152,12 +138,12 @@ impl FormWeather {
 
         // Serialize gi_lighting_intensity (Vec<f32>)
         for intensity in &self.gi_lighting_intensity {
-            bytes.extend_from_slice(&intensity.to_be_bytes());
+            bytes.extend_from_slice(&intensity.to_le_bytes());
         }
 
         // Serialize gi_shadow_intensity (Vec<f32>)
         for shadow_intensity in &self.gi_shadow_intensity {
-            bytes.extend_from_slice(&shadow_intensity.to_be_bytes());
+            bytes.extend_from_slice(&shadow_intensity.to_le_bytes());
         }
 
         // Serialize precipitation_preset (Vec<GlobalID>)
@@ -167,17 +153,17 @@ impl FormWeather {
 
         // Serialize precipitation_intensity (Vec<f32>)
         for intensity in &self.precipitation_intensity {
-            bytes.extend_from_slice(&intensity.to_be_bytes());
+            bytes.extend_from_slice(&intensity.to_le_bytes());
         }
 
         // Serialize wind_speed (Vec<f32>)
         for speed in &self.wind_speed {
-            bytes.extend_from_slice(&speed.to_be_bytes());
+            bytes.extend_from_slice(&speed.to_le_bytes());
         }
 
         // Serialize wind_turbulence (Vec<f32>)
         for turbulence in &self.wind_turbulence {
-            bytes.extend_from_slice(&turbulence.to_be_bytes());
+            bytes.extend_from_slice(&turbulence.to_le_bytes());
         }
 
         // Serialize wind_direction (Vec<Vec3Float>)
@@ -192,7 +178,7 @@ impl FormWeather {
 
         // Serialize skybox_cloud_density (Vec<f32>)
         for cloud_density in &self.skybox_cloud_density {
-            bytes.extend_from_slice(&cloud_density.to_be_bytes());
+            bytes.extend_from_slice(&cloud_density.to_le_bytes());
         }
 
         // Serialize skybox_sun_color (Vec<SmlColor>)
@@ -202,22 +188,22 @@ impl FormWeather {
 
         // Serialize skybox_sun_intensity (Vec<f32>)
         for sun_intensity in &self.skybox_sun_intensity {
-            bytes.extend_from_slice(&sun_intensity.to_be_bytes());
+            bytes.extend_from_slice(&sun_intensity.to_le_bytes());
         }
 
         // Serialize fog_density (Vec<f32>)
         for density in &self.fog_density {
-            bytes.extend_from_slice(&density.to_be_bytes());
+            bytes.extend_from_slice(&density.to_le_bytes());
         }
 
         // Serialize fog_height (Vec<f32>)
         for height in &self.fog_height {
-            bytes.extend_from_slice(&height.to_be_bytes());
+            bytes.extend_from_slice(&height.to_le_bytes());
         }
 
         // Serialize fog_scattering (Vec<f32>)
         for scattering in &self.fog_scattering {
-            bytes.extend_from_slice(&scattering.to_be_bytes());
+            bytes.extend_from_slice(&scattering.to_le_bytes());
         }
 
         // Serialize fog_color (Vec<SmlColor>)
@@ -232,17 +218,17 @@ impl FormWeather {
 
         // Serialize sound_env_reverb (Vec<f32>)
         for reverb in &self.sound_env_reverb {
-            bytes.extend_from_slice(&reverb.to_be_bytes());
+            bytes.extend_from_slice(&reverb.to_le_bytes());
         }
 
         // Serialize sound_env_dampening (Vec<f32>)
         for dampening in &self.sound_env_dampening {
-            bytes.extend_from_slice(&dampening.to_be_bytes());
+            bytes.extend_from_slice(&dampening.to_le_bytes());
         }
 
         // Serialize sound_env_echo_delay (Vec<f32>)
         for echo_delay in &self.sound_env_echo_delay {
-            bytes.extend_from_slice(&echo_delay.to_be_bytes());
+            bytes.extend_from_slice(&echo_delay.to_le_bytes());
         }
 
         bytes
@@ -297,7 +283,7 @@ impl FormWeather {
         for _ in 0..4 {
             let mut color_buffer = [0u8; SmlColor::BYTE_COUNT];
             file.read_exact(&mut color_buffer)?;
-            gi_lighting_color.push(SmlColor::read_from_byte_buffer(color_buffer));
+            gi_lighting_color.push(SmlColor::from(color_buffer));
         }
 
         // Read gi_lighting_intensity (4 values)
@@ -305,7 +291,7 @@ impl FormWeather {
         for _ in 0..4 {
             let mut intensity_buffer = [0u8; 4];
             file.read_exact(&mut intensity_buffer)?;
-            gi_lighting_intensity.push(f32::from_be_bytes(intensity_buffer));
+            gi_lighting_intensity.push(f32::from_le_bytes(intensity_buffer));
         }
 
         // Read gi_shadow_intensity (4 values)
@@ -313,7 +299,7 @@ impl FormWeather {
         for _ in 0..4 {
             let mut shadow_intensity_buffer = [0u8; 4];
             file.read_exact(&mut shadow_intensity_buffer)?;
-            gi_shadow_intensity.push(f32::from_be_bytes(shadow_intensity_buffer));
+            gi_shadow_intensity.push(f32::from_le_bytes(shadow_intensity_buffer));
         }
 
         // Read precipitation_preset (4 values)
@@ -329,7 +315,7 @@ impl FormWeather {
         for _ in 0..4 {
             let mut intensity_buffer = [0u8; 4];
             file.read_exact(&mut intensity_buffer)?;
-            precipitation_intensity.push(f32::from_be_bytes(intensity_buffer));
+            precipitation_intensity.push(f32::from_le_bytes(intensity_buffer));
         }
 
         // Read wind_speed (4 values)
@@ -337,7 +323,7 @@ impl FormWeather {
         for _ in 0..4 {
             let mut speed_buffer = [0u8; 4];
             file.read_exact(&mut speed_buffer)?;
-            wind_speed.push(f32::from_be_bytes(speed_buffer));
+            wind_speed.push(f32::from_le_bytes(speed_buffer));
         }
 
         // Read wind_turbulence (4 values)
@@ -345,7 +331,7 @@ impl FormWeather {
         for _ in 0..4 {
             let mut turbulence_buffer = [0u8; 4];
             file.read_exact(&mut turbulence_buffer)?;
-            wind_turbulence.push(f32::from_be_bytes(turbulence_buffer));
+            wind_turbulence.push(f32::from_le_bytes(turbulence_buffer));
         }
 
         // Read wind_direction (4 values)
@@ -367,7 +353,7 @@ impl FormWeather {
         for _ in 0..4 {
             let mut cloud_density_buffer = [0u8; 4];
             file.read_exact(&mut cloud_density_buffer)?;
-            skybox_cloud_density.push(f32::from_be_bytes(cloud_density_buffer));
+            skybox_cloud_density.push(f32::from_le_bytes(cloud_density_buffer));
         }
 
         // Read skybox_sun_color (4 values)
@@ -375,7 +361,7 @@ impl FormWeather {
         for _ in 0..4 {
             let mut color_buffer = [0u8; SmlColor::BYTE_COUNT];
             file.read_exact(&mut color_buffer)?;
-            skybox_sun_color.push(SmlColor::read_from_byte_buffer(color_buffer));
+            skybox_sun_color.push(SmlColor::from(color_buffer));
         }
 
         // Read skybox_sun_intensity (4 values)
@@ -383,7 +369,7 @@ impl FormWeather {
         for _ in 0..4 {
             let mut sun_intensity_buffer = [0u8; 4];
             file.read_exact(&mut sun_intensity_buffer)?;
-            skybox_sun_intensity.push(f32::from_be_bytes(sun_intensity_buffer));
+            skybox_sun_intensity.push(f32::from_le_bytes(sun_intensity_buffer));
         }
 
         // Read fog_density (4 values)
@@ -391,7 +377,7 @@ impl FormWeather {
         for _ in 0..4 {
             let mut density_buffer = [0u8; 4];
             file.read_exact(&mut density_buffer)?;
-            fog_density.push(f32::from_be_bytes(density_buffer));
+            fog_density.push(f32::from_le_bytes(density_buffer));
         }
 
         // Read fog_height (4 values)
@@ -399,7 +385,7 @@ impl FormWeather {
         for _ in 0..4 {
             let mut height_buffer = [0u8; 4];
             file.read_exact(&mut height_buffer)?;
-            fog_height.push(f32::from_be_bytes(height_buffer));
+            fog_height.push(f32::from_le_bytes(height_buffer));
         }
 
         // Read fog_scattering (4 values)
@@ -407,7 +393,7 @@ impl FormWeather {
         for _ in 0..4 {
             let mut scattering_buffer = [0u8; 4];
             file.read_exact(&mut scattering_buffer)?;
-            fog_scattering.push(f32::from_be_bytes(scattering_buffer));
+            fog_scattering.push(f32::from_le_bytes(scattering_buffer));
         }
 
         // Read fog_color (4 values)
@@ -415,7 +401,7 @@ impl FormWeather {
         for _ in 0..4 {
             let mut color_buffer = [0u8; SmlColor::BYTE_COUNT];
             file.read_exact(&mut color_buffer)?;
-            fog_color.push(SmlColor::read_from_byte_buffer(color_buffer));
+            fog_color.push(SmlColor::from(color_buffer));
         }
 
         // Read sound_ambient_profile (4 values)
@@ -431,7 +417,7 @@ impl FormWeather {
         for _ in 0..4 {
             let mut reverb_buffer = [0u8; 4];
             file.read_exact(&mut reverb_buffer)?;
-            sound_env_reverb.push(f32::from_be_bytes(reverb_buffer));
+            sound_env_reverb.push(f32::from_le_bytes(reverb_buffer));
         }
 
         // Read sound_env_dampening (4 values)
@@ -439,7 +425,7 @@ impl FormWeather {
         for _ in 0..4 {
             let mut dampening_buffer = [0u8; 4];
             file.read_exact(&mut dampening_buffer)?;
-            sound_env_dampening.push(f32::from_be_bytes(dampening_buffer));
+            sound_env_dampening.push(f32::from_le_bytes(dampening_buffer));
         }
 
         // Read sound_env_echo_delay (4 values)
@@ -447,7 +433,7 @@ impl FormWeather {
         for _ in 0..4 {
             let mut echo_delay_buffer = [0u8; 4];
             file.read_exact(&mut echo_delay_buffer)?;
-            sound_env_echo_delay.push(f32::from_be_bytes(echo_delay_buffer));
+            sound_env_echo_delay.push(f32::from_le_bytes(echo_delay_buffer));
         }
 
         // Return the FormWeather instance
@@ -510,7 +496,7 @@ impl FormWeather {
                 return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for gi_lighting_color"));
             }
             let color_bytes: [u8; SmlColor::BYTE_COUNT] = bytes[offset..offset + SmlColor::BYTE_COUNT].try_into().unwrap();
-            gi_lighting_color.push(SmlColor::read_from_byte_buffer(color_bytes));
+            gi_lighting_color.push(SmlColor::from(color_bytes));
             offset += SmlColor::BYTE_COUNT;
         }
 
@@ -521,7 +507,7 @@ impl FormWeather {
                 return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for gi_lighting_intensity"));
             }
             let intensity_bytes: [u8; 4] = bytes[offset..offset + 4].try_into().unwrap();
-            gi_lighting_intensity.push(f32::from_be_bytes(intensity_bytes));
+            gi_lighting_intensity.push(f32::from_le_bytes(intensity_bytes));
             offset += 4;
         }
 
@@ -532,7 +518,7 @@ impl FormWeather {
                 return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for gi_shadow_intensity"));
             }
             let shadow_intensity_bytes: [u8; 4] = bytes[offset..offset + 4].try_into().unwrap();
-            gi_shadow_intensity.push(f32::from_be_bytes(shadow_intensity_bytes));
+            gi_shadow_intensity.push(f32::from_le_bytes(shadow_intensity_bytes));
             offset += 4;
         }
 
@@ -554,7 +540,7 @@ impl FormWeather {
                 return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for precipitation_intensity"));
             }
             let intensity_bytes: [u8; 4] = bytes[offset..offset + 4].try_into().unwrap();
-            precipitation_intensity.push(f32::from_be_bytes(intensity_bytes));
+            precipitation_intensity.push(f32::from_le_bytes(intensity_bytes));
             offset += 4;
         }
 
@@ -565,7 +551,7 @@ impl FormWeather {
                 return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for wind_speed"));
             }
             let speed_bytes: [u8; 4] = bytes[offset..offset + 4].try_into().unwrap();
-            wind_speed.push(f32::from_be_bytes(speed_bytes));
+            wind_speed.push(f32::from_le_bytes(speed_bytes));
             offset += 4;
         }
 
@@ -576,7 +562,7 @@ impl FormWeather {
                 return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for wind_turbulence"));
             }
             let turbulence_bytes: [u8; 4] = bytes[offset..offset + 4].try_into().unwrap();
-            wind_turbulence.push(f32::from_be_bytes(turbulence_bytes));
+            wind_turbulence.push(f32::from_le_bytes(turbulence_bytes));
             offset += 4;
         }
 
@@ -606,7 +592,7 @@ impl FormWeather {
                 return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for skybox_cloud_density"));
             }
             let cloud_density_bytes: [u8; 4] = bytes[offset..offset + 4].try_into().unwrap();
-            skybox_cloud_density.push(f32::from_be_bytes(cloud_density_bytes));
+            skybox_cloud_density.push(f32::from_le_bytes(cloud_density_bytes));
             offset += 4;
         }
 
@@ -617,7 +603,7 @@ impl FormWeather {
                 return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for skybox_sun_color"));
             }
             let color_bytes: [u8; SmlColor::BYTE_COUNT] = bytes[offset..offset + SmlColor::BYTE_COUNT].try_into().unwrap();
-            skybox_sun_color.push(SmlColor::read_from_byte_buffer(color_bytes));
+            skybox_sun_color.push(SmlColor::from(color_bytes));
             offset += SmlColor::BYTE_COUNT;
         }
 
@@ -628,7 +614,7 @@ impl FormWeather {
                 return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for skybox_sun_intensity"));
             }
             let sun_intensity_bytes: [u8; 4] = bytes[offset..offset + 4].try_into().unwrap();
-            skybox_sun_intensity.push(f32::from_be_bytes(sun_intensity_bytes));
+            skybox_sun_intensity.push(f32::from_le_bytes(sun_intensity_bytes));
             offset += 4;
         }
 
@@ -639,7 +625,7 @@ impl FormWeather {
                 return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for fog_density"));
             }
             let density_bytes: [u8; 4] = bytes[offset..offset + 4].try_into().unwrap();
-            fog_density.push(f32::from_be_bytes(density_bytes));
+            fog_density.push(f32::from_le_bytes(density_bytes));
             offset += 4;
         }
 
@@ -650,7 +636,7 @@ impl FormWeather {
                 return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for fog_height"));
             }
             let height_bytes: [u8; 4] = bytes[offset..offset + 4].try_into().unwrap();
-            fog_height.push(f32::from_be_bytes(height_bytes));
+            fog_height.push(f32::from_le_bytes(height_bytes));
             offset += 4;
         }
 
@@ -661,7 +647,7 @@ impl FormWeather {
                 return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for fog_scattering"));
             }
             let scattering_bytes: [u8; 4] = bytes[offset..offset + 4].try_into().unwrap();
-            fog_scattering.push(f32::from_be_bytes(scattering_bytes));
+            fog_scattering.push(f32::from_le_bytes(scattering_bytes));
             offset += 4;
         }
 
@@ -672,7 +658,7 @@ impl FormWeather {
                 return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for fog_color"));
             }
             let color_bytes: [u8; SmlColor::BYTE_COUNT] = bytes[offset..offset + SmlColor::BYTE_COUNT].try_into().unwrap();
-            fog_color.push(SmlColor::read_from_byte_buffer(color_bytes));
+            fog_color.push(SmlColor::from(color_bytes));
             offset += SmlColor::BYTE_COUNT;
         }
 
@@ -694,7 +680,7 @@ impl FormWeather {
                 return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for sound_env_reverb"));
             }
             let reverb_bytes: [u8; 4] = bytes[offset..offset + 4].try_into().unwrap();
-            sound_env_reverb.push(f32::from_be_bytes(reverb_bytes));
+            sound_env_reverb.push(f32::from_le_bytes(reverb_bytes));
             offset += 4;
         }
 
@@ -705,7 +691,7 @@ impl FormWeather {
                 return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for sound_env_dampening"));
             }
             let dampening_bytes: [u8; 4] = bytes[offset..offset + 4].try_into().unwrap();
-            sound_env_dampening.push(f32::from_be_bytes(dampening_bytes));
+            sound_env_dampening.push(f32::from_le_bytes(dampening_bytes));
             offset += 4;
         }
 
@@ -716,7 +702,7 @@ impl FormWeather {
                 return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for sound_env_echo_delay"));
             }
             let echo_delay_bytes: [u8; 4] = bytes[offset..offset + 4].try_into().unwrap();
-            sound_env_echo_delay.push(f32::from_be_bytes(echo_delay_bytes));
+            sound_env_echo_delay.push(f32::from_le_bytes(echo_delay_bytes));
             offset += 4;
         }
 

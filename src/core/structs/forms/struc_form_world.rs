@@ -16,7 +16,6 @@ pub struct FormWorld {
     pub world_part_anchors: Vec<Vec3Int>, // New field for world part anchors
 }
 
-
 #[allow(unused)]
 impl FormWorld {
     /// Byte count for the parts count (2 bytes for both parts and anchors).
@@ -45,7 +44,6 @@ impl FormWorld {
             world_part_anchors: world_part_anchor,
         }
     }
-    
 
     /// Returns the total byte count needed to serialize the form
     pub fn get_byte_count(&self) -> usize {
@@ -62,7 +60,8 @@ impl FormWorld {
         bytes.extend_from_slice(&self.world_name_id.to_bytes());  // Changed from world_name to world_name_id
         bytes.extend_from_slice(&self.world_map.to_bytes());
         
-        bytes.extend_from_slice(&(self.world_parts.len() as u16).to_be_bytes());
+        // Use Little-Endian for parts count
+        bytes.extend_from_slice(&(self.world_parts.len() as u16).to_le_bytes());
     
         for part in &self.world_parts {
             bytes.extend_from_slice(&part.to_bytes());
@@ -74,7 +73,6 @@ impl FormWorld {
     
         bytes
     }
-    
 
     /// Converts the form into a dictionary-like JSON object for serialization.
     pub fn to_dict(&self) -> Value {
@@ -88,7 +86,6 @@ impl FormWorld {
             "world_part_anchor": self.world_part_anchors.iter().map(|anchor| anchor.to_dict()).collect::<Vec<_>>(), 
         })
     }
-    
 }
 
 #[allow(unused)]
@@ -117,7 +114,7 @@ impl FormWorld {
         // Read WorldParts count (2 bytes)
         let mut parts_count_buffer = [0u8; 2];
         file.read_exact(&mut parts_count_buffer)?;
-        let parts_count = u16::from_be_bytes(parts_count_buffer) as usize;
+        let parts_count = u16::from_le_bytes(parts_count_buffer) as usize;
     
         // Read WorldParts
         let mut world_parts = Vec::with_capacity(parts_count);
@@ -150,93 +147,93 @@ impl FormWorld {
             world_part_anchors: world_part_anchor, // Include anchors
         })
     }
-/// Reads `FormWorld` from a byte buffer
-pub fn read_from_byte_buffer(bytes: &[u8]) -> io::Result<(Self, usize)> {
-    let mut offset = 0;
 
-    // Read FormID
-    if bytes.len() < offset + FormID::BYTE_COUNT {
-        return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for FormID"));
-    }
-    let form_id_array: [u8; FormID::BYTE_COUNT] = bytes[offset..offset + FormID::BYTE_COUNT].try_into().unwrap();
-    let form_id = FormID::from(form_id_array);
-    offset += FormID::BYTE_COUNT;
+    /// Reads `FormWorld` from a byte buffer
+    pub fn read_from_byte_buffer(bytes: &[u8]) -> io::Result<(Self, usize)> {
+        let mut offset = 0;
 
-    // Read FormType
-    if bytes.len() < offset + FormType::BYTE_COUNT {
-        return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for FormType"));
-    }
-    let form_type = FormType::from(bytes[offset]);
-    offset += FormType::BYTE_COUNT;
-
-    // Read FormName
-    let (form_name, consumed) = StrSml::read_from_byte_buffer(&bytes[offset..])?;
-    offset += consumed;
-
-    // Read WorldName as GlobalID
-    if bytes.len() < offset + GlobalID::BYTE_COUNT {
-        return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for GlobalID"));
-    }
-    let world_name_id_array: [u8; GlobalID::BYTE_COUNT] = bytes[offset..offset + GlobalID::BYTE_COUNT].try_into().unwrap();
-    let world_name_id = GlobalID::from(world_name_id_array);  // Correct GlobalID extraction
-    offset += GlobalID::BYTE_COUNT;
-
-    // Read WorldMap
-    let (world_map, consumed) = StrSml::read_from_byte_buffer(&bytes[offset..])?;
-    offset += consumed;
-
-    // Read WorldParts count (2 bytes)
-    if bytes.len() < offset + 2 {
-        return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for parts count"));
-    }
-    let parts_count = u16::from_be_bytes([bytes[offset], bytes[offset + 1]]) as usize;
-    offset += 2;
-
-    // Read WorldParts
-    let mut world_parts = Vec::with_capacity(parts_count);
-    for _ in 0..parts_count {
-        if bytes.len() < offset + GlobalID::BYTE_COUNT {
-            return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for world part"));
+        // Read FormID
+        if bytes.len() < offset + FormID::BYTE_COUNT {
+            return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for FormID"));
         }
+        let form_id_array: [u8; FormID::BYTE_COUNT] = bytes[offset..offset + FormID::BYTE_COUNT].try_into().unwrap();
+        let form_id = FormID::from(form_id_array);
+        offset += FormID::BYTE_COUNT;
 
-        let part_array: [u8; GlobalID::BYTE_COUNT] = bytes[offset..offset + GlobalID::BYTE_COUNT].try_into().unwrap();
-        let part = GlobalID::from(part_array);
+        // Read FormType
+        if bytes.len() < offset + FormType::BYTE_COUNT {
+            return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for FormType"));
+        }
+        let form_type = FormType::from(bytes[offset]);
+        offset += FormType::BYTE_COUNT;
+
+        // Read FormName
+        let (form_name, consumed) = StrSml::read_from_byte_buffer(&bytes[offset..])?;
+        offset += consumed;
+
+        // Read WorldName as GlobalID
+        if bytes.len() < offset + GlobalID::BYTE_COUNT {
+            return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for GlobalID"));
+        }
+        let world_name_id_array: [u8; GlobalID::BYTE_COUNT] = bytes[offset..offset + GlobalID::BYTE_COUNT].try_into().unwrap();
+        let world_name_id = GlobalID::from(world_name_id_array);  // Correct GlobalID extraction
         offset += GlobalID::BYTE_COUNT;
 
-        world_parts.push(part);
-    }
+        // Read WorldMap
+        let (world_map, consumed) = StrSml::read_from_byte_buffer(&bytes[offset..])?;
+        offset += consumed;
 
-    // Read WorldPartAnchors
-    let mut world_part_anchor = Vec::with_capacity(parts_count);
-    for _ in 0..parts_count {
-        if bytes.len() < offset + Vec3Int::BYTE_COUNT {
-            return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for anchor part"));
+        // Read WorldParts count (2 bytes)
+        if bytes.len() < offset + 2 {
+            return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for parts count"));
+        }
+        let parts_count = u16::from_le_bytes([bytes[offset], bytes[offset + 1]]) as usize;
+        offset += 2;
+
+        // Read WorldParts
+        let mut world_parts = Vec::with_capacity(parts_count);
+        for _ in 0..parts_count {
+            if bytes.len() < offset + GlobalID::BYTE_COUNT {
+                return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for world part"));
+            }
+
+            let part_array: [u8; GlobalID::BYTE_COUNT] = bytes[offset..offset + GlobalID::BYTE_COUNT].try_into().unwrap();
+            let part = GlobalID::from(part_array);
+            offset += GlobalID::BYTE_COUNT;
+
+            world_parts.push(part);
         }
 
-        let anchor_array: [u8; Vec3Int::BYTE_COUNT] = bytes[offset..offset + Vec3Int::BYTE_COUNT].try_into().unwrap();
-        let anchor = Vec3Int::from(anchor_array);
-        offset += Vec3Int::BYTE_COUNT;
+        // Read WorldPartAnchors
+        let mut world_part_anchor = Vec::with_capacity(parts_count);
+        for _ in 0..parts_count {
+            if bytes.len() < offset + Vec3Int::BYTE_COUNT {
+                return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for anchor part"));
+            }
 
-        world_part_anchor.push(anchor);
-    }
+            let anchor_array: [u8; Vec3Int::BYTE_COUNT] = bytes[offset..offset + Vec3Int::BYTE_COUNT].try_into().unwrap();
+            let anchor = Vec3Int::from(anchor_array);
+            offset += Vec3Int::BYTE_COUNT;
 
-    // Return the FormWorld instance
-    Ok((
-        FormWorld {
-            base: FormBase {
-                form_id,
-                form_type,
-                form_name,
+            world_part_anchor.push(anchor);
+        }
+
+        // Return the FormWorld instance
+        Ok((
+            FormWorld {
+                base: FormBase {
+                    form_id,
+                    form_type,
+                    form_name,
+                },
+                world_name_id,
+                world_map,
+                world_parts,
+                world_part_anchors: world_part_anchor, // Include anchors
             },
-            world_name_id,
-            world_map,
-            world_parts,
-            world_part_anchors: world_part_anchor, // Include anchors
-        },
-        offset,
-    ))
-}
-
+            offset,
+        ))
+    }
 }
 
 /// Implementation of the `FormTrait` for `FormWorld`

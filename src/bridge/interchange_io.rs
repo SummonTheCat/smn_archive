@@ -1,12 +1,24 @@
-use std::{ffi::{c_void, CStr}, ptr, slice};
+use std::{
+    ffi::{c_void, CStr},
+    ptr, slice,
+};
 
-use crate::core::io::{delete_form, get_form_exists, read_archive_info, read_form, read_forms, read_lite_archive, write_archive_info, write_archive_skeleton, write_form};
+use crate::core::io::{
+    delete_form, get_form_exists, read_archive_info, read_form, read_forms, read_lite_archive,
+    write_archive_info, write_archive_skeleton, write_form,
+};
 use crate::core::structs::*;
 
 /// Writes the skeleton of an archive, initializing the archive structure.
 /// Parameters are passed as C-style strings and integers, and memory is allocated for the result.
 #[no_mangle]
-pub extern "C" fn smn_write_archive_skeleton(path: *const i8, archive_id: u8, version_major: u8, version_minor: u8, description: *const i8) -> *const u8 {
+pub extern "C" fn smn_write_archive_skeleton(
+    path: *const i8,
+    archive_id: u8,
+    version_major: u8,
+    version_minor: u8,
+    description: *const i8,
+) -> *const u8 {
     // Convert C strings to Rust strings
     let c_str = unsafe { CStr::from_ptr(path) };
     let path_str = c_str.to_str().unwrap_or("Invalid UTF-8");
@@ -29,18 +41,18 @@ pub extern "C" fn smn_write_archive_skeleton(path: *const i8, archive_id: u8, ve
     };
 
     // Allocate memory for the success flag and its length
-    let result_len = std::mem::size_of::<u8>();
-    let total_len = std::mem::size_of::<u32>() + result_len;
-    let ptr = unsafe { libc::malloc(total_len) as *mut u8 };
+    let result_len = std::mem::size_of::<u8>() as u32;
+    let total_len = std::mem::size_of::<u32>() as u32 + result_len;
+    let ptr = unsafe { libc::malloc(total_len as usize) as *mut u8 };
     if ptr.is_null() {
         return ptr::null();
     }
 
     // Write length and success flag into the allocated memory
     unsafe {
-        let len_ptr = ptr as *mut u32;
-        *len_ptr = result_len as u32;
-        let bool_ptr = ptr.add(std::mem::size_of::<u32>());
+        let len_bytes = result_len.to_le_bytes();
+        ptr::copy_nonoverlapping(len_bytes.as_ptr(), ptr as *mut u8, 4);
+        let bool_ptr = ptr.add(4);
         *bool_ptr = was_successful as u8;
     }
 
@@ -49,7 +61,13 @@ pub extern "C" fn smn_write_archive_skeleton(path: *const i8, archive_id: u8, ve
 
 /// Writes archive info to a file, including the archive header.
 #[no_mangle]
-pub extern "C" fn smn_write_archive_info(path: *const i8, archive_id: u8, version_major: u8, version_minor: u8, description: *const i8) -> *const u8 {
+pub extern "C" fn smn_write_archive_info(
+    path: *const i8,
+    archive_id: u8,
+    version_major: u8,
+    version_minor: u8,
+    description: *const i8,
+) -> *const u8 {
     // Convert C strings to Rust strings
     let c_str = unsafe { CStr::from_ptr(path) };
     let path_str = c_str.to_str().unwrap_or("Invalid UTF-8");
@@ -72,18 +90,18 @@ pub extern "C" fn smn_write_archive_info(path: *const i8, archive_id: u8, versio
     };
 
     // Allocate memory for the success flag and its length
-    let result_len = std::mem::size_of::<u8>();
-    let total_len = std::mem::size_of::<u32>() + result_len;
-    let ptr = unsafe { libc::malloc(total_len) as *mut u8 };
+    let result_len = std::mem::size_of::<u8>() as u32;
+    let total_len = std::mem::size_of::<u32>() as u32 + result_len;
+    let ptr = unsafe { libc::malloc(total_len as usize) as *mut u8 };
     if ptr.is_null() {
         return ptr::null();
     }
 
     // Write length and success flag into the allocated memory
     unsafe {
-        let len_ptr = ptr as *mut u32;
-        *len_ptr = result_len as u32;
-        let bool_ptr = ptr.add(std::mem::size_of::<u32>());
+        let len_bytes = result_len.to_le_bytes();
+        ptr::copy_nonoverlapping(len_bytes.as_ptr(), ptr as *mut u8, 4);
+        let bool_ptr = ptr.add(4);
         *bool_ptr = was_successful as u8;
     }
 
@@ -116,9 +134,9 @@ pub extern "C" fn smn_read_archive_info(path: *const i8) -> *const u8 {
 
     // Write length and archive bytes to the allocated memory
     unsafe {
-        let len_ptr = ptr as *mut u32;
-        *len_ptr = len;
-        let data_ptr = ptr.add(std::mem::size_of::<u32>());
+        let len_bytes = len.to_le_bytes();
+        ptr::copy_nonoverlapping(len_bytes.as_ptr(), ptr as *mut u8, 4);
+        let data_ptr = ptr.add(4);
         data_ptr.copy_from_nonoverlapping(archive_bytes.as_ptr(), len as usize);
     }
 
@@ -150,9 +168,9 @@ pub extern "C" fn smn_read_lite_archive(path: *const i8) -> *const u8 {
 
     // Write length and archive bytes to the allocated memory
     unsafe {
-        let len_ptr = ptr as *mut u32;
-        *len_ptr = len;
-        let data_ptr = ptr.add(std::mem::size_of::<u32>());
+        let len_bytes = len.to_le_bytes();
+        ptr::copy_nonoverlapping(len_bytes.as_ptr(), ptr as *mut u8, 4);
+        let data_ptr = ptr.add(4);
         data_ptr.copy_from_nonoverlapping(archive_bytes.as_ptr(), archive_bytes.len());
     }
 
@@ -161,7 +179,11 @@ pub extern "C" fn smn_read_lite_archive(path: *const i8) -> *const u8 {
 
 /// Writes form data to a file and returns a success flag.
 #[no_mangle]
-pub extern "C" fn smn_write_form(path: *const i8, form_data: *const u8, form_size: usize) -> *const u8 {
+pub extern "C" fn smn_write_form(
+    path: *const i8,
+    form_data: *const u8,
+    form_size: usize,
+) -> *const u8 {
     let c_str = unsafe { CStr::from_ptr(path) };
     let path_str = c_str.to_str().unwrap_or("Invalid UTF-8");
 
@@ -182,16 +204,17 @@ pub extern "C" fn smn_write_form(path: *const i8, form_data: *const u8, form_siz
     };
 
     // Prepare a response with the success flag
-    let response_len = 5;
-    let ptr = unsafe { libc::malloc(response_len) as *mut u8 };
+    let response_len = 1u32;
+    let total_len = std::mem::size_of::<u32>() as u32 + response_len;
+    let ptr = unsafe { libc::malloc(total_len as usize) as *mut u8 };
     if ptr.is_null() {
         return ptr::null();
     }
 
     // Write length and success flag to the allocated memory
     unsafe {
-        let len_ptr = ptr as *mut u32;
-        *len_ptr = 1u32;
+        let len_bytes = response_len.to_le_bytes();
+        ptr::copy_nonoverlapping(len_bytes.as_ptr(), ptr as *mut u8, 4);
         *ptr.add(4) = was_successful;
     }
 
@@ -213,18 +236,18 @@ pub extern "C" fn smn_delete_form(path: *const i8, form_id: u16) -> *const u8 {
     };
 
     // Allocate memory for the success flag
-    let result_len = std::mem::size_of::<u8>();
-    let total_len = std::mem::size_of::<u32>() + result_len;
-    let ptr = unsafe { libc::malloc(total_len) as *mut u8 };
+    let result_len = std::mem::size_of::<u8>() as u32;
+    let total_len = std::mem::size_of::<u32>() as u32 + result_len;
+    let ptr = unsafe { libc::malloc(total_len as usize) as *mut u8 };
     if ptr.is_null() {
         return ptr::null();
     }
 
     // Write length and success flag into the allocated memory
     unsafe {
-        let len_ptr = ptr as *mut u32;
-        *len_ptr = result_len as u32;
-        let bool_ptr = ptr.add(std::mem::size_of::<u32>());
+        let len_bytes = result_len.to_le_bytes();
+        ptr::copy_nonoverlapping(len_bytes.as_ptr(), ptr as *mut u8, 4);
+        let bool_ptr = ptr.add(4);
         *bool_ptr = was_successful as u8;
     }
 
@@ -245,18 +268,18 @@ pub extern "C" fn smn_get_form_exists(path: *const i8, form_id: u16) -> *const u
     };
 
     // Allocate memory for the result
-    let result_len = std::mem::size_of::<u8>();
-    let total_len = std::mem::size_of::<u32>() + result_len;
-    let ptr = unsafe { libc::malloc(total_len) as *mut u8 };
+    let result_len = std::mem::size_of::<u8>() as u32;
+    let total_len = std::mem::size_of::<u32>() as u32 + result_len;
+    let ptr = unsafe { libc::malloc(total_len as usize) as *mut u8 };
     if ptr.is_null() {
         return ptr::null();
     }
 
     // Write length and result into the allocated memory
     unsafe {
-        let len_ptr = ptr as *mut u32;
-        *len_ptr = result_len as u32;
-        let bool_ptr = ptr.add(std::mem::size_of::<u32>());
+        let len_bytes = result_len.to_le_bytes();
+        ptr::copy_nonoverlapping(len_bytes.as_ptr(), ptr as *mut u8, 4);
+        let bool_ptr = ptr.add(4);
         *bool_ptr = form_exists as u8;
     }
 
@@ -290,9 +313,9 @@ pub extern "C" fn smn_read_form(path: *const i8, form_id: u16) -> *const u8 {
 
     // Write length and form bytes to the allocated memory
     unsafe {
-        let len_ptr = ptr as *mut u32;
-        *len_ptr = len;
-        let data_ptr = ptr.add(std::mem::size_of::<u32>());
+        let len_bytes = len.to_le_bytes();
+        ptr::copy_nonoverlapping(len_bytes.as_ptr(), ptr as *mut u8, 4);
+        let data_ptr = ptr.add(4);
         data_ptr.copy_from_nonoverlapping(form_bytes.as_ptr(), len as usize);
     }
 
@@ -306,13 +329,14 @@ pub extern "C" fn smn_read_forms(path: *const i8, form_ids: *const u8) -> *const
     let path_str = c_str.to_str().unwrap_or("Invalid UTF-8");
 
     // Read the number of form IDs from the first 2 bytes
-    let form_count = unsafe { *(form_ids as *const u16) } as usize;
+    let form_count_bytes = unsafe { slice::from_raw_parts(form_ids, 2) };
+    let form_count = u16::from_le_bytes([form_count_bytes[0], form_count_bytes[1]]) as usize;
     let form_id_bytes = unsafe { slice::from_raw_parts(form_ids.add(2), form_count * 2) };
 
     // Convert form ID bytes to a vector of FormIDs
     let mut form_ids_vec = Vec::with_capacity(form_count);
     for i in 0..form_count {
-        let form_id = u16::from_be_bytes([form_id_bytes[i * 2], form_id_bytes[i * 2 + 1]]);
+        let form_id = u16::from_le_bytes([form_id_bytes[i * 2], form_id_bytes[i * 2 + 1]]);
         form_ids_vec.push(FormID::from(form_id));
     }
 
@@ -340,9 +364,9 @@ pub extern "C" fn smn_read_forms(path: *const i8, form_ids: *const u8) -> *const
 
     // Write length and form bytes to the allocated memory
     unsafe {
-        let len_ptr = ptr as *mut u32;
-        *len_ptr = len;
-        let data_ptr = ptr.add(std::mem::size_of::<u32>());
+        let len_bytes = len.to_le_bytes();
+        ptr::copy_nonoverlapping(len_bytes.as_ptr(), ptr as *mut u8, 4);
+        let data_ptr = ptr.add(4);
         data_ptr.copy_from_nonoverlapping(form_bytes.as_ptr(), len as usize);
     }
 

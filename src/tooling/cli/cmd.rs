@@ -74,6 +74,14 @@ fn cmd_test(args: Vec<String>) {
     let test_type = &args[2];
 
     match test_type.as_str() {
+        "help" => {
+            println!("Available test types:");
+            println!("-> core");
+            println!("-> sample");
+            println!("-> basic");
+            println!("-> todictionary");
+            println!("-> manyformsthreaded");
+        },
         "core" => {
             run_test_core();
         },
@@ -130,14 +138,14 @@ fn run_test_many_forms_threaded(operation_type: &str, num_forms: u16, num_thread
             test_read_forms_many_threaded(num_forms, num_threads)
         },
         "w" => {
-            test_write_forms_many_threaded(num_forms)
+            test_write_forms_many(num_forms)
         }, 
         "rw" => {
-            test_write_forms_many_threaded(num_forms);
+            test_write_forms_many(num_forms);
             test_read_forms_many_threaded(num_forms, num_threads);
         },
         "wr" => {
-            test_write_forms_many_threaded(num_forms);
+            test_write_forms_many(num_forms);
             test_read_forms_many_threaded(num_forms, num_threads);
         },
         _ => {

@@ -13,7 +13,7 @@ impl FormID {
 
     /// Converts FormID to a byte array.
     pub fn to_bytes(&self) -> [u8; Self::BYTE_COUNT] {
-        self.value.to_be_bytes()
+        self.value.to_le_bytes()
     }
 
     /// Returns the internal u16 value of FormID.
@@ -60,7 +60,7 @@ impl From<String> for FormID {
 impl From<[u8; FormID::BYTE_COUNT]> for FormID {
     /// Converts a byte array to FormID.
     fn from(bytes: [u8; FormID::BYTE_COUNT]) -> Self {
-        let value = u16::from_be_bytes(bytes);
+        let value = u16::from_le_bytes(bytes);
         Self { value }
     }
 }
@@ -286,10 +286,10 @@ impl From<(GlobalID, FormID)> for EntID {
 }
 
 impl From<&str> for EntID {
-    /// Creates an EntID from a 13-digit string (8 digits for GlobalID + 2 digits for reference FormID).
+    /// Creates an EntID from a 13-digit string (8 digits for GlobalID + 5 digits for reference FormID).
     fn from(s: &str) -> Self {
         if s.len() != 13 || !s.chars().all(|c| c.is_digit(10)) {
-            panic!("EntID string must be exactly 10 digits long and numeric.");
+            panic!("EntID string must be exactly 13 digits long and numeric.");
         }
         let global_id = GlobalID::from(&s[..8]);
         let reference_id = FormID::from(&s[8..]);
@@ -331,7 +331,7 @@ impl fmt::Display for EntID {
         // Format GlobalID and reference FormID with the desired padding.
         write!(
             f,
-            "{} {}",   // Call the Display of GlobalID first
+            "{} {}",
             self.global_id,
             format!("{:05}", self.reference_id.to_u16())  // FormID formatted to 5 digits for the reference ID
         )

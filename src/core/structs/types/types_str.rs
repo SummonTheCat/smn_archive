@@ -129,9 +129,9 @@ impl StrLrg {
     /// Converts `StrLrg` to a byte array.
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = Vec::with_capacity(Self::CHAR_COUNT_BYTE_SIZE + self.value.len() * 2);
-        bytes.extend_from_slice(&(self.value.len() as u16).to_be_bytes());  // Store length in 2 bytes
+        bytes.extend_from_slice(&(self.value.len() as u16).to_le_bytes());  // Store length in 2 bytes (LE)
         for &ch in &self.value {
-            bytes.extend_from_slice(&ch.to_be_bytes());  // Add UTF-16 characters
+            bytes.extend_from_slice(&ch.to_le_bytes());  // Add UTF-16 characters (LE)
         }
         bytes
     }
@@ -175,18 +175,18 @@ impl From<String> for StrLrg {
 
 #[allow(unused)]
 impl StrLrg {
-    /// Reads `StrLrg` from a file, assuming UTF-16 encoding.
+    /// Reads `StrLrg` from a file, assuming UTF-16 LE encoding.
     pub fn read_from_bytes(file: &mut File) -> io::Result<Self> {
         let mut length_buffer = [0u8; 2];
         file.read_exact(&mut length_buffer)?;
 
-        let char_count = u16::from_be_bytes(length_buffer) as usize;
+        let char_count = u16::from_le_bytes(length_buffer) as usize;
         let mut value = Vec::with_capacity(char_count);
 
         for _ in 0..char_count {
             let mut char_buffer = [0u8; 2];
             file.read_exact(&mut char_buffer)?;
-            value.push(u16::from_be_bytes(char_buffer));
+            value.push(u16::from_le_bytes(char_buffer));
         }
 
         Ok(Self { value })
@@ -200,7 +200,7 @@ impl StrLrg {
             return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Not enough bytes for string length"));
         }
         let length_buffer: [u8; 2] = bytes[offset..offset + 2].try_into().unwrap();
-        let char_count = u16::from_be_bytes(length_buffer) as usize;
+        let char_count = u16::from_le_bytes(length_buffer) as usize;
 
         offset += 2;
 
@@ -212,7 +212,7 @@ impl StrLrg {
             }
             let char_buffer: [u8; 2] = bytes[offset..offset + 2].try_into().unwrap();
 
-            value.push(u16::from_be_bytes(char_buffer));
+            value.push(u16::from_le_bytes(char_buffer));
             offset += 2;
         }
 

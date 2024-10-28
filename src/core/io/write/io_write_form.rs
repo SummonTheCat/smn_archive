@@ -38,7 +38,7 @@ fn write_form_existing(file_path: &str, form: &dyn FormTrait) -> std::io::Result
 
     let mut last_form_data_start_offset_buf = [0u8; 4];
     file.read_exact(&mut last_form_data_start_offset_buf)?;
-    let last_form_data_start_offset = u32::from_be_bytes(last_form_data_start_offset_buf);
+    let last_form_data_start_offset = u32::from_le_bytes(last_form_data_start_offset_buf);
 
     if last_form_id == form.form_id() {
         // Overwrite the last form
@@ -100,7 +100,7 @@ fn write_form_existing_inner(file: &mut File, form: &dyn FormTrait, archive_info
 
             let mut data_start_offset_buf = [0u8; 4];
             file.read_exact(&mut data_start_offset_buf)?;
-            let mut data_start_offset = u32::from_be_bytes(data_start_offset_buf);
+            let mut data_start_offset = u32::from_le_bytes(data_start_offset_buf);
 
 
             if i as u64 > index_position {
@@ -111,7 +111,7 @@ fn write_form_existing_inner(file: &mut File, form: &dyn FormTrait, archive_info
             // Write the index item to the temp file
             temp_index_file.write_all(&form_id_buf)?;
             temp_index_file.write_all(&form_type_buf)?;
-            temp_index_file.write_all(&data_start_offset.to_be_bytes())?;
+            temp_index_file.write_all(&data_start_offset.to_le_bytes())?;
         }
 
         // Go to the start of the data changes
@@ -375,7 +375,7 @@ fn write_form_new_mid(file: &mut File, form_bytes: &Vec<u8>, form_insert_positio
 
         let mut data_start_offset_buf = [0u8; 4];
         file.read_exact(&mut data_start_offset_buf)?;
-        let mut data_start_offset = u32::from_be_bytes(data_start_offset_buf);
+        let mut data_start_offset = u32::from_le_bytes(data_start_offset_buf);
 
         if i as u64 == form_insert_position {
             passed_insert_position = true;
@@ -387,7 +387,7 @@ fn write_form_new_mid(file: &mut File, form_bytes: &Vec<u8>, form_insert_positio
 
             temp_index_file.write_all(&new_form_id)?;
             temp_index_file.write_all(&[new_form_type])?;
-            temp_index_file.write_all(&new_form_data_start_offset.to_be_bytes())?;
+            temp_index_file.write_all(&new_form_data_start_offset.to_le_bytes())?;
 
         }
 
@@ -400,7 +400,7 @@ fn write_form_new_mid(file: &mut File, form_bytes: &Vec<u8>, form_insert_positio
         // Write the index item to the temp file
         temp_index_file.write_all(&form_id_buf)?;
         temp_index_file.write_all(&form_type_buf)?;
-        temp_index_file.write_all(&data_start_offset.to_be_bytes())?;
+        temp_index_file.write_all(&data_start_offset.to_le_bytes())?;
     }
 
     // Debug: Read all bytes from the temp index file and print as bytes
@@ -512,7 +512,7 @@ fn write_form_new_end(file: &mut File, form_bytes: &Vec<u8>, archive_info: &mut 
     // Read the offset of the last form in the archive
     let mut form_offset_buf = [0u8; 4];
     file.read_exact(&mut form_offset_buf)?;
-    let last_form_offset = u32::from_be_bytes(form_offset_buf);
+    let last_form_offset = u32::from_le_bytes(form_offset_buf);
 
     // Read the last form from the archive
     file.seek(SeekFrom::Start(last_form_offset as u64 + archive_info.bytestart_data as u64 ))?;
@@ -573,7 +573,7 @@ fn write_form_new_end(file: &mut File, form_bytes: &Vec<u8>, archive_info: &mut 
     let form_type_byte = form_bytes[2];
     file.write_all(&[form_type_byte])?;
 
-    let new_form_offset_bytes = new_form_offset.to_be_bytes();
+    let new_form_offset_bytes = new_form_offset.to_le_bytes();
     file.write_all(&new_form_offset_bytes)?;
     
     // Write the new header to the archive
@@ -634,12 +634,12 @@ fn write_form_new_start(file: &mut File, form_bytes: &Vec<u8>, form: &dyn FormTr
         // Read 4 bytes for data_start_offset and add form_bytes_len to it
         let mut offset_buf = [0u8; 4];
         file.read_exact(&mut offset_buf)?;
-        let data_start_offset = u32::from_be_bytes(offset_buf) + form_bytes_len;
+        let data_start_offset = u32::from_le_bytes(offset_buf) + form_bytes_len;
 
         // Write the modified index item to the temp index file
         temp_index_file.write_all(&form_id_buf)?;
         temp_index_file.write_all(&form_type_buf)?;
-        temp_index_file.write_all(&data_start_offset.to_be_bytes())?;
+        temp_index_file.write_all(&data_start_offset.to_le_bytes())?;
     }
 
     // Update the archive info

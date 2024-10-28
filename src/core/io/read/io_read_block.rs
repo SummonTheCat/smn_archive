@@ -1,6 +1,11 @@
-use std::{fs::File, io::{self, Read, Seek, SeekFrom}};
+use std::{
+    fs::File,
+    io::{self, Read, Seek, SeekFrom},
+};
 
-use crate::core::io::{IOStructByteStarts, IOStructHeader, IOStructIndex, IOStructIndexItem};
+use crate::core::io::{
+    IOStructByteStarts, IOStructHeader, IOStructIndex, IOStructIndexItem,
+};
 use crate::core::structs::types::*;
 
 pub fn read_block_header(file: &mut File) -> io::Result<IOStructHeader> {
@@ -20,7 +25,7 @@ pub fn read_block_header(file: &mut File) -> io::Result<IOStructHeader> {
     // Read Form Count (u16)
     let mut form_count_buf = [0u8; 2]; // 2 bytes for u16
     file.read_exact(&mut form_count_buf)?;
-    let form_count = u16::from_be_bytes(form_count_buf);
+    let form_count = u16::from_le_bytes(form_count_buf);
 
     // Return the IoStructHeader with the extracted data
     Ok(IOStructHeader {
@@ -33,14 +38,14 @@ pub fn read_block_header(file: &mut File) -> io::Result<IOStructHeader> {
 
 pub fn read_block_bytestarts(file: &mut File) -> io::Result<IOStructByteStarts> {
     // Read BYTESTART Index
-    let mut bytestart_index_buf = [0u8; 4]; 
+    let mut bytestart_index_buf = [0u8; 4];
     file.read_exact(&mut bytestart_index_buf)?;
-    let bytestart_index = u32::from_be_bytes(bytestart_index_buf);
+    let bytestart_index = u32::from_le_bytes(bytestart_index_buf);
 
     // Read BYTESTART Data
-    let mut bytestart_data_buf = [0u8; 4]; 
+    let mut bytestart_data_buf = [0u8; 4];
     file.read_exact(&mut bytestart_data_buf)?;
-    let bytestart_data = u32::from_be_bytes(bytestart_data_buf);
+    let bytestart_data = u32::from_le_bytes(bytestart_data_buf);
 
     // Return the IoStructByteStarts with the extracted data
     Ok(IOStructByteStarts {
@@ -70,7 +75,7 @@ pub fn read_block_index(file: &mut File, form_count: u16) -> io::Result<IOStruct
         // Read Data Start Offset
         let mut data_start_offset_buf = [0u8; 4]; // 4 bytes for u32
         file.read_exact(&mut data_start_offset_buf)?;
-        let data_start_offset = u32::from_be_bytes(data_start_offset_buf);
+        let data_start_offset = u32::from_le_bytes(data_start_offset_buf);
 
         // Create a new IOStructIndexItem and add it to the index
         index.indexes.push(IOStructIndexItem {
@@ -85,16 +90,16 @@ pub fn read_block_index(file: &mut File, form_count: u16) -> io::Result<IOStruct
 }
 
 pub fn binary_search_for_index_item(
-    file: &mut File, 
-    target_form_id: FormID, 
-    form_count: u16
+    file: &mut File,
+    target_form_id: FormID,
+    form_count: u16,
 ) -> io::Result<Option<IOStructIndexItem>> {
     let item_size = FormID::BYTE_COUNT + 1 + 4; // 7 bytes per index item
-    let mut left = file.stream_position()?;  // Start at current file position (index block start)
+    let mut left = file.stream_position()?; // Start at current file position (index block start)
     let mut right = left + (item_size * form_count as usize) as u64;
 
     let mut passes = 0;
-    let max_passes = 30;  // Number of binary search passes before switching to linear search
+    let max_passes = 30; // Number of binary search passes before switching to linear search
 
     while passes < max_passes {
         passes += 1;
@@ -124,7 +129,7 @@ pub fn binary_search_for_index_item(
 
             let mut data_start_offset_buf = [0u8; 4];
             file.read_exact(&mut data_start_offset_buf)?;
-            let data_start_offset = u32::from_be_bytes(data_start_offset_buf);
+            let data_start_offset = u32::from_le_bytes(data_start_offset_buf);
 
             return Ok(Some(IOStructIndexItem {
                 form_id,
@@ -148,7 +153,6 @@ pub fn binary_search_for_index_item(
         file.read_exact(&mut form_id_buf)?;
         let form_id = FormID::from(form_id_buf);
 
-
         if form_id == target_form_id {
             // Read FormType
             let mut form_type_buf = [0u8; 1];
@@ -158,7 +162,7 @@ pub fn binary_search_for_index_item(
             // Read Data Start Offset
             let mut data_start_offset_buf = [0u8; 4];
             file.read_exact(&mut data_start_offset_buf)?;
-            let data_start_offset = u32::from_be_bytes(data_start_offset_buf);
+            let data_start_offset = u32::from_le_bytes(data_start_offset_buf);
 
             return Ok(Some(IOStructIndexItem {
                 form_id,
@@ -175,19 +179,18 @@ pub fn binary_search_for_index_item(
     Ok(None)
 }
 
-
 pub fn binary_search_for_index_item_and_position(
-    file: &mut File, 
-    target_form_id: FormID, 
-    form_count: u16
+    file: &mut File,
+    target_form_id: FormID,
+    form_count: u16,
 ) -> io::Result<Option<(u64, IOStructIndexItem)>> {
     let item_size = FormID::BYTE_COUNT + 1 + 4; // 7 bytes per index item
-    let start = file.stream_position()?;  // Start at current file position (index block start)
-    let mut left = file.stream_position()?;  // Start at current file position (index block start)
+    let start = file.stream_position()?; // Start at current file position (index block start)
+    let mut left = file.stream_position()?; // Start at current file position (index block start)
     let mut right = left + (item_size * form_count as usize) as u64;
 
     let mut passes = 0;
-    let max_passes = 10;  // Number of binary search passes before switching to linear search
+    let max_passes = 10; // Number of binary search passes before switching to linear search
 
     while passes < max_passes {
         passes += 1;
@@ -217,16 +220,19 @@ pub fn binary_search_for_index_item_and_position(
 
             let mut data_start_offset_buf = [0u8; 4];
             file.read_exact(&mut data_start_offset_buf)?;
-            let data_start_offset = u32::from_be_bytes(data_start_offset_buf);
+            let data_start_offset = u32::from_le_bytes(data_start_offset_buf);
 
             // Calculate the position in the index
             let index_position = (mid - left) / item_size as u64;
 
-            return Ok(Some((index_position, IOStructIndexItem {
-                form_id,
-                form_type,
-                data_start_offset,
-            })));
+            return Ok(Some((
+                index_position,
+                IOStructIndexItem {
+                    form_id,
+                    form_type,
+                    data_start_offset,
+                },
+            )));
         } else if form_id < target_form_id {
             // Move left up to the next item
             left = mid + item_size as u64;
@@ -256,14 +262,16 @@ pub fn binary_search_for_index_item_and_position(
             // Read Data Start Offset
             let mut data_start_offset_buf = [0u8; 4];
             file.read_exact(&mut data_start_offset_buf)?;
-            let data_start_offset = u32::from_be_bytes(data_start_offset_buf);
+            let data_start_offset = u32::from_le_bytes(data_start_offset_buf);
 
-
-            return Ok(Some((index_position, IOStructIndexItem {
-                form_id,
-                form_type,
-                data_start_offset,
-            })));
+            return Ok(Some((
+                index_position,
+                IOStructIndexItem {
+                    form_id,
+                    form_type,
+                    data_start_offset,
+                },
+            )));
         }
 
         // Move to the next item
@@ -284,7 +292,10 @@ pub fn binary_search_for_index_item_inmem(
 
     // For each target FormID, perform binary search over the index
     for target_form_id in target_form_ids {
-        match index.indexes.binary_search_by_key(&target_form_id, |item| item.form_id) {
+        match index
+            .indexes
+            .binary_search_by_key(&target_form_id, |item| item.form_id)
+        {
             Ok(pos) => {
                 // Found the item at position `pos`
                 let index_item = index.indexes[pos].clone();

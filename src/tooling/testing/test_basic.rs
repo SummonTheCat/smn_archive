@@ -20,7 +20,8 @@ pub fn test_basic() {
 
     let _ = write_archive_skeleton(&path, &archive);
     
-    
+    println!("Written Archive Info");
+
     // Write a RefGroup
     let form_id = FormID::from(1);
     let form_name = StrSml::from("CollWrldList");
@@ -35,9 +36,11 @@ pub fn test_basic() {
 
     let _ = write_form(&path, &form);
 
-    
+    println!("------------------------");
+
     // Write the worlds
-    let form_id = FormID::from(50);
+    
+    let form_id = FormID::from(51);
     let form_name = StrSml::from("WrldBeach");
 
     let form = FormWorld::new(
@@ -56,9 +59,8 @@ pub fn test_basic() {
     );
 
     let _ = write_form(&path, &form);
-
     
-    let form_id = FormID::from(51);
+    let form_id = FormID::from(52);
     let form_name = StrSml::from("WrldForest");
 
     let form = FormWorld::new(
@@ -77,10 +79,9 @@ pub fn test_basic() {
             Vec3Int::from((-500, 8, 100))
         ]
     );
-
-    let _ = write_form(&path, &form);
-
     
+    let _ = write_form(&path, &form); 
+
     println!("------------------------");
 
     let form_id = FormID::from(10);
@@ -94,18 +95,20 @@ pub fn test_basic() {
     let form = FormString::new(form_id, form_name, languages, strings);
     let _ = write_form(&path, &form);
 
-    
+   
     // Read the forms
-    let form = read_form(&path, FormID::from(1));
-    println!("{:?}", form);
-    println!("------------------------");
+    let ref_form = read_form (&path, FormID::from(1));
+    println!("{:?}", ref_form);
+
+    let world_form = read_form (&path, FormID::from(51));
+    println!("{:?}", world_form);
+
+    let world_form = read_form (&path, FormID::from(52));
+    println!("{:?}", world_form);
+
+    let string_form = read_form (&path, FormID::from(10));
+    println!("{:?}", string_form);
     
-    let form = read_form(&path, FormID::from(50));
-    println!("{:?}", form);
-     
-    let form = read_form(&path, FormID::from(51));
-    println!("{:?}", form);
-/*
-    */
-    println!("------------------------");
+    
+
 }

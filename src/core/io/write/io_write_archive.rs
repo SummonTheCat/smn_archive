@@ -1,8 +1,8 @@
 use std::fs::{File, OpenOptions};
 use std::io::{self, Read, Seek, SeekFrom, Write};
 
-use crate::core::structs::Archive;
-use crate::core::io::{write_block_header, write_block_bytestart, write_block_index, read_block_bytestarts, read_block_header, read_block_index};
+use crate::core::structs::*;
+use crate::core::io::{read_block_index, write_block_header, write_block_bytestart, write_block_index, read_block_bytestarts, read_block_header};
 use crate::core::io::IOStructIndex;
 
 /// Writes the archive skeleton to the specified file.

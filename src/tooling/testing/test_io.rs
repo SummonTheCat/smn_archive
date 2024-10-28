@@ -156,7 +156,7 @@ fn test_io_form(path: &str) {
 
 
 
-pub fn test_write_forms_many_threaded(form_count: u16) {
+pub fn test_write_forms_many(form_count: u16) {
     println!("--- Performance Test: Writing {} Forms ---", form_count);
 
     let current_dir: PathBuf = env::current_dir().expect("Failed to get current directory");
