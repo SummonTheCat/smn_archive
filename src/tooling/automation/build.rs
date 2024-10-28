@@ -27,6 +27,7 @@ pub fn build_full() {
     // Step 2: Get the target library path
     let target_dir = "target\\release";
     let lib_files = vec!["smn_archive.dll", "smn_archive.dll.exp", "smn_archive.dll.lib", "smn_archive.pdb"];
+    let lib_files_outname = vec!["smn_archive_external.dll", "smn_archive_external.dll.exp", "smn_archive_external.dll.lib", "smn_archive_external.pdb"];
 
     // Step 3: Copy the compiled library files to each external project
     println!("Copying the compiled library files to each external project...");
@@ -52,5 +53,24 @@ pub fn build_full() {
             }
         }
         
+    }
+
+    // Step 4: Rename the copied library files
+    println!("Renaming the copied library files...");
+
+    for output_path in EXTERNAL_OUTPUT_PATHS.iter() {
+        for (i, lib_file) in lib_files.iter().enumerate() {
+            let src = Path::new(output_path).join(lib_file);
+            let dest = Path::new(output_path).join(lib_files_outname[i]);
+
+            if src.exists() {
+                match fs::rename(&src, &dest) {
+                    Ok(_) => println!("Successfully renamed {:?} to {:?}", src, dest),
+                    Err(e) => eprintln!("Failed to rename {:?} to {:?}: {:?}", src, dest, e),
+                }
+            } else {
+                println!("{:?} does not exist, skipping...", src);
+            }
+        }
     }
 }

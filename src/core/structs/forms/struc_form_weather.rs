@@ -819,6 +819,7 @@ impl fmt::Display for FormWeather {
             form_id: {},\n\
             form_type: {},\n\
             form_name: {},\n\
+            \ngi_lighting_color: \nDay: {}, \nDusk: {}, \nNight: {}, \nDawn: {}\
             \ngi_lighting_intensity: \nDay: {}, \nDusk: {}, \nNight: {}, \nDawn: {}\
             \ngi_shadow_intensity: \nDay: {}, \nDusk: {}, \nNight: {}, \nDawn: {}\
             \nprecipitation_preset: \nDay: {:?}, \nDusk: {:?}, \nNight: {:?}, \nDawn: {:?}\
@@ -842,6 +843,8 @@ impl fmt::Display for FormWeather {
             self.base.form_id.to_string(),
             self.base.form_type.to_string(),
             self.base.form_name.to_string(),
+            // GI Lighting Color
+            self.gi_lighting_color[0], self.gi_lighting_color[1], self.gi_lighting_color[2], self.gi_lighting_color[3],
             // GI Lighting Intensity
             self.gi_lighting_intensity[0], self.gi_lighting_intensity[1], self.gi_lighting_intensity[2], self.gi_lighting_intensity[3],
             // GI Shadow Intensity
@@ -893,6 +896,7 @@ impl fmt::Debug for FormWeather {
             form_id: {},\n\
             form_type: {},\n\
             form_name: {},\n\
+            \ngi_lighting_color: \nDay: {}, \nDusk: {}, \nNight: {}, \nDawn: {}\
             \ngi_lighting_intensity: \nDay: {}, \nDusk: {}, \nNight: {}, \nDawn: {}\
             \ngi_shadow_intensity: \nDay: {}, \nDusk: {}, \nNight: {}, \nDawn: {}\
             \nprecipitation_preset: \nDay: {:?}, \nDusk: {:?}, \nNight: {:?}, \nDawn: {:?}\
@@ -916,6 +920,8 @@ impl fmt::Debug for FormWeather {
             self.base.form_id.to_string(),
             self.base.form_type.to_string(),
             self.base.form_name.to_string(),
+            // GI Lighting Color
+            self.gi_lighting_color[0], self.gi_lighting_color[1], self.gi_lighting_color[2], self.gi_lighting_color[3],
             // GI Lighting Intensity
             self.gi_lighting_intensity[0], self.gi_lighting_intensity[1], self.gi_lighting_intensity[2], self.gi_lighting_intensity[3],
             // GI Shadow Intensity

@@ -27,15 +27,7 @@
 //   Forest Models: FormID 6000
 //     Model IDs: 6001 - 6004
 //
-// Precipitation Presets:
-//   Rain: FormID 7000
-//   Snow: FormID 7001
-//
-// Sound Ambient Profiles:
-//   Day: FormID 8000
-//   Dusk: FormID 8001
-//   Night: FormID 8002
-//   Dawn: FormID 8003
+
 
 use std::{env, path::PathBuf};
 use crate::core::{
@@ -91,7 +83,7 @@ pub fn test_sample() {
             FormID::from(2000), // WrldBeach
             StrSml::from("WrldBeach"),
             GlobalID::from((archive_id, FormID::from(4000))), // WeatherRain
-            StrSml::from("Beach of Amonal"),
+            StrSml::from("BeachOfAmonal"),
             vec![
                 GlobalID::from((archive_id, FormID::from(3000))), // WrldBeachPart1
                 GlobalID::from((archive_id, FormID::from(3001))), // WrldBeachPart2
@@ -102,7 +94,7 @@ pub fn test_sample() {
             FormID::from(2001), // WrldForest
             StrSml::from("WrldForest"),
             GlobalID::from((archive_id, FormID::from(4000))), // WeatherRain
-            StrSml::from("Forest of Amonal"),
+            StrSml::from("ForestOfAmonal"),
             vec![
                 GlobalID::from((archive_id, FormID::from(3002))), // WrldForestPart1
                 GlobalID::from((archive_id, FormID::from(3003))), // WrldForestPart2
@@ -274,7 +266,7 @@ pub fn test_sample() {
         let precipitation_intensity = vec![0.5, 0.7, 0.9, 0.6]; // Varying intensities
 
         // Wind properties
-        let wind_speed = vec![5.0, 10.0, 15.0, 7.0]; // Speeds in m/s
+        let wind_speed = vec![5.2, 10.5, 15.0, 7.4]; // Speeds in m/s
         let wind_turbulence = vec![0.3, 0.5, 0.7, 0.4];
         let wind_direction = vec![
             Vec3Float::from((1.0, 0.0, 0.0)),  // East wind

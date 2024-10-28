@@ -1,3 +1,6 @@
+use core::fmt;
+use std::fmt::Display;
+
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub struct SmlColor {
     pub r: u8,
@@ -40,6 +43,13 @@ impl From<(u8, u8, u8, u8)> for SmlColor {
             b: values.2,
             a: values.3,
         }
+    }
+}
+
+impl Display for SmlColor {
+    /// Formats `SmlColor` as a string in the format `RGBA(r, g, b, a)`.
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "RGBA({}, {}, {}, {})", self.r, self.g, self.b, self.a)
     }
 }
 
