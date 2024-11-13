@@ -302,19 +302,20 @@ pub fn test_read_forms_many_threaded(form_count: u16, thread_count: usize) {
     for thread_id in 0..thread_count {
         let file_path = Arc::clone(&file_path);
         let completed_forms = Arc::clone(&completed_forms);
-
+    
         // Calculate the start and end form IDs for this thread
-        let start_form = (thread_id * forms_per_thread + 1) as u16;
-        let end_form = std::cmp::min(start_form + forms_per_thread as u16 - 1, form_count);
-
+        let start_form = ((thread_id as u32) * (forms_per_thread as u32) + 1) as u16;
+        let end_form = (std::cmp::min(start_form as u32 + forms_per_thread as u32 - 1, form_count as u32)) as u16;
+    
         let handle = thread::spawn(move || {
             // Collect the form IDs assigned to this thread
             let form_ids: Vec<FormID> = (start_form..=end_form).map(FormID::from).collect();
-
+    
             // Call the optimized batch read function
             match read_forms(&file_path, form_ids) {
                 Ok(forms) => {
                     // Update the completed_forms counter
+                    
                     completed_forms.fetch_add(forms.len(), Ordering::SeqCst);
                 }
                 Err(e) => {
@@ -327,9 +328,10 @@ pub fn test_read_forms_many_threaded(form_count: u16, thread_count: usize) {
                 }
             }
         });
-
+    
         handles.push(handle);
     }
+    
 
     // Main thread progress bar
     let total_forms = form_count as usize;
