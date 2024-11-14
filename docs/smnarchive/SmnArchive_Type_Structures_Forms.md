@@ -4,7 +4,7 @@ Forms are all structured with some shared Base Form fields, then additional fiel
 
 |Data Field|Data Type|Byte Size|Description|Reading Rules|Example|
 |---|---|---|---|---|---|
-|`form_id`|`FormID`|2|Unique identifier for the form, `u16` value.|Stored as `u16` (Big Endian).|`12345`|
+|`form_id`|`FormID`|2|Unique identifier for the form, `u16` value.|Stored as `u16` (Little Endian).|`12345`|
 |`form_type`|`FormType`|1|Enum representing the form type, `u8` value.|Stored as `u8` (`0 = STRING`, `1 = WORLD`, etc.).|`0` (for `STRING`)|
 |`form_name`|`StrSml`|1 + (1 * chars)|Small string (ASCII) representing the form name.|First byte (`u8`) for length, followed by ASCII characters.|`"form_name"`|
 
@@ -28,7 +28,7 @@ Forms are all structured with some shared Base Form fields, then additional fiel
 
 |Data Field|Data Type|Byte Size|Description|Reading Rules|Example|
 |---|---|---|---|---|---|
-|`form_id`|`FormID`|2|Unique identifier for the form, `u16` value.|Stored as `u16` (Big Endian).|`12345`|
+|`form_id`|`FormID`|2|Unique identifier for the form, `u16` value.|Stored as `u16` (Little Endian).|`12345`|
 |`form_type`|`FormType`|1|Enum representing the form type (`WORLD` = 1), `u8` value.|Stored as `u8`.|`1` (for `WORLD`)|
 |`form_name`|`StrSml`|1 + (1 * chars)|Small string (ASCII) representing the form name.|First byte (`u8`) for length, followed by ASCII characters.|`"world_form"`|
 |`world_name_id`|`GlobalID`|3|Global ID referencing the world name.|3 bytes for `GlobalID`.|`"00112345"`|
@@ -57,7 +57,7 @@ Forms are all structured with some shared Base Form fields, then additional fiel
 
 |Data Field|Data Type|Byte Size|Description|Reading Rules|Example|
 |---|---|---|---|---|---|
-|`form_id`|`FormID`|2|Unique identifier for the form, `u16` value.|Stored as `u16` (Big Endian).|`12345`|
+|`form_id`|`FormID`|2|Unique identifier for the form, `u16` value.|Stored as `u16` (Little Endian).|`12345`|
 |`form_type`|`FormType`|1|Enum representing the form type (`STRING` = 0), `u8` value.|Stored as `u8`.|`0` (for `STRING`)|
 |`form_name`|`StrSml`|1 + (1 * chars)|Small string (ASCII) representing the form name.|First byte (`u8`) for length, followed by ASCII characters.|`"string_form"`|
 |`lang_count`|`u8`|1|Number of languages associated with the form.|Stored as `u8`.|`2`|
@@ -84,7 +84,7 @@ Forms are all structured with some shared Base Form fields, then additional fiel
 
 |Data Field|Data Type|Byte Size|Description|Reading Rules|Example|
 |---|---|---|---|---|---|
-|`form_id`|`FormID`|2|Unique identifier for the form, `u16` value.|Stored as `u16` (Big Endian).|`12345`|
+|`form_id`|`FormID`|2|Unique identifier for the form, `u16` value.|Stored as `u16` (Little Endian).|`12345`|
 |`form_type`|`FormType`|1|Enum representing the form type (`REFGROUP` = 2), `u8` value.|Stored as `u8`.|`2` (for `REFGROUP`)|
 |`form_name`|`StrSml`|1 + (1 * chars)|Small string (ASCII) representing the form name.|First byte (`u8`) for length, followed by ASCII characters.|`"refgroup_form"`|
 |`references_count`|`u8`|1|Number of references in the group.|Stored as `u8`.|`3`|
@@ -111,7 +111,7 @@ Forms are all structured with some shared Base Form fields, then additional fiel
 
 | Data Field       | Data Type       | Byte Size             | Description                                                    | Reading Rules                                               | Example               |
 | ---------------- | --------------- | --------------------- | -------------------------------------------------------------- | ----------------------------------------------------------- | --------------------- |
-| `form_id`        | `FormID`        | 2                     | Unique identifier for the form, `u16` value.                   | Stored as `u16` (Big Endian).                               | `12345`               |
+| `form_id`        | `FormID`        | 2                     | Unique identifier for the form, `u16` value.                   | Stored as `u16` (Little Endian).                               | `12345`               |
 | `form_type`      | `FormType`      | 1                     | Enum representing the form type (`WORLDPART` = 3), `u8` value. | Stored as `u8`.                                             | `3` (for `WORLDPART`) |
 | `form_name`      | `StrSml`        | 1 + (1 * chars)       | Small string (ASCII) representing the form name.               | First byte (`u8`) for length, followed by ASCII characters. | `"world_part_form"`   |
 | `entities_count` | `u16`           | 2                     | Number of entities in this world part.                         | Stored as `u16`.                                            | `4`                   |
@@ -138,7 +138,7 @@ Forms are all structured with some shared Base Form fields, then additional fiel
 
 |Data Field|Data Type|Byte Size|Description|Reading Rules|Example|
 |---|---|---|---|---|---|
-|`form_id`|`FormID`|2|Unique identifier for the form, `u16` value.|Stored as `u16` (Big Endian).|`12345`|
+|`form_id`|`FormID`|2|Unique identifier for the form, `u16` value.|Stored as `u16` (Little Endian).|`12345`|
 |`form_type`|`FormType`|1|Enum representing the form type (`WEATHER` = 4), `u8` value.|Stored as `u8`.|`4` (for `WEATHER`)|
 |`form_name`|`StrSml`|1+(1*chars)|Small string (ASCII) representing the form name.|First byte (`u8`) for length, followed by ASCII chars.|`"weather_form"`|
 |`gi_lighting_color`|`SmlColor[4]`|4 * `SmlColor` byte size|Array of 4 lighting colors (Day, Dusk, Night, Dawn).|Stored as 4 `SmlColor` values.|`[(255,255,255), ...]`|
